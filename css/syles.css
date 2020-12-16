@@ -1,0 +1,76 @@
+/* If JavaScript isn't present, don't show the loader */
+.no-js #loader { display: none;  }
+.js #loader { display: block; position: absolute; left: 100px; top: 50px; }
+
+/* display gif while page loads */
+.se-pre-con {
+	position: fixed;
+	left: 0px;
+	top: 0px;
+	width: 100%;
+	height: 100%;
+	z-index: 9999;
+	background: url(https://smallenvelop.com/wp-content/uploads/2014/08/Preloader_11.gif) center no-repeat #fff;
+}
+
+#mapid {
+	top: 55px;
+	height: 94vh;
+	position: absolute;
+	width: 100%;
+	overflow: hidden;
+}
+
+* {
+	margin: 0px;
+	padding: 0px;
+	box-sizing: border-box;
+	color: #666666;
+}
+
+#title {
+	color: #f6f3ed;
+	font-size: x-large;
+	font-weight: 500;
+}
+
+.nav-item, .nav-link {
+	color: #f6f3ed;
+}
+
+#labelId {
+	color: #f6f3ed;
+}
+
+select {
+	color: #666666;
+	margin: 50px;
+	width: 200px;
+	padding: 5px 35px 5px 5px;
+	font-size: 16px;
+	border: 1px solid #CCC;
+	height: 34px;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	background: 96% / 15% no-repeat #f6f3ed;
+}
+
+.navbar-nav {
+	background-color: #666666;
+	margin-left: 5%;
+	max-width: 30%;
+	display: inline-block;
+}
+  
+select::-ms-expand {
+	  display: none; /* Remove default arrow in Internet Explorer 10 and 11 */
+}
+  
+/* Target Internet Explorer 9 to undo the custom arrow */
+@media screen and (min-width:0\0) {
+	select {
+		background: none\9;
+		padding: 5px\9;
+	}
+}

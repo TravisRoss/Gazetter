@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta http-equiv="Cache-control" content="no-cache">
+    <title>Leaflet Map</title> 
+    <link rel="stylesheet" href="Vendor/Leaflet/Leaflet/leaflet.css">
+    <link rel="stylesheet" href="css/syles.css">
+    <script src="Vendor/JQuery/jQuery.js"></script>
+    <link rel="stylesheet" href="Vendor/Bootstrap/css/bootstrap.min.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-md navbar-light fixed-top" role="navigation" style="background-color: #666666;">
+
+        <button id="toggleButton" class="navbar-toggler" data-toggle="collapse" data-target="#collapse_target">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="collapse_target">
+
+        <span id="title" class="navbar-text" >Gazetteer</span>
+        
+        <ul class="navbar-nav" id="navbar">
+            <label id="labelId" for="country" class="navbar-text">Select a country:</label>
+            <select id="selCountry" name="country" onchange="selectCountry()">
+            </select>
+        </ul>
+
+        </div>
+
+    </nav>
+    
+    <div id="mapid"></div>
+
+    <script src="Vendor/Leaflet/Leaflet/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.js"></script>
+    <script src="Vendor/Bootstrap/js/bootstrap.min.js"></script>
+    <script src="JS/app.js" type="text/javascript"></script>
+</body>
+<div class="se-pre-con"></div>
+</html>
