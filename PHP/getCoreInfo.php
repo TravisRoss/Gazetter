@@ -5,7 +5,7 @@
 
 	$executionStartTime = microtime(true) / 1000;
 
-	$url='https://api.opencagedata.com/geocode/v1/json?q=' + $_REQUEST['lat'] + '%2C+' + $_REQUEST['lng'] + '&key=61d11ab3f64b472c96c9a8665cbcfe34' + '&pretty=1';
+	$url='https://api.opencagedata.com/geocode/v1/json?q=' . $_REQUEST['lat'] . '%2C+' . $_REQUEST['lng'] . '&key=61d11ab3f64b472c96c9a8665cbcfe34' . '&pretty=1';
 	
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -23,7 +23,7 @@
 	$output['status']['description'] = "mission saved";
 	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
 
-	$output['data'] = $decode['rate']; //just take the rate object
+	$output['data'] = $decode['results'];	//just take the results object
 	
 	header('Content-Type: application/json; charset=UTF-8');
 

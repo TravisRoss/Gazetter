@@ -68,16 +68,15 @@ $(document).ready(function() {
                         success: function(response) { //response is the countryCode here
                             if(response.status.name == "ok"){
                                 console.log(response);
-                                console.log("country code returned successfully");
+                                console.log("Country Code load successful");
                                 
-                                //update the value of the select
-                                $('#selCountry').val = response['data'][0];
+                                //update the value of the select to the users location using the country code value ie if it's GB set it to United Kingdom
+                                
                                 
                             }
                         },
 
-                        error: function(textStatus, errorThrown) {
-                            alert("Status: " + textStatus);
+                        error: function(errorThrown) {
                             alert("Country code error: " + errorThrown);
                         }
 
@@ -109,8 +108,7 @@ $(document).ready(function() {
 
         },
 
-        error: function(textStatus, errorThrown) {
-            alert("Status: " + textStatus);
+        error: function(errorThrown) {
             alert("Error with code and name: " + errorThrown);
         }
 
@@ -131,12 +129,16 @@ function selectCountry(){
         },
         
         success: function(response) {
-
-            if (response.status.name == "ok") {
+            
+            if (response.status.name == "ok") {     //response is the coordinates here.
                 //should log the coordinates of the selected tag
                 console.log(response);
-                console.log("coordinaes returned successfully");
+                console.log("country borders loaded successfully");
 
+                //set the selected border on the map
+                L.geoJson(response['data']).setStyle().addTo(map);
+                
+                
                 //ajax call to a php routine that gets all of the APIs, one after another
                 $.ajax({
 
@@ -149,36 +151,31 @@ function selectCountry(){
                     },
 
                     success: function(response) {   //response is the core info here
-                        
+                            
                         if(response.status.name == "ok"){
-                            
+                                
                             console.log(response);
-                            console.log("core info returned successfully");
+                            console.log("Core Information load successful");
                             
-                            //update the value of the select
+                            //set the map view to the selected country
+                            
+                            //setView(<LatLng> center, <Number> zoom, <Zoom/pan options> options?)
                             
                         }
+                        
                     },
 
-                    error: function(textStatus, errorThrown){
-                        alert("Status: " + textStatus);
-                        alert("Error with the core info: " + errorThrown);
+                    error: function(errorThrown){
+                        alert("Core info loading failed: " + errorThrown);
                     }
 
-                });
+                });//end ajax call
 
-                //clear the map
-                
-
-                //set the selected border on the map
-                L.geoJson(response['data']).setStyle().addTo(map);
-                
             }  
 
         },
 
-        error: function(textStatus, errorThrown) {
-            alert("Status: " + textStatus);
+        error: function(errorThrown) {
             alert("Error: " + errorThrown);
         }
 
