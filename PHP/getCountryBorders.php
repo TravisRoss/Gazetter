@@ -1,8 +1,8 @@
 <?php
-    //need to returnn the feature, rather than the
+
     $executionStartTime = microtime(true);
 
-    //decode the file using json_decode, and that will give you an array of features
+    //decoding the file using json_decode gives an array of features
     $countryData = json_decode(file_get_contents("../countryBorders.geo.json"), true);
 
     $countryCode = $_REQUEST['isoCode'];

@@ -24,7 +24,7 @@ function onMapClick(e) {
         .setContent("You clicked the map at " + e.latlng.toString())
         .openOn(map);
 }
-map.once('click', onMapClick);
+map.on('click', onMapClick);
 
 
 //Populate the select with country names and country codes.
@@ -65,14 +65,15 @@ $(document).ready(function() {
                             lng: window.lng
                         },
 
-                        success: function(response) { //response is the countryCode here
+                        success: function(response) { //response is the countryCode here.
                             if(response.status.name == "ok"){
                                 console.log(response);
-                                console.log("Country Code load successful");
+                                console.log("Country Code");
                                 
-                                //update the value of the select to the users location using the country code value ie if it's GB set it to United Kingdom
-                                
-                                
+                                //update the select value
+
+                                //set default border. wil only work once we can update the select value
+
                             }
                         },
 
@@ -121,52 +122,50 @@ function selectCountry(){
 
     $.ajax({
 
-        url: 'PHP/getCoordinates.php',
+        url: 'PHP/getCoreInfo.php',
         type: 'GET',
         dataType: 'json',
         data: {
-            isoCode: $('#selCountry').val()
+            lat: window.lat,
+            lng: window.lng
         },
         
         success: function(response) {
             
-            if (response.status.name == "ok") {     //response is the coordinates here.
-                //should log the coordinates of the selected tag
+            if (response.status.name == "ok") {     
                 console.log(response);
-                console.log("country borders loaded successfully");
+                console.log("core info");
 
-                //set the selected border on the map
-                L.geoJson(response['data']).setStyle().addTo(map);
+                //display the core info
+
+                //set the map view to the selected country using lat and lng returned from getCoreInfo php routine
+                map.setView(response['data'][0]['geometry']);
                 
-                
-                //ajax call to a php routine that gets all of the APIs, one after another
                 $.ajax({
 
-                    url: 'PHP/getCoreInfo.php',
+                    url: 'PHP/getCountryBorders.php',
                     type: 'GET',
                     dataType: 'json',
                     data: { 
-                        lat: window.lat,
-                        lng: window.lng
+                        isoCode: $('#selCountry').val() 
                     },
 
-                    success: function(response) {   //response is the core info here
+                    success: function(response) { 
                             
                         if(response.status.name == "ok"){
-                                
+ 
                             console.log(response);
-                            console.log("Core Information load successful");
-                            
-                            //set the map view to the selected country
-                            
-                            //setView(<LatLng> center, <Number> zoom, <Zoom/pan options> options?)
+                            console.log("Country Borders");
+
+                            //set the selected border on the map
+                            L.geoJson(response['data']).setStyle().addTo(map);
                             
                         }
                         
                     },
 
                     error: function(errorThrown){
-                        alert("Core info loading failed: " + errorThrown);
+                        alert("Core info failed: " + errorThrown);
                     }
 
                 });//end ajax call
