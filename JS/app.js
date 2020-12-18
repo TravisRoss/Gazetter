@@ -26,6 +26,7 @@ function onMapClick(e) {
 }
 map.on('click', onMapClick);
 
+var border = null;
 
 //Populate the select with country names and country codes.
 $(document).ready(function() {
@@ -72,7 +73,7 @@ $(document).ready(function() {
                                 
                                 //update the select value
 
-                                //set default border. wil only work once we can update the select value
+                                //set default border. will only work once we can update the select value
 
                             }
                         },
@@ -137,9 +138,6 @@ function selectCountry(){
                 console.log("core info");
 
                 //display the core info
-
-                //set the map view to the selected country using lat and lng returned from getCoreInfo php routine
-                map.setView(response['data'][0]['geometry']);
                 
                 $.ajax({
 
@@ -158,8 +156,17 @@ function selectCountry(){
                             console.log("Country Borders");
 
                             //set the selected border on the map
-                            L.geoJson(response['data']).setStyle().addTo(map);
-                            
+                            if (map.hasLayer(border)) {
+                                map.removeLayer(border);    //remove the previous border each time a new one is selected
+                            }
+                        
+                            border = L.geoJson(response.data,{
+                                color: '#666666',
+                                weight: 2,
+                                opacity: 0.65
+                            }).addTo(map);         
+                        
+                            map.fitBounds(border.getBounds());
                         }
                         
                     },
