@@ -185,38 +185,96 @@ function selectCountry(){
                                     console.log(response);
                                 }
 
+                                //get wikipedia links using GeoNames API
+                                $.ajax({
+
+                                    url: 'PHP/getWikiLinks.php',
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    data: { 
+                                        north: response.data.north,
+                                        south: response.data.south,
+                                        east: response.data.east,
+                                        west: response.data.west
+                                    },
+
+                                    success: function(response) {
+
+                                        if(response.status.name == "ok"){
+                                            console.log("wiki links");
+                                            console.log(response);
+                                        }
+
+                                    },
+
+                                    error: function(errorThrown){
+                                        alert("error with wiki links: " + errorThrown);
+                                    }
+
+                                });
+
+                                //get earthquake activity using GeoNames API
+                                $.ajax({
+
+                                    url: 'PHP/getEarthquakeActivity.php',
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    data: { 
+                                        north: response.data.north,
+                                        south: response.data.south,
+                                        east: response.data.east,
+                                        west: response.data.west
+                                    },
+
+                                    success: function(response) {
+
+                                        if(response.status.name == "ok"){
+                                            console.log("earthquake activity");
+                                            console.log(response);
+                                        }
+
+                                    },
+
+                                    error: function(errorThrown){
+                                        alert("error with earthquake activity: " + errorThrown);
+                                    }
+
+                                });
+
+                                //get current exchange rate using the currencyCode returned from the getGeoData.php routine
+                                /*
+                                $.ajax({
+
+                                    url: 'PHP/getCurrentExchangeRate.php',
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    data: { 
+                                        currencyCode: response.data.currencyCode
+                                    },
+
+                                    success: function(response) {
+
+                                        if(response.status.name == "ok"){
+                                            console.log("exchange rate");
+                                            console.log(response);
+                                        }
+
+                                    },
+
+                                    error: function(errorThrown){
+                                        alert("error with exchange rate: " + errorThrown);
+                                    }
+
+                                });
+                                */
+
+
                             },
 
                             error: function(errorThrown){
                                 alert("error with geonames data: " + errorThrown);
                             }
                     
-                        });
-
-                        //get GeoNames Weather data
-                        $.ajax({
-
-                            url: 'PHP/getWeatherInfo.php',
-                            type: 'GET',
-                            dataType: 'json',
-                            data: { 
-                                lat: response.data.geometry.lat,
-                                lng: response.data.geometry.lng
-                            },
-
-                            success: function(response) {
-
-                                if(response.status.name == "ok"){
-                                    console.log("Geo weather data");
-                                    console.log(response);
-                                }
-
-                            },
-
-                            error: function(errorThrown){
-                                alert("error with weather data: " + errorThrown);
-                            }
-
                         });
 
                         //get GeoNames nearby POIs (points of interest)
@@ -245,8 +303,57 @@ function selectCountry(){
 
                         });
 
-                        
-                        
+                        //get weather using Open Weather API
+                        $.ajax({
+
+                            url: 'PHP/getWeather.php',
+                            type: 'GET',
+                            dataType: 'json',
+                            data: { 
+                                lat: response.data.geometry.lat,
+                                lng: response.data.geometry.lng
+                            },
+
+                            success: function(response) {
+
+                                if(response.status.name == "ok"){
+                                    console.log("weather");
+                                    console.log(response);
+                                }
+
+                            },
+
+                            error: function(errorThrown){
+                                alert("error with current weather: " + errorThrown);
+                            }
+
+                        });
+
+                        //get weather using Open Weather API
+                        $.ajax({
+
+                            url: 'PHP/getFlags.php',
+                            type: 'GET',
+                            dataType: 'json',
+                            data: { 
+                                isoCode: $('#selCountry').val(),
+                            },
+
+                            success: function(response) {
+
+                                if(response.status.name == "ok"){
+                                    console.log("flags");
+                                    console.log(response);
+                                }
+
+                            },
+
+                            error: function(errorThrown){
+                                alert("error with flags: " + errorThrown);
+                            }
+
+                        });
+
                     },
 
                     error: function(errorThrown){
