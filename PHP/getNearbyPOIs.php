@@ -5,9 +5,7 @@
 
 	$executionStartTime = microtime(true) / 1000;
 
-	$isoCode = $_REQUEST['isoCode'];
-	
-	$url = 'https://api.opencagedata.com/geocode/v1/json?q=' . $isoCode . '&key=61d11ab3f64b472c96c9a8665cbcfe34&language=en&pretty=1';
+	$url='http://api.geonames.org/findNearbyPOIsOSMJSON?lat=' . $_REQUEST['lat'] . '&lng=' . $_REQUEST['lng'] . '&username=travyalonso';
 	
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -17,26 +15,15 @@
 	$result=curl_exec($ch);
 
 	curl_close($ch);
-
-	$decode = json_decode($result,true);
-	
-	$countryData = null;
-	
-    //loop through the array of features and return the one feature that matches the country code (iso_a3).
-    foreach ($decode['results'] as $result) {
-        
-        if($isoCode == $result["components"]['ISO_3166-1_alpha-2']){   
-            $countryData = $result;
-        }
-
-    }
+	 
+	$decode = json_decode($result,true);	
 
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";
 	$output['status']['description'] = "mission saved";
 	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
 
-	$output['data'] = $countryData;
+	$output['data'] = $decode['poi'];
 	
 	header('Content-Type: application/json; charset=UTF-8');
 

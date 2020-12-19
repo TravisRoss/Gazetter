@@ -68,9 +68,9 @@ $(document).ready(function() {
 
                         success: function(response) { //response is the countryCode here.
                             if(response.status.name == "ok"){
+                                console.log("country code");
                                 console.log(response);
-                                console.log("Country Code");
-                                
+
                                 //update the select value
 
                                 //set default border. will only work once we can update the select value
@@ -118,56 +118,134 @@ $(document).ready(function() {
 
 });
 
+
+//use the name, iso_a2 and iso_a3 values returned from the getCountryBorders.php routine to call the OpenCage API
 //set map view to selected country and put a border around it
 function selectCountry(){
 
     $.ajax({
 
-        url: 'PHP/getCoreInfo.php',
+        url: 'PHP/getCountryBorders.php',
         type: 'GET',
         dataType: 'json',
         data: {
-            lat: window.lat,
-            lng: window.lng
+            isoCode: $('#selCountry').val() 
         },
         
         success: function(response) {
             
             if (response.status.name == "ok") {     
+                console.log("country borders");
                 console.log(response);
-                console.log("core info");
-
-                //display the core info
                 
+                //set the selected border on the map
+                if (map.hasLayer(border)) {
+                    map.removeLayer(border);    //remove any previous borders and set the new border
+                }
+            
+                border = L.geoJson(response.data,{
+                    color: '#666666',
+                    weight: 2,
+                    opacity: 0.65
+                }).addTo(map);         
+            
+                map.fitBounds(border.getBounds());
+
+                //ajax call to get the core info
                 $.ajax({
 
-                    url: 'PHP/getCountryBorders.php',
+                    url: 'PHP/getCoreInfo.php',
                     type: 'GET',
                     dataType: 'json',
                     data: { 
-                        isoCode: $('#selCountry').val() 
+                        isoCode: $('#selCountry').val(),
                     },
 
                     success: function(response) { 
                             
                         if(response.status.name == "ok"){
- 
+                            //log the country info matching the country code (isoCode) passed in
+                            console.log("core info");
                             console.log(response);
-                            console.log("Country Borders");
-
-                            //set the selected border on the map
-                            if (map.hasLayer(border)) {
-                                map.removeLayer(border);    //remove the previous border each time a new one is selected
-                            }
-                        
-                            border = L.geoJson(response.data,{
-                                color: '#666666',
-                                weight: 2,
-                                opacity: 0.65
-                            }).addTo(map);         
-                        
-                            map.fitBounds(border.getBounds());
                         }
+
+                        //get GeoNames Data
+                        $.ajax({
+
+                            url: 'PHP/getGeoData.php',
+                            type: 'GET',
+                            dataType: 'json',
+                            data: { 
+                                isoCode: $('#selCountry').val(),
+                            },
+
+                            success: function(response) {
+                                if(response.status.name == "ok"){
+                                    console.log("Geo data");
+                                    console.log(response);
+                                }
+
+                            },
+
+                            error: function(errorThrown){
+                                alert("error with geonames data: " + errorThrown);
+                            }
+                    
+                        });
+
+                        //get GeoNames Weather data
+                        $.ajax({
+
+                            url: 'PHP/getWeatherInfo.php',
+                            type: 'GET',
+                            dataType: 'json',
+                            data: { 
+                                lat: response.data.geometry.lat,
+                                lng: response.data.geometry.lng
+                            },
+
+                            success: function(response) {
+
+                                if(response.status.name == "ok"){
+                                    console.log("Geo weather data");
+                                    console.log(response);
+                                }
+
+                            },
+
+                            error: function(errorThrown){
+                                alert("error with weather data: " + errorThrown);
+                            }
+
+                        });
+
+                        //get GeoNames nearby POIs (points of interest)
+                        $.ajax({
+
+                            url: 'PHP/getNearbyPOIs.php',
+                            type: 'GET',
+                            dataType: 'json',
+                            data: { 
+                                lat: response.data.geometry.lat,
+                                lng: response.data.geometry.lng
+                            },
+
+                            success: function(response) {
+
+                                if(response.status.name == "ok"){
+                                    console.log("Geo Nearby POIs");
+                                    console.log(response);
+                                }
+
+                            },
+
+                            error: function(errorThrown){
+                                alert("error with nearby POIs: " + errorThrown);
+                            }
+
+                        });
+
+                        
                         
                     },
 
@@ -182,7 +260,7 @@ function selectCountry(){
         },
 
         error: function(errorThrown) {
-            alert("Error: " + errorThrown);
+            alert("country borders failed: " + errorThrown);
         }
 
     });
