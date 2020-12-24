@@ -19,9 +19,7 @@
 	curl_close($ch);
 
 	$decode = json_decode($result,true);
-	
     $isoCode = $_REQUEST['isoCode'];
-    
     $countryData = null;
 	
     //loop through the array of features and return the one feature that matches the country code (iso_a3).
