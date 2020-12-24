@@ -17,23 +17,13 @@
 	curl_close($ch);
 
     $decode = json_decode($result,true);
-    $currencyCode = $_REQUEST['currencyCode'];
-    $ratesData = null;
-
-    for($i = 0; $i < count($decode['rates']); $i++){
-
-        if($currencyCode == $decode.$rates.$i){
-            $ratesData = $decode.$rates.$i;
-        }
-
-    }
-
+   
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";
 	$output['status']['description'] = "mission saved";
 	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
 
-	$output['data'] = $ratesData;
+	$output['data'] = $decode['rates'];
 	
 	header('Content-Type: application/json; charset=UTF-8');
 
