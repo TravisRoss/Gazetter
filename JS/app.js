@@ -234,7 +234,7 @@ function selectCountry(){
                                     success: function(response) {
 
                                         if(response.status.name == "ok"){
-                                            console.log("wiki links");
+                                            console.log("wikipedia links");
                                             console.log(response);
                                         }
 
