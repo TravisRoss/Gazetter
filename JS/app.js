@@ -17,6 +17,7 @@ var OpenStreetMap_DE = L.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmd
 var popup = L.popup();
 
 //add a click event to display the lat and lng of wherever the user clicks
+
 function onMapClick(e) {
     popup
         .setLatLng(e.latlng)
@@ -25,27 +26,7 @@ function onMapClick(e) {
 }
 map.on('click', onMapClick);
 
-//declare global variables
 var border = null;
-var marker = null;
-var marker2 = null;
-
-//featureGroup
-var myfeatureGroup = L.featureGroup().addTo(map);
-
-/*
-var greenIcon = L.icon({
-    iconUrl: 'images/infoIcon.png',
-    shadowUrl: 'leaf-shadow.png',
-
-    iconSize:     [38, 95], // size of the icon
-    shadowSize:   [50, 64], // size of the shadow
-    iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
-    shadowAnchor: [4, 62],  // the same for the shadow
-    popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-});
-
-L.marker([51.5, -0.09], {icon: greenIcon}).addTo(map);*/
 
 //Populate the select with country names and country codes.
 $(document).ready(function() {
@@ -106,7 +87,25 @@ $(document).ready(function() {
             });
 
             } else {
-                console.log("Your browser does not support geolocation!");
+            console.log("Your browser does not support geolocation!");
+            }
+
+            //error callback
+            function show_error(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("Permission denied by user.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Location position unavailable.");
+                    break;
+                case error.TIMEOUT:
+                    alert("Request timeout.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("Unknown error.");
+                    break;
+            }
             }
 
         },
@@ -119,6 +118,8 @@ $(document).ready(function() {
 
 });
 
+
+//use the name, iso_a2 and iso_a3 values returned from the getCountryBorders.php routine to call the OpenCage API
 //set map view to selected country and put a border around it
 function selectCountry(){
 
@@ -137,8 +138,9 @@ function selectCountry(){
                 console.log("country borders");
                 console.log(response);
                 
+                //set the selected border on the map
                 if (map.hasLayer(border)) {
-                    map.removeLayer(border);    
+                    map.removeLayer(border);    //remove any previous borders and set the new border
                 }
             
                 border = L.geoJson(response.data,{
@@ -149,7 +151,6 @@ function selectCountry(){
             
                 map.fitBounds(border.getBounds());
 
-                
                 //ajax call to get the core info
                 $.ajax({
 
@@ -161,33 +162,11 @@ function selectCountry(){
                     },
 
                     success: function(response) { 
-
+                            
                         if(response.status.name == "ok"){
-
+                            //log the country info matching the country code (isoCode) passed in
                             console.log("core info");
                             console.log(response);
-
-                            window.lat = response.data.geometry.lat;
-                            window.lat = response.data.geometry.lat;
-
-                            marker = L.marker([response.data.geometry.lat, response.data.geometry.lng]);
-
-                            marker.bindPopup("<h1>" + response.data.components.country + "</h1>" + 
-                            "<br>Currency: " + response.data.annotations.currency.name +
-                            "<br>Subunit: " + response.data.annotations.currency.subunit +  
-                            "<br>Symbol: " + response.data.annotations.currency.symbol +
-                            "<br>Country code: " + response.data.annotations.currency.iso_code +
-                            "<br>Drive on: " + response.data.annotations.roadinfo.drive_on + 
-                            "<br>Speed in: " + response.data.annotations.roadinfo.speed_in +
-                            "<br>Timezone Offset: " + response.data.annotations.timezone.offset_string +
-                            "<br>Timezone: " + response.data.annotations.timezone.short_name +
-                            "<br>Continent: " + response.data.components.continent +
-                            "<br>Political union: " + response.data.components.political_union +
-                            "<br>Latitude: " + response.data.geometry.lat +
-                            "<br>Longitude" + response.data.geometry.lng).openPopup();
-
-                            myfeatureGroup.addLayer(marker);
-
                         }
 
                         //get GeoNames Data
@@ -204,18 +183,6 @@ function selectCountry(){
                                 if(response.status.name == "ok"){
                                     console.log("Geo data");
                                     console.log(response);
-
-                                    marker2 = L.marker([response.data.geometry.lat, response.data.geometry.lng]);
-
-                                    marker2.bindPopup(
-                                    "<br>Capital: "  + response.data.capital +
-                                    "<br>Area in Square Kilometres: " + response.data.areaInSqKm + 
-                                    "<br>Languages: " + response.data.languages +
-                                    "<br>Population" + response.data.population
-                                    ).openPopup();
-
-                                    myfeatureGroup.addLayer(marker2);
-
                                 }
 
                                 //get wikipedia links using GeoNames API
@@ -275,6 +242,7 @@ function selectCountry(){
                                 });
 
                                 //get current exchange rate using the currencyCode returned from the getGeoData.php routine
+                                /*
                                 $.ajax({
 
                                     url: 'PHP/getCurrentExchangeRate.php',
@@ -298,14 +266,16 @@ function selectCountry(){
                                     }
 
                                 });
-                                
+                                */
+
+
                             },
 
                             error: function(errorThrown){
                                 alert("error with geonames data: " + errorThrown);
                             }
                     
-                        }); 
+                        });
 
                         //get GeoNames nearby POIs (points of interest)
                         $.ajax({
@@ -359,6 +329,7 @@ function selectCountry(){
 
                         });
 
+                        //get weather using Open Weather API
                         $.ajax({
 
                             url: 'PHP/getFlags.php',
