@@ -5,7 +5,10 @@
 
 	$executionStartTime = microtime(true) / 1000;
 
-	$url='https://openexchangerates.org/api/latest.json?app_id=5dc53117c0834e53ab4bfd404e4f79c0';
+	$currencyCode = $_REQUEST['currencyCode'];
+
+	//$url='https://openexchangerates.org/api/latest.json?app_id=5dc53117c0834e53ab4bfd404e4f79c0';
+	$url = 'https://api.exchangeratesapi.io/latest?base=' . $currencyCode;
 
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -16,7 +19,7 @@
 
 	curl_close($ch);
 
-    $decode = json_decode($result,true);
+	$decode = json_decode($result,true);
    
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";

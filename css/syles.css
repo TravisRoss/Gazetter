@@ -74,3 +74,21 @@ select::-ms-expand {
 		padding: 5px\9;
 	}
 }
+
+.flag {
+	height: 100%;
+	width: 100%;
+}
+
+table {
+    border:1px solid black;
+    border-collapse: collapse;
+}
+
+td {
+    border:1px solid black;
+}
+
+th {
+	text-align: center;
+}

@@ -6,8 +6,10 @@
 	$executionStartTime = microtime(true) / 1000;
 
 	$isoCode = $_REQUEST['isoCode'];
+	$countryName = $_REQUEST['name'];
+	$newCountryName = str_replace(' ', '%20', $countryName);
 	
-	$url = 'https://api.opencagedata.com/geocode/v1/json?q=' . $isoCode . '&key=61d11ab3f64b472c96c9a8665cbcfe34&language=en&pretty=1';
+	$url = 'https://api.opencagedata.com/geocode/v1/json?q=' . $isoCode . '%2C%20' . $newCountryName . '&key=61d11ab3f64b472c96c9a8665cbcfe34&language=en&pretty=1';
 	
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);

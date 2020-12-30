@@ -1,4 +1,6 @@
 <?php
+	//need to return the lat and lng of each feature to be put on the map at that location (lat and lon)
+	//also need to return the current weather. (current)
 
 	ini_set('display_errors', 'On');
 	error_reporting(E_ALL);
