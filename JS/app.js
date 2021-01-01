@@ -17,21 +17,17 @@ var OpenStreetMap_DE = L.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmd
 var popup = L.popup();
 
 //add a click event to display the lat and lng of wherever the user clicks
+/*
 function onMapClick(e) {
     popup
         .setLatLng(e.latlng)
         .setContent("You clicked the map at " + e.latlng.toString())
         .openOn(map);
 }
-map.on('click', onMapClick);
+map.on('click', onMapClick);*/
 
 //declare global variables
 var border = null;
-var countryDataMarker = null;
-var wikipediaLinks = null;
-
-
-
 
 //featureGroup
 var myfeatureGroup = L.featureGroup().addTo(map);
@@ -80,14 +76,7 @@ $(document).ready(function() {
                                 console.log("country code");
                                 console.log(response);
 
-                                //set default select value
-                                /*var defaultCountry = response['data'];
-                                $('#selCountry').val(defaultCountry);*/
                                 document.getElementById('selCountry').value = response.data;
-
-
-                                //set default border. will only work once we can update the select value
-
                             }
                         },
 
@@ -113,7 +102,7 @@ $(document).ready(function() {
 
 });
 
-//set map view to selected country and put a border around it
+//run each time a country is selected from the dropdown
 function selectCountry(){
 
     $.ajax({
@@ -146,6 +135,72 @@ function selectCountry(){
             
                 map.fitBounds(border.getBounds());
 
+                //ajax call to return the country flag url and currency name
+                $.ajax({
+
+                    url: 'PHP/getFlags.php',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: { 
+                        isoCode: $('#selCountry').val(),
+                    },
+
+                    success: function(response) {
+
+                        if(response.status.name == "ok"){
+                            console.log("flags");
+                            console.log(response);
+
+                            try {
+                                window.flagUrl = response.data.flag;
+                                window.currencyName =  response.data.currencies[0].name;
+                            } catch (err){
+                                console.log("error with flag url or currency name: " + err);
+                            }
+                            
+
+                            /*
+                            countryDataMarker.bindPopup("<h1>" + "<img src='" + window.flagUrl + "' class='flag'/>" + window.country + "</h1>" +
+                            "<br>Currency: " + window.currencyName +
+                            "<br>Subunit: " + window.currencySubunit +  
+                            "<br>Symbol: " + window.currencySymbol +
+                            "<br>ISO code: " + window.isoCode +
+                            "<br>Drive on: " + window.driveOn + 
+                            "<br>Speed in: " + window.speedIn +
+                            "<br>Timezone: " + window.timezoneShortName +
+                            "<br>Continent: " + window.continent +
+                            "<br>Political union: " + window.politicalUnion +
+                            "<br>Latitude: " + window.lat +
+                            "<br>Longitude" + window.lng +
+                            "<br>Capital: " + window.capital +
+                            "<br>Population: " + window.population +
+                            "<br>Current Exchange Rate: " + window.exchangeRate +
+                            "<br><br><table class='table'><th colspan='2'>Current Weather</th><tr><td>Clouds</td><td>" + window.clouds + "</td></tr>" +
+                            "<tr><td>Dew Point</td><td>" + window.dewPoint + "</td></tr>" +
+                            "<tr><td>DT</td><td>" + window.dt + "</td></tr>" +
+                            "<tr><td>Feels Like</td><td>" + window.feelsLike + "</td></tr>" +
+                            "<tr><td>Humidity</td><td>" + window.humidity + "</td></tr>" +
+                            "<tr><td>Pressure</td><td>" + window.pressure + "</td></tr>" +
+                            "<tr><td>Sunrise</td><td>" + window.sunrise + "</td></tr>" +
+                            "<tr><td>Sunset</td><td>" + window.sunset + "</td></tr>" +
+                            "<tr><td>Temperature</td><td>" + window.temp + "</td></tr>" +
+                            "<tr><td>UVI</td><td>" + window.uvi + "</td></tr>" +
+                            "<tr><td>Visibility</td><td>" + window.visibility + "</td></tr>" +
+                            "<tr><td>Description</td><td>" + window.description + "</td></tr>" +
+                            "<tr><td>Main</td><td>" + window.main + "</td></tr>" + "</table>"
+                            ).openPopup();*/
+
+                            
+                        }
+
+                    },
+
+                    error: function(errorThrown){
+                        alert("error with flags: " + errorThrown);
+                    }
+
+                });
+                
                 
                 //ajax call to get the core info
                 $.ajax({
@@ -173,20 +228,25 @@ function selectCountry(){
                             window.lat = response.data.geometry.lat;
                             window.lng = response.data.geometry.lng;
 
-                            marker = L.marker([window.lat, window.lng]);
+                            //store core info as global variables
+                            try{
+                                window.country = response.data.components.country;
+                                window.currencyName =  response.data.annotations.currency.name;
+                                window.currencySubunit = response.data.annotations.currency.subunit;
+                                window.currencySymbol = response.data.annotations.currency.symbol;
+                                window.isoCode = response.data.annotations.currency.iso_code;
+                                window.driveOn = response.data.annotations.roadinfo.drive_on; 
+                                window.speedIn = response.data.annotations.roadinfo.speed_in;
+                                window.timeOffset = response.data.annotations.timezone.offset_string ;
+                                window.timezoneShortName = response.data.annotations.timezone.short_name;
+                                window.continent = response.data.components.continent;
+                                window.politicalUnion = response.data.components.political_union;
+                            } catch (err){
+                                console.log(err.message());
+                            }
+                            
 
-                            //store core info as global variables to be used later in the marker on the map
-                            window.country = response.data.components.country;
-                            window.currencyName =  response.data.annotations.currency.name;
-                            window.currencySubunit = response.data.annotations.currency.subunit;
-                            window.currencySymbol = response.data.annotations.currency.symbol;
-                            window.isoCode = response.data.annotations.currency.iso_code;
-                            window.driveOn = response.data.annotations.roadinfo.drive_on; 
-                            window.speedIn = response.data.annotations.roadinfo.speed_in;
-                            window.timeOffset = response.data.annotations.timezone.offset_string ;
-                            window.timezoneShortName = response.data.annotations.timezone.short_name;
-                            window.continent = response.data.components.continent;
-                            window.politicalUnion = response.data.components.political_union;
+                            
                         }
 
                         //get GeoNames Data
@@ -204,9 +264,33 @@ function selectCountry(){
                                     console.log("Geo data");
                                     console.log(response);
 
-                                    //store the capital and population as global variables to be used later
                                     window.capital = response.data.capital;
                                     window.population = response.data.population;
+
+                                    //set the modal title to the name  of the country that is clicked
+                                    document.getElementById("coreInfoTitle").innerHTML = window.country;
+
+                                    //set the modal content to the core info for the country selected
+                                    document.getElementById("coreInfoBody").innerHTML = 
+                                    "<img src='" + window.flagUrl + "' class='img-fluid'/>" +
+                                    "<br><table class='table'>" +
+                                    "<tr><td>Capital</td><td>" + window.capital + "</td></tr>" +
+                                    "<tr><td>Population</td><td>" + window.population + "</td></tr>" +
+                                    "<tr><td>Continent</td><td>" + window.continent + "</td></tr>" +
+                                    "<tr><td>Timezone</td><td>" + window.timezoneShortName + "</td></tr>" +
+                                    "<tr><td>Political Union</td><td>" + window.politicalUnion + "</td></tr>" +
+                                    "<tr><td>ISO Code</td><td>" + window.isoCode + "</td></tr>" +
+                                    "<tr><td>Currency Name</td><td>" + window.currencyName + "</td></tr>" +
+                                    "<tr><td>Currency Symbol</td><td>" + window.currencySymbol + "</td></tr>" +
+                                    "<tr><td>Currency Subunit</td><td>" + window.currencySubunit + "</td></tr>" +
+                                    "<tr><td>Drive On</td><td>" + window.driveOn + "</td></tr>" +
+                                    "<tr><td>Speed In</td><td>" + window.speedIn + "</td></tr>" + "</table>";
+
+                                    //show the modal when the country border is clicked
+                                    border.on('click', function () {
+                                        $('#exampleModal').modal('show');
+                                    })
+                                        
                                 }
 
                                 //get wikipedia links using GeoNames API
@@ -219,7 +303,8 @@ function selectCountry(){
                                         north: response.data.north,
                                         south: response.data.south,
                                         east: response.data.east,
-                                        west: response.data.west
+                                        west: response.data.west,
+                                        isoCode: window.isoCode
                                     },
 
                                     success: function(response) {
@@ -227,16 +312,6 @@ function selectCountry(){
                                         if(response.status.name == "ok"){
                                             console.log("wikipedia links");
                                             console.log(response);
-
-                                            wikipediaLinks = L.geoJson(response.data,{
-                                                color: '#666666',
-                                                weight: 2,
-                                                opacity: 0.65
-                                            }).addTo(map);         
-                                        
-                                            
-
-                                            window.wikiLinks = response.data;
                                         }
 
                                     },
@@ -265,7 +340,6 @@ function selectCountry(){
                                         if(response.status.name == "ok"){
                                             console.log("earthquake activity");
                                             console.log(response);
-
                                             window.earthquakeData = response.data;
                                         }
 
@@ -291,7 +365,6 @@ function selectCountry(){
                                         if(response.status.name == "ok"){
                                             console.log("exchange rate");
                                             console.log(response);
-
                                             window.exchangeRate = "USD: " + response.data.USD + " Euro: " + response.data.EUR + " GBP: " + response.data.GBP + " AUD: " + response.data.AUD + 
                                             " Yen: " + response.data.JPY;
                                         }
@@ -312,7 +385,7 @@ function selectCountry(){
                     
                         }); 
 
-                        //get GeoNames nearby POIs (points of interest)
+                        //get nearby POIs from GeoNames API (points of interest)
                         $.ajax({
 
                             url: 'PHP/getNearbyPOIs.php',
@@ -328,7 +401,6 @@ function selectCountry(){
                                 if(response.status.name == "ok"){
                                     console.log("Geo Nearby POIs");
                                     console.log(response);
-
                                     window.nearbyPoi = response.data;
                                 }
 
@@ -356,7 +428,6 @@ function selectCountry(){
                                 if(response.status.name == "ok"){
                                     console.log("weather");
                                     console.log(response);
-
                                     window.weather = response.data.current;
 
                                     //declare weather variables to put on the marker with the rest of the core info about each country
@@ -373,60 +444,6 @@ function selectCountry(){
                                     window.visibility = response.data.current.visibility;
                                     window.description = response.data.current.weather[0].description;
                                     window.dewPoint = response.data.current.weather[0].main;
-
-                                    function onEachFeature(feature, layer) {
-                                        // does this feature have a property named popupContent?
-                                        if (feature.properties && feature.properties.popupContent) {
-                                            layer.bindPopup(feature.properties.popupContent);
-                                        }
-                                    }
-
-                                    /*
-                                    var geojsonFeature = {
-                                        
-                                        "type": "FeatureCollection",
-                                        "features": [
-                                            {
-                                            "type": "Feature",
-                                            "geometry": {
-                                                "type": "Point",
-                                                "coordinates": [ -12.35, 17.35 ]
-                                            },
-                                            "properties": {
-                                                "wikipediaUrl": response.data[0].wikipediaUrl.toString(),
-                                                "name": response.data[0].title.toString()
-                                            }
-                                            },
-                                            {
-                                            "type": "Feature",
-                                            "geometry": {
-                                                "type": "Point",
-                                                "coordinates": [ -92.7298, 30.7373 ]
-                                            },
-                                            "properties": {
-                                                "name": "Martha",
-                                                "gender": "Female"
-                                            }
-                                            },
-                                            {
-                                            "type": "Feature",
-                                            "geometry": {
-                                                "type": "Point",
-                                                "coordinates": [ -91.1473, 30.4711 ]
-                                            },
-                                            "properties": {
-                                                "name": "Zelda",
-                                                "gender": "Female"
-                                            }
-                                            }
-                                        ]
-                                        
-                                    };
-
-                                    L.geoJSON(geojsonFeature, {
-                                        onEachFeature: onEachFeature
-                                    }).addTo(map);
-                                    */
                                 }
 
                             },
@@ -437,90 +454,7 @@ function selectCountry(){
 
                         });
 
-
-                        //get flag info including the flag URL for each country
-                        $.ajax({
-
-                            url: 'PHP/getFlags.php',
-                            type: 'GET',
-                            dataType: 'json',
-                            data: { 
-                                isoCode: $('#selCountry').val(),
-                            },
-
-                            success: function(response) {
-
-                                if(response.status.name == "ok"){
-                                    console.log("flags");
-                                    console.log(response);
-
-                                    window.flagUrl = response.data.flag;
-                                    window.currencyName =  response.data.currencies[0].name;
-                                    
-                                    /*
-                                    //get the flag
-                                    var imageUrl = response.data.flag;
-                                    
-                                    //style the flag
-                                    var flagIcon = L.icon({
-                                        iconUrl: imageUrl,
-                                        iconSize: [60, 60],
-                                    });
-
-                                    //create the flag marker
-                                    marker2 = L.marker([window.lat, window.lng]).addTo(map);
-                                    //, {icon: flagIcon} 
-
-                                    marker2.bindPopup( "<img src='" + imageUrl + "' class='flag'/>").addTo(map);*/
-
-                                    if (map.hasLayer(countryDataMarker)) {
-                                        map.removeLayer(countryDataMarker);    
-                                    }
-
-                                    countryDataMarker = L.marker([window.lat, window.lng]);
-
-                                    countryDataMarker.bindPopup("<h1>" + "<img src='" + window.flagUrl + "' class='flag'/>" + window.country + "</h1>" +
-                                    "<br>Currency: " + window.currencyName +
-                                    "<br>Subunit: " + window.currencySubunit +  
-                                    "<br>Symbol: " + window.currencySymbol +
-                                    "<br>ISO code: " + window.isoCode +
-                                    "<br>Drive on: " + window.driveOn + 
-                                    "<br>Speed in: " + window.speedIn +
-                                    "<br>Timezone Offset: " + window.timeOffset +
-                                    "<br>Timezone: " + window.timezoneShortName +
-                                    "<br>Continent: " + window.continent +
-                                    "<br>Political union: " + window.politicalUnion +
-                                    "<br>Latitude: " + window.lat +
-                                    "<br>Longitude" + window.lng +
-                                    "<br>Capital: " + window.capital +
-                                    "<br>Population: " + window.population +
-                                    "<br>Current Exchange Rate: " + window.exchangeRate +
-                                    "<br><br><table class='table'><th>Current Weather</th><tr><td>Clouds</td><td>" + window.clouds + "</td></tr>" +
-                                    "<tr><td>Dew Point</td><td>" + window.dewPoint + "</td></tr>" +
-                                    "<tr><td>DT</td><td>" + window.dt + "</td></tr>" +
-                                    "<tr><td>Feels Like</td><td>" + window.feelsLike + "</td></tr>" +
-                                    "<tr><td>Humidity</td><td>" + window.humidity + "</td></tr>" +
-                                    "<tr><td>Pressure</td><td>" + window.pressure + "</td></tr>" +
-                                    "<tr><td>Sunrise</td><td>" + window.sunrise + "</td></tr>" +
-                                    "<tr><td>Sunset</td><td>" + window.sunset + "</td></tr>" +
-                                    "<tr><td>Temperature</td><td>" + window.temp + "</td></tr>" +
-                                    "<tr><td>UVI</td><td>" + window.uvi + "</td></tr>" +
-                                    "<tr><td>Visibility</td><td>" + window.visibility + "</td></tr>" +
-                                    "<tr><td>Description</td><td>" + window.description + "</td></tr>" +
-                                    "<tr><td>Main</td><td>" + window.main + "</td></tr>" + "</table>"
-                                    ).openPopup();
-
-                                    myfeatureGroup.addLayer(countryDataMarker);
-                                    
-                                }
-
-                            },
-
-                            error: function(errorThrown){
-                                alert("error with flags: " + errorThrown);
-                            }
-
-                        });
+                        
 
                     },
 
