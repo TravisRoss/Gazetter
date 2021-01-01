@@ -25,14 +25,33 @@ var myIcon = L.icon({
     popupAnchor: [0, -14]
 });
 
-var markerClusters = L.markerClusterGroup();
+//wiki icon
+var wikiIcon = L.icon({
+    iconUrl: 'images/wikiIcon.png',
+    iconRetinaUrl: 'images/wikiIcon.png',
+    iconSize: [29, 24],
+    iconAnchor: [9, 21],
+    popupAnchor: [0, -14]
+});
+
+//POI icon
+var poiIcon = L.icon({
+    iconUrl: 'images/poi.png',
+    iconRetinaUrl: 'images/poi.png',
+    iconSize: [29, 24],
+    iconAnchor: [9, 21],
+    popupAnchor: [0, -14]
+});
 
 //declare global variables
+var markerClusterGroup = L.markerClusterGroup();
 var border = null;
 
-//featureGroup
-var myfeatureGroup = L.featureGroup().addTo(map);
-var weatherFeatureGroup = L.featureGroup().addTo(map);
+//featureGroups
+var earthquakeFeatureGroup = L.featureGroup().addTo(map);
+var wikiLinksFeatureGroup = L.featureGroup().addTo(map);
+var nearbyPOIsFeatureGroup = L.featureGroup().addTo(map);
+
 
 //Populate the select with country names and country codes.
 $(document).ready(function() {
@@ -243,7 +262,7 @@ function selectCountry(){
                                 window.continent = response.data.components.continent;
                                 window.politicalUnion = response.data.components.political_union;
                             } catch (err){
-                                console.log(err.message());
+                                console.log(err);
                             }
 
                         }
@@ -311,12 +330,42 @@ function selectCountry(){
                                         if(response.status.name == "ok"){
                                             console.log("wikipedia links");
                                             console.log(response);
+
+                                            //clear any previous markers and layers
+                                            markerClusterGroup.clearLayers();
+
+                                            //put the data on the map as markers with popups
+                                            for (var i = 0; i < response.data.length; ++i) {
+                                                //put the popup earthquake data in a table
+                                                
+                                                var popup = "<table class='table'>" +
+                                                "<tr><td>Summary</td><td>" + response.data[i].summary + "</td></tr>" +
+                                                "<tr><td>URL</td><td>" + response.data[i].wikipediaUrl + "</td></tr>" +
+                                                "<tr><td>Title</td><td>" + response.data[i].title + "</td></tr>" +
+                                                "<tr><td>Type</td><td>" + response.data[i].feature + "</td></tr>" + "</table>";
+
+                                                //if the wiik link response contains an image, add it to the popup
+                                                if(response.data[i].thumbnailImg){
+                                                    popup += "<img src='" + response.data[i].thumbnailImg + "' class='img-fluid'/>";
+                                                }
+
+                                                var m = L.marker( [response.array[i].lat, response.array[i].lng], {icon: wikiIcon} )
+                                                    .bindPopup( popup );
+                                                
+                                                markerClusterGroup.addLayer(m);
+                                            }
+                                            
+                                            wikiLinksFeatureGroup.addLayer(markerClusterGroup);
+
+                                            
+
+
                                         }
 
                                     },
 
                                     error: function(errorThrown){
-                                        alert("error with wiki links: " + errorThrown);
+                                        console.log("error with wiki links: " + errorThrown);
                                     }
 
                                 });
@@ -342,8 +391,7 @@ function selectCountry(){
                                             //window.earthquakeData = response.data;
 
                                             //put the data on the map as markers with popups
-                                            for (var i = 0; i < response.data.length; ++i)
-                                                {
+                                            for (var i = 0; i < response.data.length; ++i) {
                                                 //put the popup earthquake data in a table
                                                 var popup = "<table class='table'>" +
                                                 "<tr><td>Magnitude</td><td>" + response.data[i].magnitude + "</td></tr>" +
@@ -353,10 +401,11 @@ function selectCountry(){
                                                 var m = L.marker( [response.array[i].lat, response.array[i].lng], {icon: myIcon} )
                                                     .bindPopup( popup );
                                                 
-                                                markerClusters.addLayer( m );
-                                                }
-                                                
-                                            map.addLayer( markerClusters );
+                                                markerClusterGroup.addLayer(m);
+                                            }
+                                            
+                                            earthquakeFeatureGroup.addLayer(markerClusterGroup);
+                                            
                                         }
 
                                     },
@@ -417,7 +466,23 @@ function selectCountry(){
                                 if(response.status.name == "ok"){
                                     console.log("Geo Nearby POIs");
                                     console.log(response);
-                                    window.nearbyPoi = response.data;
+
+                                    //put the data on the map as markers with popups
+                                    for (var i = 0; i < response.data.length; ++i) {
+                                        //put the popup earthquake data in a table
+                                        var popup = "<table class='table'>" +
+                                        "<tr><td>Name</td><td>" + response.data[i].name + "</td></tr>" +
+                                        "<tr><td>Distance</td><td>" + response.data[i].distance + "</td></tr>" +
+                                        "<tr><td>Type</td><td>" + response.data[i].typeClass + "</td></tr>" +
+                                        "<tr><td>Type Name</td><td>" + response.data[i].typeName + "</td></tr>" + "</table>";
+                                        
+                                        var m = L.marker( [response.array[i].lat, response.array[i].lng], {icon: poiIcon} )
+                                            .bindPopup(popup);
+                                        
+                                        markerClusterGroup.addLayer(m);
+                                    }
+                                    
+                                    nearbyPOIsFeatureGroup.addLayer(markerClusterGroup);
                                 }
 
                             },
