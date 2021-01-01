@@ -16,15 +16,16 @@ var OpenStreetMap_DE = L.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmd
 }).addTo(map);
 var popup = L.popup();
 
-//add a click event to display the lat and lng of wherever the user clicks
-/*
-function onMapClick(e) {
-    popup
-        .setLatLng(e.latlng)
-        .setContent("You clicked the map at " + e.latlng.toString())
-        .openOn(map);
-}
-map.on('click', onMapClick);*/
+//earthquake icon
+var myIcon = L.icon({
+    iconUrl: 'images/earthquake.jpg',
+    iconRetinaUrl: 'images/earthquake.jpg',
+    iconSize: [29, 24],
+    iconAnchor: [9, 21],
+    popupAnchor: [0, -14]
+});
+
+var markerClusters = L.markerClusterGroup();
 
 //declare global variables
 var border = null;
@@ -244,9 +245,7 @@ function selectCountry(){
                             } catch (err){
                                 console.log(err.message());
                             }
-                            
 
-                            
                         }
 
                         //get GeoNames Data
@@ -340,7 +339,24 @@ function selectCountry(){
                                         if(response.status.name == "ok"){
                                             console.log("earthquake activity");
                                             console.log(response);
-                                            window.earthquakeData = response.data;
+                                            //window.earthquakeData = response.data;
+
+                                            //put the data on the map as markers with popups
+                                            for (var i = 0; i < response.data.length; ++i)
+                                                {
+                                                //put the popup earthquake data in a table
+                                                var popup = "<table class='table'>" +
+                                                "<tr><td>Magnitude</td><td>" + response.data[i].magnitude + "</td></tr>" +
+                                                "<tr><td>Depth</td><td>" + response.data[i].depth + "</td></tr>" +
+                                                "<tr><td>Date and time</td><td>" + response.data[i].datetime + "</td></tr>" + "</table>";
+                                                
+                                                var m = L.marker( [response.array[i].lat, response.array[i].lng], {icon: myIcon} )
+                                                    .bindPopup( popup );
+                                                
+                                                markerClusters.addLayer( m );
+                                                }
+                                                
+                                            map.addLayer( markerClusters );
                                         }
 
                                     },
