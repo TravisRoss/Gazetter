@@ -17,7 +17,18 @@
 
 	curl_close($ch);
 
-	$decode = json_decode($result,true);
+    $countryName = $_REQUEST['countryName'];
+    $decode = json_decode($result,true);
+    $countryData = null;
+    
+    //loop through the array of features and return the one feature that matches the country code (iso_a3).
+    foreach ($decode as $feature) {
+        
+        if($countryName == $feature["country"]){   
+            $countryData = $feature;
+        }
+
+    }
 
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";
@@ -25,7 +36,7 @@
 	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
 
     //$output['data'] = $decode['result'];
-	$output['data'] = $decode;
+	$output['data'] = $countryData;
 	
 	header('Content-Type: application/json; charset=UTF-8');
 

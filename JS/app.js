@@ -453,11 +453,11 @@ function selectCountry(){
                                             console.log("Covid data");
                                             console.log(response);
                                             
-                                            window.infected = response.data[i].infected;
-                                            window.deceased = response.data[i].deceased;
-                                            window.recovered = response.data[i].recovered;
-                                            window.lastUpdatedApify = response.data[i].lastUpdatedApify;
-                                            window.sourceUrl = response.data[i].sourceUrl;
+                                            window.infected = response.data.infected;
+                                            window.deceased = response.data.deceased;
+                                            window.recovered = response.data.recovered;
+                                            window.lastUpdatedApify = response.data.lastUpdatedApify;
+                                            window.sourceUrl = response.data.sourceUrl;
 
                                         }
 
