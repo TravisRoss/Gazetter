@@ -16,28 +16,34 @@ var OpenStreetMap_DE = L.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmd
 }).addTo(map);
 var popup = L.popup();
 
-//earthquake icon
-var myIcon = L.icon({
-    iconUrl: 'images/earthquake.jpg',
-    iconRetinaUrl: 'images/earthquake.jpg',
+//make my icons
+var earthquakeIcon = L.icon({
+    iconUrl: 'images/earthquake.png',
+    iconRetinaUrl: 'images/earthquake.png',
     iconSize: [29, 24],
     iconAnchor: [9, 21],
     popupAnchor: [0, -14]
 });
 
-//wiki icon
 var wikiIcon = L.icon({
     iconUrl: 'images/wikiIcon.png',
     iconRetinaUrl: 'images/wikiIcon.png',
     iconSize: [29, 24],
     iconAnchor: [9, 21],
-    popupAnchor: [0, -14]
+    popupAnchor: [0, -14],
 });
 
-//POI icon
 var poiIcon = L.icon({
     iconUrl: 'images/poi.png',
     iconRetinaUrl: 'images/poi.png',
+    iconSize: [29, 24],
+    iconAnchor: [9, 21],
+    popupAnchor: [0, -14]
+});
+
+var weatherIcon = L.icon({
+    iconUrl: 'images/weather.png',
+    iconRetinaUrl: 'images/weather.png',
     iconSize: [29, 24],
     iconAnchor: [9, 21],
     popupAnchor: [0, -14]
@@ -51,7 +57,7 @@ var border = null;
 var earthquakeFeatureGroup = L.featureGroup().addTo(map);
 var wikiLinksFeatureGroup = L.featureGroup().addTo(map);
 var nearbyPOIsFeatureGroup = L.featureGroup().addTo(map);
-
+var weatherFeatureGroup = L.featureGroup().addTo(map);
 
 //Populate the select with country names and country codes.
 $(document).ready(function() {
@@ -285,29 +291,7 @@ function selectCountry(){
                                     window.capital = response.data.capital;
                                     window.population = response.data.population;
 
-                                    //set the modal title to the name  of the country that is clicked
-                                    document.getElementById("coreInfoTitle").innerHTML = window.country;
-
-                                    //set the modal content to the core info for the country selected
-                                    document.getElementById("coreInfoBody").innerHTML = 
-                                    "<img src='" + window.flagUrl + "' class='img-fluid'/>" +
-                                    "<br><table class='table'>" +
-                                    "<tr><td>Capital</td><td>" + window.capital + "</td></tr>" +
-                                    "<tr><td>Population</td><td>" + window.population + "</td></tr>" +
-                                    "<tr><td>Continent</td><td>" + window.continent + "</td></tr>" +
-                                    "<tr><td>Timezone</td><td>" + window.timezoneShortName + "</td></tr>" +
-                                    "<tr><td>Political Union</td><td>" + window.politicalUnion + "</td></tr>" +
-                                    "<tr><td>ISO Code</td><td>" + window.isoCode + "</td></tr>" +
-                                    "<tr><td>Currency Name</td><td>" + window.currencyName + "</td></tr>" +
-                                    "<tr><td>Currency Symbol</td><td>" + window.currencySymbol + "</td></tr>" +
-                                    "<tr><td>Currency Subunit</td><td>" + window.currencySubunit + "</td></tr>" +
-                                    "<tr><td>Drive On</td><td>" + window.driveOn + "</td></tr>" +
-                                    "<tr><td>Speed In</td><td>" + window.speedIn + "</td></tr>" + "</table>";
-
-                                    //show the modal when the country border is clicked
-                                    border.on('click', function () {
-                                        $('#exampleModal').modal('show');
-                                    })
+                                    
                                         
                                 }
 
@@ -349,7 +333,7 @@ function selectCountry(){
                                                     popup += "<img src='" + response.data[i].thumbnailImg + "' class='img-fluid'/>";
                                                 }
 
-                                                var m = L.marker( [response.array[i].lat, response.array[i].lng], {icon: wikiIcon} )
+                                                var m = L.marker( [response.array[i].lat, response.array[i].lng], {icon: wikiIcon, title:"Wikipedia Links"} )
                                                     .bindPopup( popup );
                                                 
                                                 markerClusterGroup.addLayer(m);
@@ -398,7 +382,7 @@ function selectCountry(){
                                                 "<tr><td>Depth</td><td>" + response.data[i].depth + "</td></tr>" +
                                                 "<tr><td>Date and time</td><td>" + response.data[i].datetime + "</td></tr>" + "</table>";
                                                 
-                                                var m = L.marker( [response.array[i].lat, response.array[i].lng], {icon: myIcon} )
+                                                var m = L.marker( [response.array[i].lat, response.array[i].lng], {icon: earthquakeIcon, title: "Earthquake Activity"} )
                                                     .bindPopup( popup );
                                                 
                                                 markerClusterGroup.addLayer(m);
@@ -457,8 +441,8 @@ function selectCountry(){
                             type: 'GET',
                             dataType: 'json',
                             data: { 
-                                lat: window.lat,
-                                lng: window.lng
+                                lat: response.data.geometry.lat,
+                                lng: response.data.geometry.lng
                             },
 
                             success: function(response) {
@@ -466,6 +450,7 @@ function selectCountry(){
                                 if(response.status.name == "ok"){
                                     console.log("Geo Nearby POIs");
                                     console.log(response);
+                                    
 
                                     //put the data on the map as markers with popups
                                     for (var i = 0; i < response.data.length; ++i) {
@@ -487,8 +472,14 @@ function selectCountry(){
 
                             },
 
-                            error: function(errorThrown){
-                                console.log("error with nearby POIs: " + errorThrown);
+                            error: function(jqXHR, textStatus, errorThrown){
+                                //console.log("error with nearby POIs: " + errorThrown);
+                                console.log('error with POIS:');
+                                /*console.log(jqXHR);
+                                console.log('textStatus:');
+                                console.log(textStatus);
+                                console.log('errorThrown:');
+                                console.log(errorThrown);*/
                             }
 
                         });
@@ -509,7 +500,6 @@ function selectCountry(){
                                 if(response.status.name == "ok"){
                                     console.log("weather");
                                     console.log(response);
-                                    window.weather = response.data.current;
 
                                     //declare weather variables to put on the marker with the rest of the core info about each country
                                     window.clouds = response.data.current.clouds;
@@ -525,6 +515,52 @@ function selectCountry(){
                                     window.visibility = response.data.current.visibility;
                                     window.description = response.data.current.weather[0].description;
                                     window.dewPoint = response.data.current.weather[0].main;
+
+                                    var weatherMarker = L.marker([response.data.lat, response.data.lon], {
+                                        elevation: 260.0,
+                                        title: "Weather Data",
+                                        icon: weatherIcon
+                                      }).addTo(map);
+                                
+                                    weatherMarker.bindPopup("<br><table class='table'>" +
+                                    "<tr><td>Temperature (Kelvin)</td><td>" + window.temp + "</td></tr>" +
+                                    "<tr><td>Description</td><td>" + window.description + "</td></tr>" +
+                                    "<tr><td>Humidity</td><td>" + window.humidity + "</td></tr>" +
+                                    "<tr><td>Feels Like</td><td>" + window.feelsLike + "</td></tr>" +
+                                    "<tr><td>Clouds</td><td>" + window.clouds + "</td></tr>" +
+                                    "<tr><td>DT</td><td>" + window.dt + "</td></tr>" +
+                                    "<tr><td>Pressure</td><td>" + window.pressure + "</td></tr>" +
+                                    "<tr><td>Sunrise</td><td>" + window.sunrise + "</td></tr>" +
+                                    "<tr><td>Sunset</td><td>" + window.sunset + "</td></tr>" +
+                                    "<tr><td>UVI</td><td>" + window.uvi + "</td></tr>" +
+                                    "<tr><td>Visibility</td><td>" + window.visibility + "</td></tr>" +
+                                    "<tr><td>Dew Point</td><td>" + window.dewPoint + "</td></tr>" + "</table>");
+
+                                    //set the modal title to the name  of the country that is clicked
+                                    document.getElementById("coreInfoTitle").innerHTML = window.country;
+
+                                    //set the modal content to the core info for the country selected
+                                    document.getElementById("coreInfoBody").innerHTML = 
+                                    "<img src='" + window.flagUrl + "' class='img-fluid'/>" +
+                                    "<br><table class='table'>" +
+                                    "<tr><td>Capital</td><td>" + window.capital + "</td></tr>" +
+                                    "<tr><td>Population</td><td>" + window.population + "</td></tr>" +
+                                    "<tr><td>Continent</td><td>" + window.continent + "</td></tr>" +
+                                    "<tr><td>Timezone</td><td>" + window.timezoneShortName + "</td></tr>" +
+                                    "<tr><td>Political Union</td><td>" + window.politicalUnion + "</td></tr>" +
+                                    "<tr><td>ISO Code</td><td>" + window.isoCode + "</td></tr>" +
+                                    "<tr><td>Currency Name</td><td>" + window.currencyName + "</td></tr>" +
+                                    "<tr><td>Currency Symbol</td><td>" + window.currencySymbol + "</td></tr>" +
+                                    "<tr><td>Currency Subunit</td><td>" + window.currencySubunit + "</td></tr>" +
+                                    "<tr><td>Drive On</td><td>" + window.driveOn + "</td></tr>" +
+                                    "<tr><td>Speed In</td><td>" + window.speedIn + "</td></tr>" +
+                                    "<tr><td>Exhange Rate</td><td>" + window.exchangeRate + "</td></tr>" + "</table>";
+
+                                    //show the modal when the country border is clicked
+                                    border.on('click', function () {
+                                        $('#exampleModal').modal('show');
+                                    })
+            
                                 }
 
                             },
@@ -556,4 +592,6 @@ function selectCountry(){
     });
 
 }
+
+
 

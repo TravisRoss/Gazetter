@@ -1,47 +1,48 @@
 <?php
+//return an array of lat and lngs to be used for markers. also return the full earthquake data itself.
 
-	ini_set('display_errors', 'On');
-	error_reporting(E_ALL);
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
 
-	$executionStartTime = microtime(true) / 1000;
+$executionStartTime = microtime(true) / 1000;
 
-	$url='http://api.geonames.org/findNearbyPOIsOSMJSON?lat=' . $_REQUEST['lat'] . '&lng=' . $_REQUEST['lng'] . '&username=travyalonso';
-	
-	//create emoty array
-	$latsAndLngs = [];
+$url='http://api.geonames.org/findNearbyPOIsOSMJSON?lat=' . $_REQUEST['lat'] . '&lng=' . $_REQUEST['lng'] . '&username=travyalonso';
 
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($ch, CURLOPT_URL,$url);
+//create emoty array
+$latsAndLngs = [];
 
-	$result=curl_exec($ch);
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_URL,$url);
 
-	curl_close($ch);
-	 
-	$decode = json_decode($result,true);	
+$result=curl_exec($ch);
 
-	//loop through the array of features and add the lat and lng data of each feature into the array
-	foreach ($decode['poi'] as $feature) {
-		//create empty object to store the lat and lng values
-		$temp = null;
-		$temp['lat'] = $feature["lat"];
-		$temp['lng'] = $feature["lng"];
+curl_close($ch);
 
-		//add the object into the array
-		array_push($latsAndLngs, $temp);
-	}
+$decode = json_decode($result,true);	
 
-	$output['status']['code'] = "200";
-	$output['status']['name'] = "ok";
-	$output['status']['description'] = "mission saved";
-	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+    //loop through the array of features and add the lat and lng data of each feature into the array
+    foreach ($decode['poi'] as $feature) {
+        //create empty object to store the lat and lng values
+        $temp = null;
+        $temp['lat'] = $feature["lat"];
+        $temp['lng'] = $feature["lng"];
 
-	$output['data'] = $decode['poi'];
-	$output['array'] = $latsAndLngs;
-	
-	header('Content-Type: application/json; charset=UTF-8');
+        //add the object into the array
+        array_push($latsAndLngs, $temp);
+    }
 
-	echo json_encode($output); 
+$output['status']['code'] = "200";
+$output['status']['name'] = "ok";
+$output['status']['description'] = "mission saved";
+$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+
+//$output['array'] = $latsAndLngs;
+$output['data'] = $decode['poi'];
+
+header('Content-Type: application/json; charset=UTF-8');
+
+echo json_encode($output); 
 
 ?>

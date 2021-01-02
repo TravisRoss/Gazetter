@@ -21,11 +21,11 @@
 
         <div class="collapse navbar-collapse" id="collapse_target">
 
-        <span id="title" class="navbar-text" >Gazetteer</span>
+        <span id="title" class="navbar-text" >Gazetteer &nbsp;&nbsp; </span>
         
-        <ul class="navbar-nav" id="navbar">
-            <label id="labelId" for="country" class="navbar-text">Select a country:</label>
-            <select id="selCountry" name="country" onchange="selectCountry()">
+        <ul class="navbar-text" >
+            <select class="navbar-text" id="selCountry" name="country" onchange="selectCountry()">
+                <option value="" disabled selected>Select a country</option>
             </select>
         </ul>
 
@@ -35,11 +35,6 @@
     
     <div id="mapid"></div>
 
-    <!-- Button trigger modal -->
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-        Launch demo modal
-    </button>
-    
     <!-- Modal dialog core info -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">

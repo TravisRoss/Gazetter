@@ -14,7 +14,7 @@
 }
 
 #mapid {
-	top: 55px;
+	top: 82px;
 	height: 94vh;
 	position: absolute;
 	width: 100%;
@@ -44,16 +44,18 @@
 
 .img-fluid {
 	width: 100%;
+	padding: 0px 0px 10px 0px;
 }
 
 select {
-	color: #666666;
+	color: black;
+	font-weight: 500;
 	margin: 50px;
 	width: 200px;
-	padding: 5px 35px 5px 5px;
+	padding: 10px 35px 10px 5px;
 	font-size: 16px;
 	border: 1px solid #CCC;
-	height: 34px;
+	height: 40px;
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	appearance: none;
@@ -62,11 +64,16 @@ select {
 
 .navbar-nav {
 	background-color: #666666;
-	margin-left: 5%;
 	max-width: 20%;
 	display: inline-block;
 }
-  
+
+.zoom-out {
+	color: red;
+	background-color: green;
+	top: 123px;
+}
+
 select::-ms-expand {
 	  display: none; /* Remove default arrow in Internet Explorer 10 and 11 */
 }
@@ -79,8 +86,22 @@ select::-ms-expand {
 	}
 }
 
+@media (max-width: 768px) {
+    #mapid {
+        top: 55px;
+	}
+	
+	/* style the leaflet zoom controls */
+	a.leaflet-control-zoom-in {
+		top: 55px
+	}
+
+	a.leaflet-control-zoom-out {
+		top: 55px;
+	}
+}
+
 table {
-    border:1px solid black;
 	border-collapse: collapse;
 	max-width: 100%;
 	background-color: #666666;
