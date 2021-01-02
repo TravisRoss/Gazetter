@@ -34,8 +34,8 @@ var wikiIcon = L.icon({
 });
 
 var poiIcon = L.icon({
-    iconUrl: 'images/poi.png',
-    iconRetinaUrl: 'images/poi.png',
+    iconUrl: 'images/pois.png',
+    iconRetinaUrl: 'images/pois.png',
     iconSize: [29, 24],
     iconAnchor: [9, 21],
     popupAnchor: [0, -14]
@@ -49,9 +49,19 @@ var weatherIcon = L.icon({
     popupAnchor: [0, -14]
 });
 
+var localWeatherIcon = L.icon({
+    iconUrl: 'images/localweather.png',
+    iconRetinaUrl: 'images/localweather.png',
+    iconSize: [29, 24],
+    iconAnchor: [9, 21],
+    popupAnchor: [0, -14]
+});
+
+
 //declare global variables
 var markerClusterGroup = L.markerClusterGroup();
 var border = null;
+var weatherMarker = null;
 
 //featureGroups
 var earthquakeFeatureGroup = L.featureGroup().addTo(map);
@@ -184,39 +194,6 @@ function selectCountry(){
                                 console.log("error with flag url or currency name: " + err);
                             }
                             
-
-                            /*
-                            countryDataMarker.bindPopup("<h1>" + "<img src='" + window.flagUrl + "' class='flag'/>" + window.country + "</h1>" +
-                            "<br>Currency: " + window.currencyName +
-                            "<br>Subunit: " + window.currencySubunit +  
-                            "<br>Symbol: " + window.currencySymbol +
-                            "<br>ISO code: " + window.isoCode +
-                            "<br>Drive on: " + window.driveOn + 
-                            "<br>Speed in: " + window.speedIn +
-                            "<br>Timezone: " + window.timezoneShortName +
-                            "<br>Continent: " + window.continent +
-                            "<br>Political union: " + window.politicalUnion +
-                            "<br>Latitude: " + window.lat +
-                            "<br>Longitude" + window.lng +
-                            "<br>Capital: " + window.capital +
-                            "<br>Population: " + window.population +
-                            "<br>Current Exchange Rate: " + window.exchangeRate +
-                            "<br><br><table class='table'><th colspan='2'>Current Weather</th><tr><td>Clouds</td><td>" + window.clouds + "</td></tr>" +
-                            "<tr><td>Dew Point</td><td>" + window.dewPoint + "</td></tr>" +
-                            "<tr><td>DT</td><td>" + window.dt + "</td></tr>" +
-                            "<tr><td>Feels Like</td><td>" + window.feelsLike + "</td></tr>" +
-                            "<tr><td>Humidity</td><td>" + window.humidity + "</td></tr>" +
-                            "<tr><td>Pressure</td><td>" + window.pressure + "</td></tr>" +
-                            "<tr><td>Sunrise</td><td>" + window.sunrise + "</td></tr>" +
-                            "<tr><td>Sunset</td><td>" + window.sunset + "</td></tr>" +
-                            "<tr><td>Temperature</td><td>" + window.temp + "</td></tr>" +
-                            "<tr><td>UVI</td><td>" + window.uvi + "</td></tr>" +
-                            "<tr><td>Visibility</td><td>" + window.visibility + "</td></tr>" +
-                            "<tr><td>Description</td><td>" + window.description + "</td></tr>" +
-                            "<tr><td>Main</td><td>" + window.main + "</td></tr>" + "</table>"
-                            ).openPopup();*/
-
-                            
                         }
 
                     },
@@ -287,12 +264,8 @@ function selectCountry(){
                                 if(response.status.name == "ok"){
                                     console.log("Geo data");
                                     console.log(response);
-
                                     window.capital = response.data.capital;
-                                    window.population = response.data.population;
-
-                                    
-                                        
+                                    window.population = response.data.population;   
                                 }
 
                                 //get wikipedia links using GeoNames API
@@ -320,7 +293,6 @@ function selectCountry(){
 
                                             //put the data on the map as markers with popups
                                             for (var i = 0; i < response.data.length; ++i) {
-                                                //put the popup earthquake data in a table
                                                 
                                                 var popup = "<table class='table'>" +
                                                 "<tr><td>Summary</td><td>" + response.data[i].summary + "</td></tr>" +
@@ -372,7 +344,6 @@ function selectCountry(){
                                         if(response.status.name == "ok"){
                                             console.log("earthquake activity");
                                             console.log(response);
-                                            //window.earthquakeData = response.data;
 
                                             //put the data on the map as markers with popups
                                             for (var i = 0; i < response.data.length; ++i) {
@@ -383,13 +354,11 @@ function selectCountry(){
                                                 "<tr><td>Date and time</td><td>" + response.data[i].datetime + "</td></tr>" + "</table>";
                                                 
                                                 var m = L.marker( [response.array[i].lat, response.array[i].lng], {icon: earthquakeIcon, title: "Earthquake Activity"} )
-                                                    .bindPopup( popup );
+                                                    .bindPopup(popup);
                                                 
                                                 markerClusterGroup.addLayer(m);
                                             }
-                                            
                                             earthquakeFeatureGroup.addLayer(markerClusterGroup);
-                                            
                                         }
 
                                     },
@@ -420,8 +389,50 @@ function selectCountry(){
 
                                     },
 
+                                });
+
+                                //get local weather from GeoNames API (points of interest)
+                                $.ajax({
+
+                                    url: 'PHP/getLocalWeather.php',
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    data: { 
+                                        north: response.data.north,
+                                        south: response.data.south,
+                                        east: response.data.east,
+                                        west: response.data.west
+                                    },
+
+                                    success: function(response) {
+
+                                        if(response.status.name == "ok"){
+                                            console.log("local weather");
+                                            console.log(response);
+                                            
+                                            //put the data on the map as markers with popups
+                                            for (var i = 0; i < response.data.length; ++i) {
+                                                var popup = "<table class='table'>" +
+                                                "<tr><td>Temperature</td><td>" + response.data[i].temperature + "</td></tr>" +
+                                                "<tr><td>Date And Time</td><td>" + response.data[i].datetime + "</td></tr>" +
+                                                "<tr><td>Humidity</td><td>" + response.data[i].humidity + "</td></tr>" +
+                                                "<tr><td>Station Name</td><td>" + response.data[i].stationName + "</td></tr>" +
+                                                "<tr><td>Clouds</td><td>" + response.data[i].clouds + "</td></tr>" +
+                                                "<tr><td>Wind Speed</td><td>" + response.data[i].windSpeed + "</td></tr>" + "</table>";
+                                                
+                                                var m = L.marker( [response.array[i].lat, response.array[i].lng], {icon: localWeatherIcon, title: "Local Weather"} )
+                                                    .bindPopup(popup);
+                                                
+                                                markerClusterGroup.addLayer(m);
+                                            }
+                                            
+                                            nearbyPOIsFeatureGroup.addLayer(markerClusterGroup);
+                                        }
+
+                                    },
+
                                     error: function(errorThrown){
-                                        console.log("error with exchange rate: " + errorThrown);
+                                        console.log("error with POIs");
                                     }
 
                                 });
@@ -432,57 +443,9 @@ function selectCountry(){
                                 console.log("error: Base " + currencyCode + " is not supported. " + errorThrown);
                             }
                     
-                        }); 
+                        }); //end geo data ajax call
 
-                        //get nearby POIs from GeoNames API (points of interest)
-                        $.ajax({
-
-                            url: 'PHP/getNearbyPOIs.php',
-                            type: 'GET',
-                            dataType: 'json',
-                            data: { 
-                                lat: response.data.geometry.lat,
-                                lng: response.data.geometry.lng
-                            },
-
-                            success: function(response) {
-
-                                if(response.status.name == "ok"){
-                                    console.log("Geo Nearby POIs");
-                                    console.log(response);
-                                    
-
-                                    //put the data on the map as markers with popups
-                                    for (var i = 0; i < response.data.length; ++i) {
-                                        //put the popup earthquake data in a table
-                                        var popup = "<table class='table'>" +
-                                        "<tr><td>Name</td><td>" + response.data[i].name + "</td></tr>" +
-                                        "<tr><td>Distance</td><td>" + response.data[i].distance + "</td></tr>" +
-                                        "<tr><td>Type</td><td>" + response.data[i].typeClass + "</td></tr>" +
-                                        "<tr><td>Type Name</td><td>" + response.data[i].typeName + "</td></tr>" + "</table>";
-                                        
-                                        var m = L.marker( [response.array[i].lat, response.array[i].lng], {icon: poiIcon} )
-                                            .bindPopup(popup);
-                                        
-                                        markerClusterGroup.addLayer(m);
-                                    }
-                                    
-                                    nearbyPOIsFeatureGroup.addLayer(markerClusterGroup);
-                                }
-
-                            },
-
-                            error: function(jqXHR, textStatus, errorThrown){
-                                //console.log("error with nearby POIs: " + errorThrown);
-                                console.log('error with POIS:');
-                                /*console.log(jqXHR);
-                                console.log('textStatus:');
-                                console.log(textStatus);
-                                console.log('errorThrown:');
-                                console.log(errorThrown);*/
-                            }
-
-                        });
+                        
 
                         //get weather using Open Weather API
                         $.ajax({
@@ -516,11 +479,15 @@ function selectCountry(){
                                     window.description = response.data.current.weather[0].description;
                                     window.dewPoint = response.data.current.weather[0].main;
 
-                                    var weatherMarker = L.marker([response.data.lat, response.data.lon], {
+                                    if (map.hasLayer(weatherMarker)) {
+                                        map.removeLayer(weatherMarker);    
+                                    }
+
+                                    weatherMarker = L.marker([response.data.lat, response.data.lon], {
                                         elevation: 260.0,
-                                        title: "Weather Data",
+                                        title: "Current weather here",
                                         icon: weatherIcon
-                                      }).addTo(map);
+                                    }).addTo(map);
                                 
                                     weatherMarker.bindPopup("<br><table class='table'>" +
                                     "<tr><td>Temperature (Kelvin)</td><td>" + window.temp + "</td></tr>" +

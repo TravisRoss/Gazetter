@@ -6,7 +6,8 @@ error_reporting(E_ALL);
 
 $executionStartTime = microtime(true) / 1000;
 
-$url='http://api.geonames.org/findNearbyPOIsOSMJSON?lat=' . $_REQUEST['lat'] . '&lng=' . $_REQUEST['lng'] . '&username=travyalonso';
+$url = 'http://api.geonames.org/weatherJSON?formatted=true' . '&north=' . $_REQUEST['north'] . '&south=' . 
+$_REQUEST['south'] . '&east=' . $_REQUEST['east'] . '&west=' . $_REQUEST['west'] . '&username=travyalonso&style=full';
 
 //create emoty array
 $latsAndLngs = [];
@@ -23,7 +24,7 @@ curl_close($ch);
 $decode = json_decode($result,true);	
 
     //loop through the array of features and add the lat and lng data of each feature into the array
-    foreach ($decode['poi'] as $feature) {
+    foreach ($decode['weatherObservations'] as $feature) {
         //create empty object to store the lat and lng values
         $temp = null;
         $temp['lat'] = $feature["lat"];
@@ -38,8 +39,8 @@ $output['status']['name'] = "ok";
 $output['status']['description'] = "mission saved";
 $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
 
-//$output['array'] = $latsAndLngs;
-$output['data'] = $decode['poi'];
+$output['array'] = $latsAndLngs;
+$output['data'] = $decode['weatherObservations'];
 
 header('Content-Type: application/json; charset=UTF-8');
 
