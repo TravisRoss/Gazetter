@@ -436,6 +436,38 @@ function selectCountry(){
                                     }
 
                                 });
+
+                                //get covid data from https://apify.com/covid-19
+                                $.ajax({
+
+                                    url: 'PHP/getCovidData.php',
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    data: {
+                                        countryName: window.country
+                                    },
+
+                                    success: function(response) {
+
+                                        if(response.status.name == "ok"){
+                                            console.log("Covid data");
+                                            console.log(response);
+                                            
+                                            window.infected = response.data[i].infected;
+                                            window.deceased = response.data[i].deceased;
+                                            window.recovered = response.data[i].recovered;
+                                            window.lastUpdatedApify = response.data[i].lastUpdatedApify;
+                                            window.sourceUrl = response.data[i].sourceUrl;
+
+                                        }
+
+                                    },
+
+                                    error: function(errorThrown){
+                                        console.log("error with Covid data: " + errorThrown);
+                                    }
+
+                                });
                                 
                             },
 
@@ -521,7 +553,11 @@ function selectCountry(){
                                     "<tr><td>Currency Subunit</td><td>" + window.currencySubunit + "</td></tr>" +
                                     "<tr><td>Drive On</td><td>" + window.driveOn + "</td></tr>" +
                                     "<tr><td>Speed In</td><td>" + window.speedIn + "</td></tr>" +
-                                    "<tr><td>Exhange Rate</td><td>" + window.exchangeRate + "</td></tr>" + "</table>";
+                                    "<tr><td>Exhange Rate</td><td>" + window.exchangeRate + "</td></tr>" +
+                                    "<tr><td>Covid 19 Infected</td><td>" + window.infected + "</td></tr>" + 
+                                    "<tr><td>Covid 19 Deceased</td><td>" + window.deceased + "</td></tr>" +
+                                    "<tr><td>Covid 19 Recovered</td><td>" + window.recovered + "</td></tr>" + 
+                                    "<tr><td>Covid 19 Source URL</td><td>" + window.sourceUrl + "</td></tr>" + "</table>";
 
                                     //show the modal when the country border is clicked
                                     border.on('click', function () {
