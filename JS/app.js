@@ -162,6 +162,9 @@ function selectCountry(){
                 if (map.hasLayer(border)) {
                     map.removeLayer(border);    
                 }
+
+                //clear any previous markers and layers
+                markerClusterGroup.clearLayers();
             
                 border = L.geoJson(response.data,{
                     color: '#666666',
@@ -288,9 +291,6 @@ function selectCountry(){
                                             console.log("wikipedia links");
                                             console.log(response);
 
-                                            //clear any previous markers and layers
-                                            markerClusterGroup.clearLayers();
-
                                             //put the data on the map as markers with popups
                                             for (var i = 0; i < response.data.length; ++i) {
                                                 
@@ -300,11 +300,6 @@ function selectCountry(){
                                                 "<tr><td>Title</td><td>" + response.data[i].title + "</td></tr>" +
                                                 "<tr><td>Type</td><td>" + response.data[i].feature + "</td></tr>" + "</table>";
 
-                                                //if the wiik link response contains an image, add it to the popup
-                                                if(response.data[i].thumbnailImg){
-                                                    popup += "<img src='" + response.data[i].thumbnailImg + "' class='img-fluid'/>";
-                                                }
-
                                                 var m = L.marker( [response.array[i].lat, response.array[i].lng], {icon: wikiIcon, title:"Wikipedia Links"} )
                                                     .bindPopup( popup );
                                                 
@@ -312,10 +307,6 @@ function selectCountry(){
                                             }
                                             
                                             wikiLinksFeatureGroup.addLayer(markerClusterGroup);
-
-                                            
-
-
                                         }
 
                                     },
@@ -353,10 +344,10 @@ function selectCountry(){
                                                 "<tr><td>Depth</td><td>" + response.data[i].depth + "</td></tr>" +
                                                 "<tr><td>Date and time</td><td>" + response.data[i].datetime + "</td></tr>" + "</table>";
                                                 
-                                                var m = L.marker( [response.array[i].lat, response.array[i].lng], {icon: earthquakeIcon, title: "Earthquake Activity"} )
+                                                var earthquakeActivity = L.marker( [response.array[i].lat, response.array[i].lng], {icon: earthquakeIcon, title: "Earthquake Activity"} )
                                                     .bindPopup(popup);
                                                 
-                                                markerClusterGroup.addLayer(m);
+                                                markerClusterGroup.addLayer(earthquakeActivity);
                                             }
                                             earthquakeFeatureGroup.addLayer(markerClusterGroup);
                                         }
@@ -437,37 +428,7 @@ function selectCountry(){
 
                                 });
 
-                                //get covid data from https://apify.com/covid-19
-                                $.ajax({
-
-                                    url: 'PHP/getCovidData.php',
-                                    type: 'GET',
-                                    dataType: 'json',
-                                    data: {
-                                        countryName: window.country
-                                    },
-
-                                    success: function(response) {
-
-                                        if(response.status.name == "ok"){
-                                            console.log("Covid data");
-                                            console.log(response);
-                                            
-                                            window.infected = response.data.infected;
-                                            window.deceased = response.data.deceased;
-                                            window.recovered = response.data.recovered;
-                                            window.lastUpdatedApify = response.data.lastUpdatedApify;
-                                            window.sourceUrl = response.data.sourceUrl;
-
-                                        }
-
-                                    },
-
-                                    error: function(errorThrown){
-                                        console.log("error with Covid data: " + errorThrown);
-                                    }
-
-                                });
+                                
                                 
                             },
 
@@ -495,6 +456,41 @@ function selectCountry(){
                                 if(response.status.name == "ok"){
                                     console.log("weather");
                                     console.log(response);
+
+                                    //get covid data from https://apify.com/covid-19
+                                    $.ajax({
+
+                                        url: 'PHP/getCovidData.php',
+                                        type: 'GET',
+                                        dataType: 'json',
+                                        data: {
+                                            countryName: window.country
+                                        },
+
+                                        success: function(response) {
+
+                                            if(response.status.name == "ok"){
+                                                console.log("Covid data");
+                                                console.log(response);
+                                                
+                                                try{
+                                                    window.infected = response.data.infected;
+                                                    window.deceased = response.data.deceased;
+                                                    window.recovered = response.data.recovered;
+                                                    window.lastUpdatedApify = response.data.lastUpdatedApify;
+                                                    window.sourceUrl = response.data.sourceUrl;
+                                                } catch(err){
+                                                    console.log("error with covid data: posssible null value");
+                                                }
+                                            }
+
+                                        },
+
+                                        error: function(errorThrown){
+                                            console.log("error with Covid data: " + errorThrown);
+                                        }
+
+                                    });
 
                                     //declare weather variables to put on the marker with the rest of the core info about each country
                                     window.clouds = response.data.current.clouds;
@@ -538,7 +534,7 @@ function selectCountry(){
                                     //set the modal title to the name  of the country that is clicked
                                     document.getElementById("coreInfoTitle").innerHTML = window.country;
 
-                                    //set the modal content to the core info for the country selected
+                                    //set the modal content for the country selected
                                     document.getElementById("coreInfoBody").innerHTML = 
                                     "<img src='" + window.flagUrl + "' class='img-fluid'/>" +
                                     "<br><table class='table'>" +
