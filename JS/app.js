@@ -610,6 +610,3 @@ function selectCountry(){
     });
 
 }
-
-
-
