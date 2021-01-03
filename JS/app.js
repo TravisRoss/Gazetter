@@ -93,35 +93,19 @@ var localWeatherIcon = L.icon({
     popupAnchor: [0, -14]
 });
 
+//GBP
+L.easyButton( '&pound;', function(){
+    map.setView([55, -2], 5);
+}).addTo(map);
 
-var markerGroup = L.layerGroup([
-      L.marker([37.8, -91]), L.marker([38.8, -86]), L.marker([47.8, -106]),
-      L.marker([31.8, -90]), L.marker([39.8, -96]), L.marker([33.8, -100]) ]);
+//Japanese Yen (JPY)
+L.easyButton( '&yen;', function(){
+    map.setView([38, 139], 4);
+}).addTo(map);
 
-var toggle = L.easyButton({
-  states: [{
-    stateName: 'add-markers',
-    icon: 'fa-map-marker',
-    title: 'add random markers',
-    onClick: function(control) {
-      map.addLayer(markerGroup);
-      control.state('remove-markers');
-    }
-  }, {
-    icon: 'fa-undo',
-    stateName: 'remove-markers',
-    onClick: function(control) {
-      map.removeLayer(markerGroup);
-      control.state('add-markers');
-    },
-    title: 'remove markers'
-  }]
-});
-toggle.addTo(map);
-
-L.easyButton( '<span class="star">&Wopf;</span>', function(){
-    //toggle the wikipedia links
-    map.addLayer()
+//USD
+L.easyButton( '&dollar;', function(){
+    map.setView([37.8, -96], 4);
 }).addTo(map);
 
 //Populate the select with country names and country codes.
