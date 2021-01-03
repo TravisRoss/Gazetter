@@ -3,45 +3,51 @@ $(window).load(function() { // display a loading icon until the page loads
     $(".se-pre-con").fadeOut("slow");
 });
 
-//declare global variables
-var markerClusterGroup = L.markerClusterGroup();
+//global variables
 var border = null;
 var weatherMarker = null;
 var popup = L.popup();
 
-//declare featureGroups
+//ClusterGroups
+var markerClusterGroup = L.markerClusterGroup();
+var wikiClusterGroup = L.markerClusterGroup();
+var earthquakeClusterGroup = L.markerClusterGroup();
+var localWeatherClusterGroup = L.markerClusterGroup();
+
+//featureGroups.
 var earthquakeFeatureGroup = L.featureGroup();
 var wikiLinksFeatureGroup = L.featureGroup();
-var nearbyPOIsFeatureGroup = L.featureGroup();
-var weatherFeatureGroup = L.featureGroup();
+var localWeatherFeatureGroup = L.featureGroup();
+var overallWeatherFeatureGroup = L.featureGroup();
 
-//combines all the markers into one layer you can add or remove from the map at once.
+//combines all the markers into one layer so you can add or remove them from the map at once.
 var earthquakes = L.layerGroup([earthquakeFeatureGroup]);
 var wikiLinks = L.layerGroup([wikiLinksFeatureGroup]);
-var pois = L.layerGroup([nearbyPOIsFeatureGroup]);
-var localWeather = L.layerGroup([weatherFeatureGroup]);
+var localWeather = L.layerGroup([localWeatherFeatureGroup]);
+var overallWeather = L.layerGroup([overallWeatherFeatureGroup])
 
 var map = L.map('mapid').locate({
     setView: true,
     maxZoom: 6,
-    layers: [defaultMap, earthquakes, wikiLinks, localWeather]
+    layers: [defaultMap, earthquakes, wikiLinks, localWeather, overallWeather]
 });
 
 //create base layers and add the default one to the map:
 var defaultMap = L.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {id: 'mapid', maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
 var frostMap = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {id: 'mapid', maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>'});
-
-
+var darkMap = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {id: 'mapid', maxZoom: 18, attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'});
 
 var baseMaps = {
     "Default": defaultMap,
-    "Frost": frostMap
+    "Frost": frostMap,
+    "Dark mode": darkMap
 };
 
 var overlayMaps = {
     "Earthquakes": earthquakes,
     "Wikipedia Links": wikiLinks,
-    "Local Weather": localWeather
+    "Local Weather": localWeather,
+    "Overall Weather": overallWeather
 };
 
 L.control.layers(baseMaps, overlayMaps).addTo(map);
@@ -88,6 +94,36 @@ var localWeatherIcon = L.icon({
 });
 
 
+var markerGroup = L.layerGroup([
+      L.marker([37.8, -91]), L.marker([38.8, -86]), L.marker([47.8, -106]),
+      L.marker([31.8, -90]), L.marker([39.8, -96]), L.marker([33.8, -100]) ]);
+
+var toggle = L.easyButton({
+  states: [{
+    stateName: 'add-markers',
+    icon: 'fa-map-marker',
+    title: 'add random markers',
+    onClick: function(control) {
+      map.addLayer(markerGroup);
+      control.state('remove-markers');
+    }
+  }, {
+    icon: 'fa-undo',
+    stateName: 'remove-markers',
+    onClick: function(control) {
+      map.removeLayer(markerGroup);
+      control.state('add-markers');
+    },
+    title: 'remove markers'
+  }]
+});
+toggle.addTo(map);
+
+L.easyButton( '<span class="star">&Wopf;</span>', function(){
+    //toggle the wikipedia links
+    map.addLayer()
+}).addTo(map);
+
 //Populate the select with country names and country codes.
 $(document).ready(function() {
     
@@ -113,8 +149,6 @@ $(document).ready(function() {
                 navigator.geolocation.getCurrentPosition(function(position) {
                     lat = position.coords.latitude;
                     lng = position.coords.longitude;
-                    
-                    console.log("lat: " + lat + " and lng: " + lng);
 
                     $.ajax({
 
@@ -126,7 +160,7 @@ $(document).ready(function() {
                             lng: lng
                         },
 
-                        success: function(response) { //response is the countryCode here.
+                        success: function(response) {
                             if(response.status.name == "ok"){
                                 console.log("country code");
                                 console.log(response);
@@ -175,7 +209,6 @@ function selectCountry(){
                 console.log("country borders");
                 console.log(response);
 
-                //country name1
                 window.name = response.data.properties.name;
                 
                 if (map.hasLayer(border)) {
@@ -184,14 +217,16 @@ function selectCountry(){
 
                 //clear any previous markers and layers
                 markerClusterGroup.clearLayers();
-            
+                
                 border = L.geoJson(response.data,{
                     color: '#666666',
-                    weight: 2,
-                    opacity: 0.65
+                    weight: 3,
+                    opacity: 1
                 }).addTo(map);         
             
-                map.fitBounds(border.getBounds());
+                map.fitBounds(border.getBounds()); 
+
+                //if dark map is activated, change the border color to white to make it visible
 
                 //ajax call to return the country flag url and currency name
                 $.ajax({
@@ -226,7 +261,6 @@ function selectCountry(){
 
                 });
                 
-                
                 //ajax call to get the core info
                 $.ajax({
 
@@ -241,7 +275,6 @@ function selectCountry(){
                     success: function(response) { 
 
                         if(response.status.name == "ok"){
-
                             console.log("core info");
                             console.log(response);
 
@@ -312,7 +345,6 @@ function selectCountry(){
 
                                             //put the data on the map as markers with popups
                                             for (var i = 0; i < response.data.length; ++i) {
-                                                
                                                 var popup = "<table class='table'>" +
                                                 "<tr><td>Summary</td><td>" + response.data[i].summary + "</td></tr>" +
                                                 "<tr><td>URL</td><td>" + response.data[i].wikipediaUrl + "</td></tr>" +
@@ -322,10 +354,9 @@ function selectCountry(){
                                                 var m = L.marker( [response.array[i].lat, response.array[i].lng], {icon: wikiIcon, title:"Wikipedia Links"} )
                                                     .bindPopup(popup, {maxWidth: "auto"});
                                                 
-                                                markerClusterGroup.addLayer(m);
+                                                    wikiClusterGroup.addLayer(m);
                                             }
-                                            
-                                            wikiLinksFeatureGroup.addLayer(markerClusterGroup);
+                                            wikiLinksFeatureGroup.addLayer(wikiClusterGroup);
                                         }
 
                                     },
@@ -366,9 +397,9 @@ function selectCountry(){
                                                 var earthquakeActivity = L.marker( [response.array[i].lat, response.array[i].lng], {icon: earthquakeIcon, title: "Earthquake Activity"} )
                                                     .bindPopup(popup);
                                                 
-                                                markerClusterGroup.addLayer(earthquakeActivity);
+                                                    earthquakeClusterGroup.addLayer(earthquakeActivity);
                                             }
-                                            earthquakeFeatureGroup.addLayer(markerClusterGroup);
+                                            earthquakeFeatureGroup.addLayer(earthquakeClusterGroup);
                                         }
 
                                     },
@@ -430,13 +461,13 @@ function selectCountry(){
                                                 "<tr><td>Clouds</td><td>" + response.data[i].clouds + "</td></tr>" +
                                                 "<tr><td>Wind Speed</td><td>" + response.data[i].windSpeed + "</td></tr>" + "</table>";
                                                 
-                                                var m = L.marker( [response.array[i].lat, response.array[i].lng], {icon: localWeatherIcon, title: "Local Weather"} )
+                                                var localWeatherMarkers = L.marker( [response.array[i].lat, response.array[i].lng], {icon: localWeatherIcon, title: "Local Weather"} )
                                                     .bindPopup(popup);
                                                 
-                                                markerClusterGroup.addLayer(m);
+                                                    localWeatherClusterGroup.addLayer(localWeatherMarkers);
                                             }
                                             
-                                            nearbyPOIsFeatureGroup.addLayer(markerClusterGroup);
+                                            localWeatherFeatureGroup.addLayer(localWeatherClusterGroup);
                                         }
 
                                     },
@@ -534,7 +565,10 @@ function selectCountry(){
                                         elevation: 260.0,
                                         title: "Current weather here",
                                         icon: weatherIcon
-                                    }).addTo(map);
+                                    });
+
+                                    //add overall weather to the overallWeather feature group
+                                    overallWeatherFeatureGroup.addLayer(weatherMarker);
                                 
                                     weatherMarker.bindPopup("<br><table class='table'>" +
                                     "<tr><td>Temperature (Kelvin)</td><td>" + window.temp + "</td></tr>" +
