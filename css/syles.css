@@ -15,7 +15,7 @@
 
 #mapid {
 	top: 82px;
-	height: 94vh;
+	
 	position: absolute;
 	width: 100%;
 	overflow: hidden;
@@ -45,6 +45,10 @@
 .img-fluid {
 	width: 100%;
 	padding: 0px 0px 10px 0px;
+}
+
+#example-modal {
+	max-width: "auto";
 }
 
 select {

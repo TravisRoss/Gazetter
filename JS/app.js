@@ -1,22 +1,52 @@
 /* CREATE AND POPULATE MAP */
 $(window).load(function() { // display a loading icon until the page loads
-    $(".se-pre-con").fadeOut("slow");;
+    $(".se-pre-con").fadeOut("slow");
 });
 
-//once user agrees to share locstion, set the view to the user's location
-var map = L.map('mapid').locate({
-    setView: true,
-    maxZoom: 6
-});
-
-//tileLayer
-var OpenStreetMap_DE = L.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
-    maxZoom: 18,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
+//declare global variables
+var markerClusterGroup = L.markerClusterGroup();
+var border = null;
+var weatherMarker = null;
 var popup = L.popup();
 
-//make my icons
+//declare featureGroups
+var earthquakeFeatureGroup = L.featureGroup();
+var wikiLinksFeatureGroup = L.featureGroup();
+var nearbyPOIsFeatureGroup = L.featureGroup();
+var weatherFeatureGroup = L.featureGroup();
+
+//combines all the markers into one layer you can add or remove from the map at once.
+var earthquakes = L.layerGroup([earthquakeFeatureGroup]);
+var wikiLinks = L.layerGroup([wikiLinksFeatureGroup]);
+var pois = L.layerGroup([nearbyPOIsFeatureGroup]);
+var localWeather = L.layerGroup([weatherFeatureGroup]);
+
+var map = L.map('mapid').locate({
+    setView: true,
+    maxZoom: 6,
+    layers: [defaultMap, earthquakes, wikiLinks, localWeather]
+});
+
+//create base layers and add the default one to the map:
+var defaultMap = L.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {id: 'mapid', maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
+var frostMap = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {id: 'mapid', maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>'});
+
+
+
+var baseMaps = {
+    "Default": defaultMap,
+    "Frost": frostMap
+};
+
+var overlayMaps = {
+    "Earthquakes": earthquakes,
+    "Wikipedia Links": wikiLinks,
+    "Local Weather": localWeather
+};
+
+L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+//icons
 var earthquakeIcon = L.icon({
     iconUrl: 'images/earthquake.png',
     iconRetinaUrl: 'images/earthquake.png',
@@ -57,17 +87,6 @@ var localWeatherIcon = L.icon({
     popupAnchor: [0, -14]
 });
 
-
-//declare global variables
-var markerClusterGroup = L.markerClusterGroup();
-var border = null;
-var weatherMarker = null;
-
-//featureGroups
-var earthquakeFeatureGroup = L.featureGroup().addTo(map);
-var wikiLinksFeatureGroup = L.featureGroup().addTo(map);
-var nearbyPOIsFeatureGroup = L.featureGroup().addTo(map);
-var weatherFeatureGroup = L.featureGroup().addTo(map);
 
 //Populate the select with country names and country codes.
 $(document).ready(function() {
@@ -301,7 +320,7 @@ function selectCountry(){
                                                 "<tr><td>Type</td><td>" + response.data[i].feature + "</td></tr>" + "</table>";
 
                                                 var m = L.marker( [response.array[i].lat, response.array[i].lng], {icon: wikiIcon, title:"Wikipedia Links"} )
-                                                    .bindPopup( popup );
+                                                    .bindPopup(popup, {maxWidth: "auto"});
                                                 
                                                 markerClusterGroup.addLayer(m);
                                             }
@@ -559,7 +578,7 @@ function selectCountry(){
                                     border.on('click', function () {
                                         $('#exampleModal').modal('show');
                                     })
-            
+
                                 }
 
                             },
