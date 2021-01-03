@@ -1,16 +1,22 @@
-/* If JavaScript isn't present, don't show the loader */
-.no-js #loader { display: none;  }
-.js #loader { display: block; position: absolute; left: 100px; top: 50px; }
-
-/* display gif while page loads */
-.se-pre-con {
-	position: fixed;
-	left: 0px;
-	top: 0px;
+/* styles for the loading gif and it's div */
+#loading {
 	width: 100%;
 	height: 100%;
-	z-index: 9999;
-	background: url('https://smallenvelop.com/wp-content/uploads/2014/08/Preloader_11.gif') center no-repeat #fff;
+	top: 0;
+	left: 0;
+	position: fixed;
+	display: block;
+	opacity: 0.7;
+	background-color: #fff;
+	z-index: 99;
+	text-align: center;
+}
+
+#loading-image {
+	position: absolute;
+	top: 100px;
+	left: 240px;
+	z-index: 100;
 }
 
 #mapid {

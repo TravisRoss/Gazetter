@@ -1,7 +1,7 @@
-/* CREATE AND POPULATE MAP */
-$(window).load(function() { // display a loading icon until the page loads
-    $(".se-pre-con").fadeOut("slow");
-});
+//loading gif while page loads
+/*$(window).load(function() {
+    $('#loading').hide();
+});*/
 
 //global variables
 var border = null;
@@ -95,17 +95,17 @@ var localWeatherIcon = L.icon({
 
 //GBP
 L.easyButton( '&pound;', function(){
-    map.setView([55, -2], 5);
+    map.setView([55, -2], 6);
 }).addTo(map);
 
 //Japanese Yen (JPY)
 L.easyButton( '&yen;', function(){
-    map.setView([38, 139], 4);
+    map.setView([38, 139], 5);
 }).addTo(map);
 
 //USD
 L.easyButton( '&dollar;', function(){
-    map.setView([37.8, -96], 4);
+    map.setView([37.8, -96], 5);
 }).addTo(map);
 
 //Populate the select with country names and country codes.
