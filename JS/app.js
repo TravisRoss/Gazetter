@@ -214,6 +214,7 @@ function selectCountry(){
                 }
 
                 //clear any previous markers and layers
+                overallWeatherFeatureGroup.clearLayers();
                 wikiClusterGroup.clearLayers();
                 earthquakeClusterGroup.clearLayers();
                 localWeatherClusterGroup.clearLayers();
@@ -292,10 +293,7 @@ function selectCountry(){
                                 window.currencyName =  response.data.annotations.currency.name;
                                 window.currencySubunit = response.data.annotations.currency.subunit;
                                 window.currencySymbol = response.data.annotations.currency.symbol;
-                                window.isoCode = response.data.annotations.currency.iso_code;
-                                window.driveOn = response.data.annotations.roadinfo.drive_on; 
-                                window.speedIn = response.data.annotations.roadinfo.speed_in;
-                                window.timeOffset = response.data.annotations.timezone.offset_string ;
+                                window.timeOffset = response.data.annotations.timezone.offset_string;
                                 window.timezoneShortName = response.data.annotations.timezone.short_name;
                                 window.continent = response.data.components.continent;
                                 window.politicalUnion = response.data.components.political_union;
@@ -572,7 +570,7 @@ function selectCountry(){
                                                     //var lastUpdatedApify = response.data.lastUpdatedApify;
                                                     var sourceUrl = response.data.sourceUrl;
                                                 } catch(err){
-                                                    console.log("No covid data is available for this country.");
+                                                    alert("Covid 19 data is unavailable for this country.");
                                                 }
 
                                                 //set the modal title to the name  of the country that is clicked
@@ -586,14 +584,9 @@ function selectCountry(){
                                                 "<tr><td>Population</td><td>" + window.population + "</td></tr>" +
                                                 "<tr><td>Continent</td><td>" + window.continent + "</td></tr>" +
                                                 "<tr><td>Timezone</td><td>" + window.timezoneShortName + "</td></tr>" +
-                                                "<tr><td>Political Union</td><td>" + window.politicalUnion + "</td></tr>" +
-                                                "<tr><td>ISO Code</td><td>" + window.isoCode + "</td></tr>" +
-                                                "<tr><td>Currency Name</td><td>" + window.currencyName + "</td></tr>" +
-                                                "<tr><td>Currency Symbol</td><td>" + window.currencySymbol + "</td></tr>" +
+                                                "<tr><td>Currency</td><td>" + window.currencyName + " (" + window.currencySymbol + ")" + "</td></tr>" +
                                                 "<tr><td>Currency Subunit</td><td>" + window.currencySubunit + "</td></tr>" +
-                                                "<tr><td>Drive On</td><td>" + window.driveOn + "</td></tr>" +
-                                                "<tr><td>Speed In</td><td>" + window.speedIn + "</td></tr>" +
-                                                "<tr><td>Exhange Rate</td><td>" + window.exchangeRate + "</td></tr>" +
+                                                "<tr><td>Current Exhange Rate</td><td>" + window.exchangeRate + "</td></tr>" +
                                                 "<tr><td>Covid 19 Infected</td><td>" + infected + "</td></tr>" + 
                                                 "<tr><td>Covid 19 Deceased</td><td>" + deceased + "</td></tr>" +
                                                 "<tr><td>Covid 19 Recovered</td><td>" + recovered + "</td></tr>" + 

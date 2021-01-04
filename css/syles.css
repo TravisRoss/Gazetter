@@ -112,7 +112,7 @@ select::-ms-expand {
 
 table {
 	border-collapse: collapse;
-	max-width: 100%;
+	max-width: auto;
 	background-color: #666666;
 }
 
