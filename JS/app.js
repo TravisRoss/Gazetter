@@ -1,7 +1,7 @@
 //loading gif while page loads
-/*$(window).load(function() {
+$(window).load(function() {
     $('#loading').hide();
-});*/
+});
 
 //global variables
 var border = null;
@@ -9,7 +9,6 @@ var weatherMarker = null;
 var popup = L.popup();
 
 //ClusterGroups
-var markerClusterGroup = L.markerClusterGroup();
 var wikiClusterGroup = L.markerClusterGroup();
 var earthquakeClusterGroup = L.markerClusterGroup();
 var localWeatherClusterGroup = L.markerClusterGroup();
@@ -200,7 +199,9 @@ function selectCountry(){
                 }
 
                 //clear any previous markers and layers
-                markerClusterGroup.clearLayers();
+                wikiClusterGroup.clearLayers();
+                earthquakeClusterGroup.clearLayers();
+                localWeatherClusterGroup.clearLayers();
                 
                 border = L.geoJson(response.data,{
                     color: '#666666',
