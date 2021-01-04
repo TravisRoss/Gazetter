@@ -25,6 +25,19 @@ var wikiLinks = L.layerGroup([wikiLinksFeatureGroup]);
 var localWeather = L.layerGroup([localWeatherFeatureGroup]);
 var overallWeather = L.layerGroup([overallWeatherFeatureGroup])
 
+var Stamen_TonerLabels = L.tileLayer.provider('Stamen.TonerLabels', {
+	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+	subdomains: 'abcd',
+	minZoom: 0,
+	maxZoom: 20,
+	ext: 'png'
+});
+
+var WaymarkedTrails_cycling = L.tileLayer.provider('WaymarkedTrails.cycling', {
+	maxZoom: 18,
+	attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Map style: &copy; <a href="https://waymarkedtrails.org">waymarkedtrails.org</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+});
+
 var map = L.map('mapid').locate({
     setView: true,
     maxZoom: 6,
@@ -32,21 +45,23 @@ var map = L.map('mapid').locate({
 });
 
 //create base layers and add the default one to the map:
-var defaultMap = L.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {id: 'mapid', maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
-var frostMap = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {id: 'mapid', maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>'});
-var darkMap = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {id: 'mapid', maxZoom: 18, attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'});
+var defaultMap = L.tileLayer.provider('OpenStreetMap.DE', {id: 'mapid', maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
+var tonerMap = L.tileLayer.provider('Stamen.Toner', {id: 'mapid', maxZoom: 18, attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'});
+var worldStreetMap = L.tileLayer.provider('Esri.WorldStreetMap', {id: 'mapid', maxZoom: 18, attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'});
 
 var baseMaps = {
-    "Default": defaultMap,
-    "Frost": frostMap,
-    "Dark mode": darkMap
+    "Default Map": defaultMap,
+    "Toner Map": tonerMap,
+    "World Street Map": worldStreetMap
 };
 
 var overlayMaps = {
     "Earthquakes": earthquakes,
     "Wikipedia Links": wikiLinks,
     "Local Weather": localWeather,
-    "Overall Weather": overallWeather
+    "Overall Weather": overallWeather,
+    "Toner labels": Stamen_TonerLabels,
+    "Way Marked Cycling Trails": WaymarkedTrails_cycling
 };
 
 L.control.layers(baseMaps, overlayMaps).addTo(map);
@@ -492,41 +507,6 @@ function selectCountry(){
                                     console.log("weather");
                                     console.log(response);
 
-                                    //get covid data from https://apify.com/covid-19
-                                    $.ajax({
-
-                                        url: 'PHP/getCovidData.php',
-                                        type: 'GET',
-                                        dataType: 'json',
-                                        data: {
-                                            countryName: window.country
-                                        },
-
-                                        success: function(response) {
-
-                                            if(response.status.name == "ok"){
-                                                console.log("Covid data");
-                                                console.log(response);
-                                                
-                                                try{
-                                                    window.infected = response.data.infected;
-                                                    window.deceased = response.data.deceased;
-                                                    window.recovered = response.data.recovered;
-                                                    window.lastUpdatedApify = response.data.lastUpdatedApify;
-                                                    window.sourceUrl = response.data.sourceUrl;
-                                                } catch(err){
-                                                    console.log("error with covid data: posssible null value");
-                                                }
-                                            }
-
-                                        },
-
-                                        error: function(errorThrown){
-                                            console.log("error with Covid data: " + errorThrown);
-                                        }
-
-                                    });
-
                                     //declare weather variables to put on the marker with the rest of the core info about each country
                                     window.clouds = response.data.current.clouds;
                                     window.dewPoint = response.data.current.dew_point;
@@ -569,34 +549,70 @@ function selectCountry(){
                                     "<tr><td>Visibility</td><td>" + window.visibility + "</td></tr>" +
                                     "<tr><td>Dew Point</td><td>" + window.dewPoint + "</td></tr>" + "</table>");
 
-                                    //set the modal title to the name  of the country that is clicked
-                                    document.getElementById("coreInfoTitle").innerHTML = window.country;
+                                    //get covid data from https://apify.com/covid-19
+                                    $.ajax({
 
-                                    //set the modal content for the country selected
-                                    document.getElementById("coreInfoBody").innerHTML = 
-                                    "<img src='" + window.flagUrl + "' class='img-fluid'/>" +
-                                    "<br><table class='table'>" +
-                                    "<tr><td>Capital</td><td>" + window.capital + "</td></tr>" +
-                                    "<tr><td>Population</td><td>" + window.population + "</td></tr>" +
-                                    "<tr><td>Continent</td><td>" + window.continent + "</td></tr>" +
-                                    "<tr><td>Timezone</td><td>" + window.timezoneShortName + "</td></tr>" +
-                                    "<tr><td>Political Union</td><td>" + window.politicalUnion + "</td></tr>" +
-                                    "<tr><td>ISO Code</td><td>" + window.isoCode + "</td></tr>" +
-                                    "<tr><td>Currency Name</td><td>" + window.currencyName + "</td></tr>" +
-                                    "<tr><td>Currency Symbol</td><td>" + window.currencySymbol + "</td></tr>" +
-                                    "<tr><td>Currency Subunit</td><td>" + window.currencySubunit + "</td></tr>" +
-                                    "<tr><td>Drive On</td><td>" + window.driveOn + "</td></tr>" +
-                                    "<tr><td>Speed In</td><td>" + window.speedIn + "</td></tr>" +
-                                    "<tr><td>Exhange Rate</td><td>" + window.exchangeRate + "</td></tr>" +
-                                    "<tr><td>Covid 19 Infected</td><td>" + window.infected + "</td></tr>" + 
-                                    "<tr><td>Covid 19 Deceased</td><td>" + window.deceased + "</td></tr>" +
-                                    "<tr><td>Covid 19 Recovered</td><td>" + window.recovered + "</td></tr>" + 
-                                    "<tr><td>Covid 19 Source URL</td><td>" + window.sourceUrl + "</td></tr>" + "</table>";
+                                        url: 'PHP/getCovidData.php',
+                                        type: 'GET',
+                                        dataType: 'json',
+                                        data: {
+                                            countryName: window.country
+                                        },
 
-                                    //show the modal when the country border is clicked
-                                    border.on('click', function () {
-                                        $('#exampleModal').modal('show');
-                                    })
+                                        success: function(response) {
+
+                                            if(response.status.name == "ok"){
+                                                console.log("Covid data");
+                                                console.log(response);
+                                                
+                                                try{
+                                                    var infected = response.data.infected;
+                                                    var deceased = response.data.deceased;
+                                                    var recovered = response.data.recovered;
+                                                    //var lastUpdatedApify = response.data.lastUpdatedApify;
+                                                    var sourceUrl = response.data.sourceUrl;
+                                                } catch(err){
+                                                    console.log("No covid data is available for this country.");
+                                                }
+
+                                                //set the modal title to the name  of the country that is clicked
+                                                document.getElementById("coreInfoTitle").innerHTML = window.country;
+
+                                                //set the modal content for the country selected
+                                                document.getElementById("coreInfoBody").innerHTML = 
+                                                "<img src='" + window.flagUrl + "' class='img-fluid'/>" +
+                                                "<br><table class='table'>" +
+                                                "<tr><td>Capital</td><td>" + window.capital + "</td></tr>" +
+                                                "<tr><td>Population</td><td>" + window.population + "</td></tr>" +
+                                                "<tr><td>Continent</td><td>" + window.continent + "</td></tr>" +
+                                                "<tr><td>Timezone</td><td>" + window.timezoneShortName + "</td></tr>" +
+                                                "<tr><td>Political Union</td><td>" + window.politicalUnion + "</td></tr>" +
+                                                "<tr><td>ISO Code</td><td>" + window.isoCode + "</td></tr>" +
+                                                "<tr><td>Currency Name</td><td>" + window.currencyName + "</td></tr>" +
+                                                "<tr><td>Currency Symbol</td><td>" + window.currencySymbol + "</td></tr>" +
+                                                "<tr><td>Currency Subunit</td><td>" + window.currencySubunit + "</td></tr>" +
+                                                "<tr><td>Drive On</td><td>" + window.driveOn + "</td></tr>" +
+                                                "<tr><td>Speed In</td><td>" + window.speedIn + "</td></tr>" +
+                                                "<tr><td>Exhange Rate</td><td>" + window.exchangeRate + "</td></tr>" +
+                                                "<tr><td>Covid 19 Infected</td><td>" + infected + "</td></tr>" + 
+                                                "<tr><td>Covid 19 Deceased</td><td>" + deceased + "</td></tr>" +
+                                                "<tr><td>Covid 19 Recovered</td><td>" + recovered + "</td></tr>" + 
+                                                "<tr><td>Covid 19 Source URL</td><td>" + sourceUrl + "</td></tr>" + "</table>";
+
+                                                //show the modal when the country border is clicked
+                                                border.on('click', function () {
+                                                    $('#exampleModal').modal('show');
+                                                })
+
+                                            }//end if
+
+                                        },//end success function
+
+                                    error: function(errorThrown){
+                                        console.log("error with Covid data: " + errorThrown);
+                                    }
+
+                                });//end covid ajax call
 
                                 }
 
@@ -606,7 +622,7 @@ function selectCountry(){
                                 alert("error with current weather: " + errorThrown);
                             }
 
-                        });
+                        });//end getWeather ajax call
 
                         
 
