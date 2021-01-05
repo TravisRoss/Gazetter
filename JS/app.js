@@ -513,12 +513,12 @@ function selectCountry(){
                                             //put the data on the map as markers with popups
                                             for (var i = 0; i < response.data.length; ++i) {
                                                 var popup = "<table class='table'>" +
-                                                "<tr><td>Temperature</td><td>" + response.data[i].temperature + "</td></tr>" +
+                                                "<tr><td>Temperature</td><td>" + response.data[i].temperature + "°C" + "</td></tr>" +
                                                 "<tr><td>Date And Time</td><td>" + toJSDate(response.data[i].datetime) + "</td></tr>" +
-                                                "<tr><td>Humidity</td><td>" + response.data[i].humidity + "</td></tr>" +
+                                                "<tr><td>Humidity</td><td>" + response.data[i].humidity + "%" + "</td></tr>" +
                                                 "<tr><td>Station Name</td><td>" + response.data[i].stationName + "</td></tr>" +
                                                 "<tr><td>Clouds</td><td>" + response.data[i].clouds + "</td></tr>" +
-                                                "<tr><td>Wind Speed</td><td>" + response.data[i].windSpeed + "</td></tr>" + "</table>";
+                                                "<tr><td>Wind Speed</td><td>" + response.data[i].windSpeed + "mph" + "</td></tr>" + "</table>";
                                                 
                                                 var localWeatherMarkers = L.marker( [response.array[i].lat, response.array[i].lng], {icon: localWeatherIcon, title: "Local Weather"} )
                                                     .bindPopup(popup);
@@ -593,19 +593,26 @@ function selectCountry(){
 
                                     //add overall weather to the overallWeather feature group
                                     overallWeatherFeatureGroup.addLayer(weatherMarker);
-                                
+                                    
+                                    //format time in seconds to time in HHMMSS
+                                    var sunrise = new Date(0);
+                                    sunrise.setSeconds(window.sunrise); // specify value for SECONDS here
+                                    var formattedSunrise = sunrise.toISOString().substr(11, 8);
+
+                                    var sunset = new Date(0);
+                                    sunset.setSeconds(window.sunrise); // specify value for SECONDS here
+                                    var formattedSunset = sunset.toISOString().substr(11, 8);
+                                    
                                     weatherMarker.bindPopup("<br><table class='table'>" +
-                                    "<tr><td>Temperature (Kelvin)</td><td>" + window.temp + "</td></tr>" +
+                                    "<tr><td>Temperature</td><td>" + window.temp + "K" +"</td></tr>" +
                                     "<tr><td>Description</td><td>" + window.description + "</td></tr>" +
-                                    "<tr><td>Humidity</td><td>" + window.humidity + "</td></tr>" +
-                                    "<tr><td>Feels Like</td><td>" + window.feelsLike + "</td></tr>" +
+                                    "<tr><td>Humidity</td><td>" + window.humidity + "%" + "</td></tr>" +
+                                    "<tr><td>Feels Like</td><td>" + window.feelsLike + "°C" + "</td></tr>" +
                                     "<tr><td>Clouds</td><td>" + window.clouds + "</td></tr>" +
-                                    "<tr><td>DT</td><td>" + window.dt + "</td></tr>" +
-                                    "<tr><td>Pressure</td><td>" + window.pressure + "</td></tr>" +
-                                    "<tr><td>Sunrise</td><td>" + window.sunrise + "</td></tr>" +
-                                    "<tr><td>Sunset</td><td>" + window.sunset + "</td></tr>" +
-                                    "<tr><td>UVI</td><td>" + window.uvi + "</td></tr>" +
-                                    "<tr><td>Visibility</td><td>" + window.visibility + "</td></tr>" +
+                                    "<tr><td>Pressure</td><td>" + window.pressure + "mb" + "</td></tr>" +
+                                    "<tr><td>Sunrise</td><td>" + formattedSunrise + "</td></tr>" +
+                                    "<tr><td>Sunset</td><td>" + formattedSunset + "</td></tr>" +
+                                    "<tr><td>Visibility</td><td>" + window.visibility/1000 + "km" + "</td></tr>" +
                                     "<tr><td>Dew Point</td><td>" + window.dewPoint + "</td></tr>" + "</table>");
 
                                     //get covid data from https://apify.com/covid-19
