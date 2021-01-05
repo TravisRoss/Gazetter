@@ -1,4 +1,4 @@
-//loading gif while page loads
+//load a gif while page loads
 $(window).load(function() {
     $('#loading').hide();
 });
@@ -13,7 +13,7 @@ var wikiClusterGroup = L.markerClusterGroup();
 var earthquakeClusterGroup = L.markerClusterGroup();
 var localWeatherClusterGroup = L.markerClusterGroup();
 
-//featureGroups.
+//featureGroups
 var earthquakeFeatureGroup = L.featureGroup();
 var wikiLinksFeatureGroup = L.featureGroup();
 var localWeatherFeatureGroup = L.featureGroup();
@@ -187,7 +187,7 @@ $(document).ready(function() {
 
     });
 
-});
+});//end on document ready function
 
 //run each time a country is selected from the dropdown
 function selectCountry(){
@@ -637,4 +637,4 @@ function selectCountry(){
 
     });
 
-}
+}//end select country function

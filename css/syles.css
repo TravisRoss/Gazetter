@@ -124,4 +124,10 @@ table > th {
 	text-align: center;
 }
 
-/* MEDIA QUERIES */
+#selCountry.navbar-text {
+	color: #666666;
+}
+
+ul.navbar-text {
+	color: #666666;
+}
