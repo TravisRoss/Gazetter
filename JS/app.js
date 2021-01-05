@@ -267,13 +267,9 @@ function selectCountry(){
                             console.log("flags");
                             console.log(response);
 
-                            
-
                             try {
                                 window.flagUrl = response.data.flag;
                                 window.currencyName =  response.data.currencies[0].name;
-
-                            
                             } catch (err){
                                 console.log("error with flag url or currency name: " + err);
                             }
@@ -646,7 +642,9 @@ function selectCountry(){
 
                                                 //set the modal content for the country selected
                                                 document.getElementById("coreInfoBody").innerHTML = 
-                                                "<img src='" + window.flagUrl + "' class='img-fluid'/>" +
+                                                "<table class='table table-striped'><thead><tr> <th scope='col'>#</th><th scope='col'>First</th><th scope='col'>Last</th><th scope='col'>Handle</th></tr></thead><tbody><tr><th scope='row'>1</th><td>Mark</td><td>Otto</td><td>@mdo</td></tr><tr><th scope='row'>2</th><td>Jacob</td><td>Thornton</td><td>@fat</td></tr><tr><th scope='row'>3</th><td>Larry</td><td>the Bird</td><td>@twitter</td></tr></tbody></table>";
+
+                                                /*"<img src='" + window.flagUrl + "' class='img-fluid'/>" +
                                                 "<br><table class='table'>" +
                                                 "<tr><td>Capital</td><td>" + window.capital + "</td></tr>" +
                                                 "<tr><td>Population</td><td>" + window.population + "</td></tr>" +
@@ -660,11 +658,10 @@ function selectCountry(){
                                                 "<tr><td>Infected</td><td>" + infected + "</td></tr>" + 
                                                 "<tr><td>Deceased</td><td>" + deceased + "</td></tr>" +
                                                 "<tr><td>Recovered</td><td>" + recovered + "</td></tr>" + 
-                                                "<tr><td>Source</td><td>" + sourceUrl + "</td></tr>" + "</table>";
-
+                                                "<tr><td>Source</td><td>" + sourceUrl + "</td></tr>" + "</table>";*/
                                                 //show the modal when the country border is clicked
                                                 border.on('click', function () {
-                                                    $('#exampleModal').modal('show');
+                                                    $('#coreInfoModal').modal('show');
                                                 })
 
                                             }//end if
