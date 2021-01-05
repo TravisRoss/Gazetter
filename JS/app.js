@@ -133,6 +133,16 @@ L.easyButton( '&dollar;', function(){
     map.setView([37.8, -96], 5);
 }).addTo(map);
 
+//format date and time
+function toJSDate (dateTime) {
+    var dateTime = dateTime.split(" ");//dateTime[0] = date, dateTime[1] = time
+    var date = dateTime[0].split("-");
+    var time = dateTime[1].split(":");
+    //(year, month, day, hours, minutes, seconds, milliseconds)
+    //month is 0 indexed so date[1] - 1 corrected format
+    return new Date(date[0], date[1]-1, date[2], time[0], time[1], time[2], 0);
+}
+
 //Populate the select with country names and country codes.
 $(document).ready(function() {
     
@@ -173,8 +183,9 @@ $(document).ready(function() {
                             if(response.status.name == "ok"){
                                 console.log("country code");
                                 console.log(response);
-
-                                $('#selCountry').value = response.data;
+                                var temp = response.data; 
+                                $("#selCountry").val(temp);
+                                
                             }
                         },
 
@@ -405,14 +416,28 @@ function selectCountry(){
                                         if(response.status.name == "ok"){
                                             console.log("earthquake activity");
                                             console.log(response);
+                                            
+                                            
 
                                             //put the data on the map as markers with popups
                                             for (var i = 0; i < response.data.length; ++i) {
+
+                                                //format date and time
+                                                function toJSDate (dateTime) {
+                                                    var dateTime = dateTime.split(" ");//dateTime[0] = date, dateTime[1] = time
+                                                    var date = dateTime[0].split("-");
+                                                    var time = dateTime[1].split(":");
+                                                    //(year, month, day, hours, minutes, seconds, milliseconds)
+                                                    //month is 0 indexed so date[1] - 1 corrected format
+                                                    return new Date(date[0], date[1]-1, date[2], time[0], time[1], time[2], 0);
+                                                        
+                                                }
+
                                                 //put the popup earthquake data in a table
                                                 var popup = "<table class='table'>" +
                                                 "<tr><td>Magnitude</td><td>" + response.data[i].magnitude + "</td></tr>" +
                                                 "<tr><td>Depth</td><td>" + response.data[i].depth + "</td></tr>" +
-                                                "<tr><td>Date and time</td><td>" + response.data[i].datetime + "</td></tr>" + "</table>";
+                                                "<tr><td>Date and time</td><td>" + toJSDate(response.data[i].datetime) + "</td></tr>" + "</table>";
                                                 
                                                 var earthquakeActivity = L.marker( [response.array[i].lat, response.array[i].lng], {icon: earthquakeIcon, title: "Earthquake Activity"} )
                                                     .bindPopup(popup);
@@ -489,7 +514,7 @@ function selectCountry(){
                                             for (var i = 0; i < response.data.length; ++i) {
                                                 var popup = "<table class='table'>" +
                                                 "<tr><td>Temperature</td><td>" + response.data[i].temperature + "</td></tr>" +
-                                                "<tr><td>Date And Time</td><td>" + response.data[i].datetime + "</td></tr>" +
+                                                "<tr><td>Date And Time</td><td>" + toJSDate(response.data[i].datetime) + "</td></tr>" +
                                                 "<tr><td>Humidity</td><td>" + response.data[i].humidity + "</td></tr>" +
                                                 "<tr><td>Station Name</td><td>" + response.data[i].stationName + "</td></tr>" +
                                                 "<tr><td>Clouds</td><td>" + response.data[i].clouds + "</td></tr>" +
