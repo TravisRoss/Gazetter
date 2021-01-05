@@ -3,7 +3,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <meta http-equiv="Cache-control" content="no-cache">
-    <title>Leaflet Map</title> 
+    <title>Gazetteer</title> 
     <link rel="stylesheet" href="Vendor/Leaflet/Leaflet/leaflet.css">
     <link rel="stylesheet" href="Vendor/Leaflet/Leaflet/MarkerCluster.css">
     <link rel="stylesheet" href="Vendor/Leaflet/Leaflet/MarkerCluster.Default.css">
@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="css/syles.css">
     <script src="Vendor/JQuery/jQuery.js"></script>
     <link rel="stylesheet" href="Vendor/Bootstrap/css/bootstrap.min.css">
+    <link rel="shortcut icon" href="favicon.ico">
 </head>
 
 <body>
@@ -19,21 +20,17 @@
         <p>Loading...</p>
     </div>
 
-    <nav class="navbar navbar-expand-md navbar-light fixed-top" role="navigation" style="background-color: #666666;">
+    <nav class="navbar navbar-dark bg-secondary navbar-expand-md fixed-top" role="navigation">
 
-        <button id="toggleButton" class="navbar-toggler" data-toggle="collapse" data-target="#collapse_target">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="collapse_target">
-
-        <span id="title" class="navbar-text" >Gazetteer &nbsp;&nbsp; </span>
+        <span id="title" class="navbar-text">Gazetteer &nbsp;&nbsp; </span>
         
-        <ul class="navbar-text" >
-            <select class="navbar-text" id="selCountry" name="country" onchange="selectCountry()">
-                <option selected="selected">Select country</option>
-            </select>
-        </ul>
+        <form>  
+            <div class="form-group">
+                <select class="form-control" id="selCountry" name="country" onchange="selectCountry()">
+                    <!-- options (countries) are populated here on document load -->
+                </select>
+            </div>
+        </form>
 
         </div>
 

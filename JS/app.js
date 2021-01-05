@@ -25,6 +25,7 @@ var wikiLinks = L.layerGroup([wikiLinksFeatureGroup]);
 var localWeather = L.layerGroup([localWeatherFeatureGroup]);
 var overallWeather = L.layerGroup([overallWeatherFeatureGroup])
 
+//toner labels
 var Stamen_TonerLabels = L.tileLayer.provider('Stamen.TonerLabels', {
 	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 	subdomains: 'abcd',
@@ -33,6 +34,13 @@ var Stamen_TonerLabels = L.tileLayer.provider('Stamen.TonerLabels', {
 	ext: 'png'
 });
 
+//hiking trails
+var WaymarkedTrails_hiking = L.tileLayer.provider('WaymarkedTrails.hiking', {
+	maxZoom: 18,
+	attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Map style: &copy; <a href="https://waymarkedtrails.org">waymarkedtrails.org</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+});
+
+//cycling trails
 var WaymarkedTrails_cycling = L.tileLayer.provider('WaymarkedTrails.cycling', {
 	maxZoom: 18,
 	attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Map style: &copy; <a href="https://waymarkedtrails.org">waymarkedtrails.org</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
@@ -48,11 +56,13 @@ var map = L.map('mapid').locate({
 var defaultMap = L.tileLayer.provider('OpenStreetMap.DE', {id: 'mapid', maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
 var tonerMap = L.tileLayer.provider('Stamen.Toner', {id: 'mapid', maxZoom: 18, attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'});
 var worldStreetMap = L.tileLayer.provider('Esri.WorldStreetMap', {id: 'mapid', maxZoom: 18, attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'});
+var USGS_USImageryTopo = L.tileLayer.provider('USGS.USImageryTopo', {id: 'mapid', maxZoom: 18, attribution: 'Tiles courtesy of the <a href="https://usgs.gov/">U.S. Geological Survey</a>'});
 
 var baseMaps = {
     "Default Map": defaultMap,
     "Toner Map": tonerMap,
-    "World Street Map": worldStreetMap
+    "World Street Map": worldStreetMap,
+    "US Imagery": USGS_USImageryTopo
 };
 
 var overlayMaps = {
@@ -61,7 +71,8 @@ var overlayMaps = {
     "Local Weather": localWeather,
     "Overall Weather": overallWeather,
     "Toner labels": Stamen_TonerLabels,
-    "Way Marked Cycling Trails": WaymarkedTrails_cycling
+    "Cycling": WaymarkedTrails_cycling,
+    "Hiking": WaymarkedTrails_hiking
 };
 
 L.control.layers(baseMaps, overlayMaps).addTo(map);
@@ -163,12 +174,12 @@ $(document).ready(function() {
                                 console.log("country code");
                                 console.log(response);
 
-                                document.getElementById('selCountry').value = response.data;
+                                $('#selCountry').value = response.data;
                             }
                         },
 
                         error: function(errorThrown) {
-                            alert("Country code error: " + errorThrown);
+                            console.log("Country code error: " + errorThrown);
                         }
 
                     });
@@ -182,7 +193,7 @@ $(document).ready(function() {
         },
 
         error: function(errorThrown) {
-            alert("Error with code and name: " + errorThrown);
+            console.log("Error with code and name: " + errorThrown);
         }
 
     });
@@ -245,9 +256,13 @@ function selectCountry(){
                             console.log("flags");
                             console.log(response);
 
+                            
+
                             try {
                                 window.flagUrl = response.data.flag;
                                 window.currencyName =  response.data.currencies[0].name;
+
+                            
                             } catch (err){
                                 console.log("error with flag url or currency name: " + err);
                             }
@@ -257,7 +272,7 @@ function selectCountry(){
                     },
 
                     error: function(errorThrown){
-                        alert("error with flags: " + errorThrown);
+                        console.log("error with flags: " + errorThrown);
                     }
 
                 });
@@ -318,7 +333,14 @@ function selectCountry(){
                                     console.log("Geo data");
                                     console.log(response);
                                     window.capital = response.data.capital;
-                                    window.population = response.data.population;   
+
+                                    function formatNumber(num) {
+                                        return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+                                    }
+                                      
+                                      //console.info(formatNumber(2665)) // 2,665
+
+                                    window.population = formatNumber(response.data.population);
                                 }
 
                                 //get wikipedia links using GeoNames API
@@ -403,7 +425,7 @@ function selectCountry(){
                                     },
 
                                     error: function(errorThrown){
-                                        alert("error with earthquake activity: " + errorThrown);
+                                        console.log("error with earthquake activity: " + errorThrown);
                                     }
 
                                 });
@@ -422,11 +444,25 @@ function selectCountry(){
                                         if(response.status.name == "ok"){
                                             console.log("exchange rate");
                                             console.log(response);
-                                            window.exchangeRate = "USD: " + response.data.USD + " Euro: " + response.data.EUR + " GBP: " + response.data.GBP + " AUD: " + response.data.AUD + 
-                                            " Yen: " + response.data.JPY;
+
+                                            if(response){
+                                                window.usd = response.data.USD;
+                                                window.eur = response.data.EUR;
+                                                window.gbp = response.data.GBP;
+                                                window.aud = response.data.AUD;
+                                                window.jpy = response.data.JPY;
+                                            } else {
+                                                window.usd = "unavailable";
+                                                window.eur = "unavailable";
+                                                window.gbp = "unavailable";
+                                                window.aud = "unavailable";
+                                                window.jpy = "unavailable";
+                                            }
+                                            
                                         }
 
                                     },
+
 
                                 });
 
@@ -570,7 +606,7 @@ function selectCountry(){
                                                     //var lastUpdatedApify = response.data.lastUpdatedApify;
                                                     var sourceUrl = response.data.sourceUrl;
                                                 } catch(err){
-                                                    alert("Covid 19 data is unavailable for this country.");
+                                                    console.log("Covid 19 data is unavailable for this country.");
                                                 }
 
                                                 //set the modal title to the name  of the country that is clicked
@@ -586,11 +622,13 @@ function selectCountry(){
                                                 "<tr><td>Timezone</td><td>" + window.timezoneShortName + "</td></tr>" +
                                                 "<tr><td>Currency</td><td>" + window.currencyName + " (" + window.currencySymbol + ")" + "</td></tr>" +
                                                 "<tr><td>Currency Subunit</td><td>" + window.currencySubunit + "</td></tr>" +
-                                                "<tr><td>Current Exhange Rate</td><td>" + window.exchangeRate + "</td></tr>" +
-                                                "<tr><td>Covid 19 Infected</td><td>" + infected + "</td></tr>" + 
-                                                "<tr><td>Covid 19 Deceased</td><td>" + deceased + "</td></tr>" +
-                                                "<tr><td>Covid 19 Recovered</td><td>" + recovered + "</td></tr>" + 
-                                                "<tr><td>Covid 19 Source URL</td><td>" + sourceUrl + "</td></tr>" + "</table>";
+                                                "<tr><td>Current Exhange Rate</td><td>" + "USD: " + window.usd + "<br>EUR: " + window.eur + "<br>GBP: " + window.gbp + "<br>AUD: " + window.aud + "<br>JPY: " + window.jpy +
+                                                "</td></tr>" + "</table>" + 
+                                                "<table class='table'><th>Covid19</th>" + 
+                                                "<tr><td>Infected</td><td>" + infected + "</td></tr>" + 
+                                                "<tr><td>Deceased</td><td>" + deceased + "</td></tr>" +
+                                                "<tr><td>Recovered</td><td>" + recovered + "</td></tr>" + 
+                                                "<tr><td>Source</td><td>" + sourceUrl + "</td></tr>" + "</table>";
 
                                                 //show the modal when the country border is clicked
                                                 border.on('click', function () {
@@ -612,7 +650,7 @@ function selectCountry(){
                             },
 
                             error: function(errorThrown){
-                                alert("error with current weather: " + errorThrown);
+                                console.log("error with current weather: " + errorThrown);
                             }
 
                         });//end getWeather ajax call
@@ -622,7 +660,7 @@ function selectCountry(){
                     },
 
                     error: function(errorThrown){
-                        alert("Core info failed: " + errorThrown);
+                        console.log("Core info failed: " + errorThrown);
                     }
 
                 });//end ajax call
@@ -632,7 +670,7 @@ function selectCountry(){
         },
 
         error: function(errorThrown) {
-            alert("country borders failed: " + errorThrown);
+            console.log("country borders failed: " + errorThrown);
         }
 
     });
