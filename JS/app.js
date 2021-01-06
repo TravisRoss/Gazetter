@@ -149,6 +149,10 @@ String.prototype.toHHMMSS = function () {
     return hours+':'+minutes+':'+seconds;
 }
 
+function roundNum(num){
+    return (Math.round(num * 100) / 100).toFixed(2);
+}
+
 //Populate the select with country names and country codes.
 $(document).ready(function() {
 
