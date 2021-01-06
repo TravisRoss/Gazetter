@@ -22,13 +22,11 @@ var localWeatherClusterGroup = L.markerClusterGroup();
 var earthquakeFeatureGroup = L.featureGroup();
 var wikiLinksFeatureGroup = L.featureGroup();
 var localWeatherFeatureGroup = L.featureGroup();
-var overallWeatherFeatureGroup = L.featureGroup();
 
 //combines all the markers into one layer so you can add or remove them from the map at once.
 var earthquakes = L.layerGroup([earthquakeFeatureGroup]);
 var wikiLinks = L.layerGroup([wikiLinksFeatureGroup]);
 var localWeather = L.layerGroup([localWeatherFeatureGroup]);
-var overallWeather = L.layerGroup([overallWeatherFeatureGroup])
 
 //toner labels
 var Stamen_TonerLabels = L.tileLayer.provider('Stamen.TonerLabels', {
@@ -51,10 +49,11 @@ var WaymarkedTrails_cycling = L.tileLayer.provider('WaymarkedTrails.cycling', {
 	attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Map style: &copy; <a href="https://waymarkedtrails.org">waymarkedtrails.org</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
 });
 
+//initialise the map and get user location
 var map = L.map('mapid').locate({
     setView: true,
     maxZoom: 6,
-    layers: [defaultMap, earthquakes, wikiLinks, localWeather, overallWeather]
+    layers: [defaultMap, earthquakes, wikiLinks, localWeather]
 });
 
 //create base layers and add the default one to the map:
@@ -74,7 +73,6 @@ var overlayMaps = {
     "Earthquakes": earthquakes,
     "Wikipedia Links": wikiLinks,
     "Local Weather": localWeather,
-    "Overall Weather": overallWeather,
     "Toner labels": Stamen_TonerLabels,
     "Cycling": WaymarkedTrails_cycling,
     "Hiking": WaymarkedTrails_hiking
@@ -138,6 +136,19 @@ function formatNumber(num) {
     return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 }
 
+//convert time in seconds to HHMMSS
+String.prototype.toHHMMSS = function () {
+    var sec_num = parseInt(this, 10); // don't forget the second param
+    var hours   = Math.floor(sec_num / 3600);
+    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+    var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+    if (hours   < 10) {hours   = "0"+hours;}
+    if (minutes < 10) {minutes = "0"+minutes;}
+    if (seconds < 10) {seconds = "0"+seconds;}
+    return hours+':'+minutes+':'+seconds;
+}
+
 //Populate the select with country names and country codes.
 $(document).ready(function() {
 
@@ -151,11 +162,21 @@ $(document).ready(function() {
 
             if (response.status.name == "ok"){
                 //loop through the response object and populate the select tag
+                //check if the country code contains a number
+                function hasNumber(myString) {
+                    return /\d/.test(myString);
+                }
+
                 var options = '';
                 for(var i = 0; i < 175; i++){
-                    options += '<option value="' + response['data'][i]['code'] + '">' + response['data'][i]['name'] + '</option>';
+                    if(hasNumber(response['data'][i]['code'])){
+                        options += '<option value="' + "SO" + '">' + response['data'][i]['name'] + '</option>';
+                    } else {
+                        options += '<option value="' + response['data'][i]['code'] + '">' + response['data'][i]['name'] + '</option>';
+                    }
                 }
                 $('#selCountry').append(options);
+
             }
 
             //Geolocate
@@ -230,7 +251,6 @@ function selectCountry(){
                 }
 
                 //clear any previous markers and layers
-                overallWeatherFeatureGroup.clearLayers();
                 wikiClusterGroup.clearLayers();
                 earthquakeClusterGroup.clearLayers();
                 localWeatherClusterGroup.clearLayers();
@@ -437,18 +457,16 @@ function selectCountry(){
                                             console.log("exchange rate");
                                             console.log(response);
 
-                                            if(response){
-                                                window.usd = response.data.USD;
-                                                window.eur = response.data.EUR;
+                                            //if exchange rate data is avilable
+                                            if(response.data != null){
+                                                window.exchangeRate = "USD: " + response.data.USD + "<br>EUR: " + response.data.EUR + "<br>GBP: " + response.data.GBP
+                                                + "<br>AUD: " + response.data.AUD + "<br>JPY: " + response.data.EUR;
+                                                response.data.EUR;
                                                 window.gbp = response.data.GBP;
                                                 window.aud = response.data.AUD;
                                                 window.jpy = response.data.JPY;
                                             } else {
-                                                window.usd = "unavailable";
-                                                window.eur = "unavailable";
-                                                window.gbp = "unavailable";
-                                                window.aud = "unavailable";
-                                                window.jpy = "unavailable";
+                                                window.exchangeRate = "unavailable";
                                             }
 
                                         }
@@ -498,7 +516,7 @@ function selectCountry(){
 
                                     },
 
-                                    error: function(errorThrown){
+                                    error: function(){
                                         console.log("error with POIs");
                                     }
 
@@ -552,35 +570,14 @@ function selectCountry(){
                                         map.removeLayer(weatherMarker);
                                     }
 
-                                    weatherMarker = L.marker([response.data.lat, response.data.lon], {
-                                        elevation: 260.0,
-                                        title: "Current weather here",
-                                        icon: weatherIcon
-                                    });
-
-                                    //add overall weather to the overallWeather feature group
-                                    overallWeatherFeatureGroup.addLayer(weatherMarker);
-
                                     //format time in seconds to time in HHMMSS
                                     var sunrise = new Date(0);
                                     sunrise.setSeconds(window.sunrise); // specify value for SECONDS here
                                     window.formattedSunrise = sunrise.toISOString().substr(11, 8);
 
                                     var sunset = new Date(0);
-                                    sunset.setSeconds(window.sunrise); // specify value for SECONDS here
+                                    sunset.setSeconds(window.sunset); // specify value for SECONDS here
                                     window.formattedSunset = sunset.toISOString().substr(11, 8);
-
-                                    weatherMarker.bindPopup("<br><table class='table'>" +
-                                    "<tr><td>Temperature</td><td>" + window.temp + "K" +"</td></tr>" +
-                                    "<tr><td>Description</td><td>" + window.description + "</td></tr>" +
-                                    "<tr><td>Humidity</td><td>" + window.humidity + "%" + "</td></tr>" +
-                                    "<tr><td>Feels Like</td><td>" + window.feelsLike + "°C" + "</td></tr>" +
-                                    "<tr><td>Clouds</td><td>" + window.clouds + "</td></tr>" +
-                                    "<tr><td>Pressure</td><td>" + window.pressure + "mb" + "</td></tr>" +
-                                    "<tr><td>Sunrise</td><td>" + window.formattedSunrise + "</td></tr>" +
-                                    "<tr><td>Sunset</td><td>" + window.formattedSunset + "</td></tr>" +
-                                    "<tr><td>Visibility</td><td>" + window.visibility/1000 + "km" + "</td></tr>" +
-                                    "<tr><td>Dew Point</td><td>" + window.dewPoint + "</td></tr>" + "</table>");
 
                                     //get covid data from https://apify.com/covid-19
                                     $.ajax({
@@ -669,13 +666,7 @@ coreInfo = L.easyButton( '<img src="images/info.png" style="width:16px">', funct
     "<tr><td>Timezone</td><td>" + window.timezoneShortName + "</td></tr>" +
     "<tr><td>Currency</td><td>" + window.currencyName + " (" + window.currencySymbol + ")" + "</td></tr>" +
     "<tr><td>Currency Subunit</td><td>" + window.currencySubunit + "</td></tr>" +
-    "<tr><td>Current Exhange Rate</td><td>" + "USD: " + window.usd + "<br>EUR: " + window.eur + "<br>GBP: " + window.gbp + "<br>AUD: " + window.aud + "<br>JPY: " + window.jpy +
-    "</td></tr>" + "</table>" +
-    "<table class='table'><th>Covid19</th>" +
-    "<tr><td>Infected</td><td>" + window.infected + "</td></tr>" +
-    "<tr><td>Deceased</td><td>" + window.deceased + "</td></tr>" +
-    "<tr><td>Recovered</td><td>" + window.recovered + "</td></tr>" +
-    "<tr><td>Source</td><td>" + window.sourceUrl + "</td></tr>" + "</table>";
+    "<tr><td>Current Exhange Rate</td><td>" + window.exchangeRate + "</td></tr>" + "</table>";
 
     //show the modal when clicked
     $('#coreInfoModal').modal('show');

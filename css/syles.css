@@ -69,7 +69,8 @@ select::-ms-expand {
 }
 
 img {
-	border-radius: 25px;
+	width: auto;
+	height: auto;
 }
 
 table {
