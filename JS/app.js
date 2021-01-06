@@ -8,6 +8,11 @@ var border = null;
 var weatherMarker = null;
 var popup = L.popup();
 
+//declare modals
+var coreInfo = null;
+var weather = null;
+var covid = null;
+
 //ClusterGroups
 var wikiClusterGroup = L.markerClusterGroup();
 var earthquakeClusterGroup = L.markerClusterGroup();
@@ -118,21 +123,6 @@ var localWeatherIcon = L.icon({
     popupAnchor: [0, -14]
 });
 
-//GBP
-L.easyButton( '&pound;', function(){
-    map.setView([55, -2], 6);
-}).addTo(map);
-
-//Japanese Yen (JPY)
-L.easyButton( '&yen;', function(){
-    map.setView([38, 139], 5);
-}).addTo(map);
-
-//USD
-L.easyButton( '&dollar;', function(){
-    map.setView([37.8, -96], 5);
-}).addTo(map);
-
 //format date and time
 function toJSDate (dateTime) {
     var dateTime = dateTime.split(" ");//dateTime[0] = date, dateTime[1] = time
@@ -143,16 +133,21 @@ function toJSDate (dateTime) {
     return new Date(date[0], date[1]-1, date[2], time[0], time[1], time[2], 0);
 }
 
+//format big numbers, seperating thousands with commas
+function formatNumber(num) {
+    return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+}
+
 //Populate the select with country names and country codes.
 $(document).ready(function() {
-    
+
     $.ajax({
         url: 'PHP/getCodeAndName.php',
         type: 'GET',
         dataType: 'json',
         data: {},
-        
-        success: function(response){    //response is the country code and name
+
+        success: function(response){
 
             if (response.status.name == "ok"){
                 //loop through the response object and populate the select tag
@@ -174,7 +169,7 @@ $(document).ready(function() {
                         url: 'PHP/getCountryCode.php',
                         type: 'GET',
                         dataType: 'json',
-                        data: { 
+                        data: {
                             lat: lat,
                             lng: lng
                         },
@@ -183,9 +178,8 @@ $(document).ready(function() {
                             if(response.status.name == "ok"){
                                 console.log("country code");
                                 console.log(response);
-                                var temp = response.data; 
+                                var temp = response.data;
                                 $("#selCountry").val(temp);
-                                
                             }
                         },
 
@@ -220,19 +214,19 @@ function selectCountry(){
         type: 'GET',
         dataType: 'json',
         data: {
-            isoCode: $('#selCountry').val() 
+            isoCode: $('#selCountry').val()
         },
-        
+
         success: function(response) {
-            
-            if (response.status.name == "ok") {     
+
+            if (response.status.name == "ok") {
                 console.log("country borders");
                 console.log(response);
 
                 window.name = response.data.properties.name;
-                
+
                 if (map.hasLayer(border)) {
-                    map.removeLayer(border);    
+                    map.removeLayer(border);
                 }
 
                 //clear any previous markers and layers
@@ -240,14 +234,14 @@ function selectCountry(){
                 wikiClusterGroup.clearLayers();
                 earthquakeClusterGroup.clearLayers();
                 localWeatherClusterGroup.clearLayers();
-                
+
                 border = L.geoJson(response.data,{
                     color: '#666666',
                     weight: 3,
                     opacity: 1
-                }).addTo(map);         
-            
-                map.fitBounds(border.getBounds()); 
+                }).addTo(map);
+
+                map.fitBounds(border.getBounds());
 
                 //if dark map is activated, change the border color to white to make it visible
 
@@ -257,7 +251,7 @@ function selectCountry(){
                     url: 'PHP/getFlags.php',
                     type: 'GET',
                     dataType: 'json',
-                    data: { 
+                    data: {
                         isoCode: $('#selCountry').val(),
                     },
 
@@ -273,7 +267,7 @@ function selectCountry(){
                             } catch (err){
                                 console.log("error with flag url or currency name: " + err);
                             }
-                            
+
                         }
 
                     },
@@ -283,19 +277,19 @@ function selectCountry(){
                     }
 
                 });
-                
+
                 //ajax call to get the core info
                 $.ajax({
 
                     url: 'PHP/getCoreInfo.php',
                     type: 'GET',
                     dataType: 'json',
-                    data: { 
+                    data: {
                         isoCode: $('#selCountry').val(),
-                        name: window.name 
+                        name: window.name
                     },
 
-                    success: function(response) { 
+                    success: function(response) {
 
                         if(response.status.name == "ok"){
                             console.log("core info");
@@ -325,13 +319,12 @@ function selectCountry(){
 
                         }
 
-                        //get GeoNames Data
                         $.ajax({
 
                             url: 'PHP/getGeoData.php',
                             type: 'GET',
                             dataType: 'json',
-                            data: { 
+                            data: {
                                 isoCode: $('#selCountry').val(),
                             },
 
@@ -340,13 +333,6 @@ function selectCountry(){
                                     console.log("Geo data");
                                     console.log(response);
                                     window.capital = response.data.capital;
-
-                                    function formatNumber(num) {
-                                        return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
-                                    }
-                                      
-                                      //console.info(formatNumber(2665)) // 2,665
-
                                     window.population = formatNumber(response.data.population);
                                 }
 
@@ -356,7 +342,7 @@ function selectCountry(){
                                     url: 'PHP/getWikiLinks.php',
                                     type: 'GET',
                                     dataType: 'json',
-                                    data: { 
+                                    data: {
                                         north: response.data.north,
                                         south: response.data.south,
                                         east: response.data.east,
@@ -380,7 +366,7 @@ function selectCountry(){
 
                                                 var m = L.marker( [response.array[i].lat, response.array[i].lng], {icon: wikiIcon, title:"Wikipedia Links"} )
                                                     .bindPopup(popup, {maxWidth: "auto"});
-                                                
+
                                                     wikiClusterGroup.addLayer(m);
                                             }
                                             wikiLinksFeatureGroup.addLayer(wikiClusterGroup);
@@ -400,7 +386,7 @@ function selectCountry(){
                                     url: 'PHP/getEarthquakeActivity.php',
                                     type: 'GET',
                                     dataType: 'json',
-                                    data: { 
+                                    data: {
                                         north: response.data.north,
                                         south: response.data.south,
                                         east: response.data.east,
@@ -412,32 +398,17 @@ function selectCountry(){
                                         if(response.status.name == "ok"){
                                             console.log("earthquake activity");
                                             console.log(response);
-                                            
-                                            
 
                                             //put the data on the map as markers with popups
                                             for (var i = 0; i < response.data.length; ++i) {
-
-                                                //format date and time
-                                                function toJSDate (dateTime) {
-                                                    var dateTime = dateTime.split(" ");//dateTime[0] = date, dateTime[1] = time
-                                                    var date = dateTime[0].split("-");
-                                                    var time = dateTime[1].split(":");
-                                                    //(year, month, day, hours, minutes, seconds, milliseconds)
-                                                    //month is 0 indexed so date[1] - 1 corrected format
-                                                    return new Date(date[0], date[1]-1, date[2], time[0], time[1], time[2], 0);
-                                                        
-                                                }
-
-                                                //put the popup earthquake data in a table
                                                 var popup = "<table class='table'>" +
                                                 "<tr><td>Magnitude</td><td>" + response.data[i].magnitude + "</td></tr>" +
                                                 "<tr><td>Depth</td><td>" + response.data[i].depth + "</td></tr>" +
                                                 "<tr><td>Date and time</td><td>" + toJSDate(response.data[i].datetime) + "</td></tr>" + "</table>";
-                                                
+
                                                 var earthquakeActivity = L.marker( [response.array[i].lat, response.array[i].lng], {icon: earthquakeIcon, title: "Earthquake Activity"} )
                                                     .bindPopup(popup);
-                                                
+
                                                     earthquakeClusterGroup.addLayer(earthquakeActivity);
                                             }
                                             earthquakeFeatureGroup.addLayer(earthquakeClusterGroup);
@@ -456,7 +427,7 @@ function selectCountry(){
                                     url: 'PHP/getCurrentExchangeRate.php',
                                     type: 'GET',
                                     dataType: 'json',
-                                    data: { 
+                                    data: {
                                         currencyCode: response.data.currencyCode
                                     },
 
@@ -479,7 +450,7 @@ function selectCountry(){
                                                 window.aud = "unavailable";
                                                 window.jpy = "unavailable";
                                             }
-                                            
+
                                         }
 
                                     },
@@ -493,7 +464,7 @@ function selectCountry(){
                                     url: 'PHP/getLocalWeather.php',
                                     type: 'GET',
                                     dataType: 'json',
-                                    data: { 
+                                    data: {
                                         north: response.data.north,
                                         south: response.data.south,
                                         east: response.data.east,
@@ -505,7 +476,7 @@ function selectCountry(){
                                         if(response.status.name == "ok"){
                                             console.log("local weather");
                                             console.log(response);
-                                            
+
                                             //put the data on the map as markers with popups
                                             for (var i = 0; i < response.data.length; ++i) {
                                                 var popup = "<table class='table'>" +
@@ -515,13 +486,13 @@ function selectCountry(){
                                                 "<tr><td>Station Name</td><td>" + response.data[i].stationName + "</td></tr>" +
                                                 "<tr><td>Clouds</td><td>" + response.data[i].clouds + "</td></tr>" +
                                                 "<tr><td>Wind Speed</td><td>" + response.data[i].windSpeed + "mph" + "</td></tr>" + "</table>";
-                                                
+
                                                 var localWeatherMarkers = L.marker( [response.array[i].lat, response.array[i].lng], {icon: localWeatherIcon, title: "Local Weather"} )
                                                     .bindPopup(popup);
-                                                
+
                                                     localWeatherClusterGroup.addLayer(localWeatherMarkers);
                                             }
-                                            
+
                                             localWeatherFeatureGroup.addLayer(localWeatherClusterGroup);
                                         }
 
@@ -533,17 +504,17 @@ function selectCountry(){
 
                                 });
 
-                                
-                                
+
+
                             },
 
                             error: function(errorThrown){
                                 console.log("error: Base " + currencyCode + " is not supported. " + errorThrown);
                             }
-                    
+
                         }); //end geo data ajax call
 
-                        
+
 
                         //get weather using Open Weather API
                         $.ajax({
@@ -551,7 +522,7 @@ function selectCountry(){
                             url: 'PHP/getWeather.php',
                             type: 'GET',
                             dataType: 'json',
-                            data: { 
+                            data: {
                                 lat: window.lat,
                                 lng: window.lng
                             },
@@ -578,7 +549,7 @@ function selectCountry(){
                                     window.dewPoint = response.data.current.weather[0].main;
 
                                     if (map.hasLayer(weatherMarker)) {
-                                        map.removeLayer(weatherMarker);    
+                                        map.removeLayer(weatherMarker);
                                     }
 
                                     weatherMarker = L.marker([response.data.lat, response.data.lon], {
@@ -589,16 +560,16 @@ function selectCountry(){
 
                                     //add overall weather to the overallWeather feature group
                                     overallWeatherFeatureGroup.addLayer(weatherMarker);
-                                    
+
                                     //format time in seconds to time in HHMMSS
                                     var sunrise = new Date(0);
                                     sunrise.setSeconds(window.sunrise); // specify value for SECONDS here
-                                    var formattedSunrise = sunrise.toISOString().substr(11, 8);
+                                    window.formattedSunrise = sunrise.toISOString().substr(11, 8);
 
                                     var sunset = new Date(0);
                                     sunset.setSeconds(window.sunrise); // specify value for SECONDS here
-                                    var formattedSunset = sunset.toISOString().substr(11, 8);
-                                    
+                                    window.formattedSunset = sunset.toISOString().substr(11, 8);
+
                                     weatherMarker.bindPopup("<br><table class='table'>" +
                                     "<tr><td>Temperature</td><td>" + window.temp + "K" +"</td></tr>" +
                                     "<tr><td>Description</td><td>" + window.description + "</td></tr>" +
@@ -606,8 +577,8 @@ function selectCountry(){
                                     "<tr><td>Feels Like</td><td>" + window.feelsLike + "°C" + "</td></tr>" +
                                     "<tr><td>Clouds</td><td>" + window.clouds + "</td></tr>" +
                                     "<tr><td>Pressure</td><td>" + window.pressure + "mb" + "</td></tr>" +
-                                    "<tr><td>Sunrise</td><td>" + formattedSunrise + "</td></tr>" +
-                                    "<tr><td>Sunset</td><td>" + formattedSunset + "</td></tr>" +
+                                    "<tr><td>Sunrise</td><td>" + window.formattedSunrise + "</td></tr>" +
+                                    "<tr><td>Sunset</td><td>" + window.formattedSunset + "</td></tr>" +
                                     "<tr><td>Visibility</td><td>" + window.visibility/1000 + "km" + "</td></tr>" +
                                     "<tr><td>Dew Point</td><td>" + window.dewPoint + "</td></tr>" + "</table>");
 
@@ -618,7 +589,8 @@ function selectCountry(){
                                         type: 'GET',
                                         dataType: 'json',
                                         data: {
-                                            countryName: window.country
+                                            countryName: window.country,
+                                            countryCode: $('#selCountry').val()
                                         },
 
                                         success: function(response) {
@@ -626,57 +598,32 @@ function selectCountry(){
                                             if(response.status.name == "ok"){
                                                 console.log("Covid data");
                                                 console.log(response);
-                                                
-                                                try{
-                                                    var infected = response.data.infected;
-                                                    var deceased = response.data.deceased;
-                                                    var recovered = response.data.recovered;
-                                                    //var lastUpdatedApify = response.data.lastUpdatedApify;
-                                                    var sourceUrl = response.data.sourceUrl;
-                                                } catch(err){
-                                                    console.log("Covid 19 data is unavailable for this country.");
-                                                }
+                                                window.confirmed = response.data.latest_data.confirmed;
+                                                window.deaths = response.data.latest_data.deaths;
+                                                window.recovered = response.data.latest_data.recovered;
+                                                window.confirmedToday = response.data.today.confirmed;
+                                                window.deathsToday = response.data.today.deaths;
+                                                window.casesPerMillion = response.data.latest_data.calculated.cases_per_million_population;
+                                                window.deathRate = response.data.latest_data.calculated.death_rate;
+                                                window.recoveryRate = response.data.latest_data.calculated.recovery_rate;
+                                                window.updatedAt = response.data.updated_at;
+                                            }
 
-                                                //set the modal title to the name  of the country that is clicked
-                                                document.getElementById("coreInfoTitle").innerHTML = window.country;
+                                            coreInfo.addTo(map);
+                                            weather.addTo(map);
+                                            covid.addTo(map);
 
-                                                //set the modal content for the country selected
-                                                document.getElementById("coreInfoBody").innerHTML = 
-                                                "<table class='table table-striped'><thead><tr> <th scope='col'>#</th><th scope='col'>First</th><th scope='col'>Last</th><th scope='col'>Handle</th></tr></thead><tbody><tr><th scope='row'>1</th><td>Mark</td><td>Otto</td><td>@mdo</td></tr><tr><th scope='row'>2</th><td>Jacob</td><td>Thornton</td><td>@fat</td></tr><tr><th scope='row'>3</th><td>Larry</td><td>the Bird</td><td>@twitter</td></tr></tbody></table>";
-
-                                                /*"<img src='" + window.flagUrl + "' class='img-fluid'/>" +
-                                                "<br><table class='table'>" +
-                                                "<tr><td>Capital</td><td>" + window.capital + "</td></tr>" +
-                                                "<tr><td>Population</td><td>" + window.population + "</td></tr>" +
-                                                "<tr><td>Continent</td><td>" + window.continent + "</td></tr>" +
-                                                "<tr><td>Timezone</td><td>" + window.timezoneShortName + "</td></tr>" +
-                                                "<tr><td>Currency</td><td>" + window.currencyName + " (" + window.currencySymbol + ")" + "</td></tr>" +
-                                                "<tr><td>Currency Subunit</td><td>" + window.currencySubunit + "</td></tr>" +
-                                                "<tr><td>Current Exhange Rate</td><td>" + "USD: " + window.usd + "<br>EUR: " + window.eur + "<br>GBP: " + window.gbp + "<br>AUD: " + window.aud + "<br>JPY: " + window.jpy +
-                                                "</td></tr>" + "</table>" + 
-                                                "<table class='table'><th>Covid19</th>" + 
-                                                "<tr><td>Infected</td><td>" + infected + "</td></tr>" + 
-                                                "<tr><td>Deceased</td><td>" + deceased + "</td></tr>" +
-                                                "<tr><td>Recovered</td><td>" + recovered + "</td></tr>" + 
-                                                "<tr><td>Source</td><td>" + sourceUrl + "</td></tr>" + "</table>";*/
-                                                //show the modal when the country border is clicked
-                                                border.on('click', function () {
-                                                    $('#coreInfoModal').modal('show');
-                                                })
-
-                                            }//end if
-
-                                        },//end success function
+                                        },//end success
 
                                     error: function(errorThrown){
                                         console.log("error with Covid data: " + errorThrown);
                                     }
 
-                                });//end covid ajax call
+                                    });//end covid ajax call
 
-                                }
+                                }//end if
 
-                            },
+                            },//end success
 
                             error: function(errorThrown){
                                 console.log("error with current weather: " + errorThrown);
@@ -684,7 +631,7 @@ function selectCountry(){
 
                         });//end getWeather ajax call
 
-                        
+
 
                     },
 
@@ -694,7 +641,7 @@ function selectCountry(){
 
                 });//end ajax call
 
-            }  
+            }
 
         },
 
@@ -705,3 +652,88 @@ function selectCountry(){
     });
 
 }//end select country function
+
+//core info modal
+coreInfo = L.easyButton( '<img src="images/info.png" style="width:16px">', function(){
+
+    //set the title
+    document.getElementById("coreInfoTitle").innerHTML = "General info for " + window.country;
+
+    //set the content
+    document.getElementById("coreInfoBody").innerHTML =
+    "<img src='" + window.flagUrl + "' class='img-fluid'/>" +
+    "<br><table class='table table-hover table-striped table-md table-responsive'>" +
+    "<tr><td>Capital</td><td>" + window.capital + "</td></tr>" +
+    "<tr><td>Population</td><td>" + window.population + "</td></tr>" +
+    "<tr><td>Continent</td><td>" + window.continent + "</td></tr>" +
+    "<tr><td>Timezone</td><td>" + window.timezoneShortName + "</td></tr>" +
+    "<tr><td>Currency</td><td>" + window.currencyName + " (" + window.currencySymbol + ")" + "</td></tr>" +
+    "<tr><td>Currency Subunit</td><td>" + window.currencySubunit + "</td></tr>" +
+    "<tr><td>Current Exhange Rate</td><td>" + "USD: " + window.usd + "<br>EUR: " + window.eur + "<br>GBP: " + window.gbp + "<br>AUD: " + window.aud + "<br>JPY: " + window.jpy +
+    "</td></tr>" + "</table>" +
+    "<table class='table'><th>Covid19</th>" +
+    "<tr><td>Infected</td><td>" + window.infected + "</td></tr>" +
+    "<tr><td>Deceased</td><td>" + window.deceased + "</td></tr>" +
+    "<tr><td>Recovered</td><td>" + window.recovered + "</td></tr>" +
+    "<tr><td>Source</td><td>" + window.sourceUrl + "</td></tr>" + "</table>";
+
+    //show the modal when clicked
+    $('#coreInfoModal').modal('show');
+
+});
+
+coreInfo.button.style.width = '35px';
+coreInfo.button.style.height = '35px';
+
+//weather modal
+weather = L.easyButton("<img src='images/weather.png' style='width:16px'>", function(){
+
+    //set the title
+    document.getElementById("nationalWeatherTitle").innerHTML = "Current weather in " + window.country;
+
+    //set the content
+    document.getElementById("nationalWeatherBody").innerHTML = "<br><table class='table table-hover table-striped table-md table-responsive'>" +
+    "<tr><td>Temperature</td><td>" + window.temp + "K" +"</td></tr>" +
+    "<tr><td>Description</td><td>" + window.description + "</td></tr>" +
+    "<tr><td>Humidity</td><td>" + window.humidity + "%" + "</td></tr>" +
+    "<tr><td>Feels Like</td><td>" + window.feelsLike + "°C" + "</td></tr>" +
+    "<tr><td>Clouds</td><td>" + window.clouds + "</td></tr>" +
+    "<tr><td>Pressure</td><td>" + window.pressure + "mb" + "</td></tr>" +
+    "<tr><td>Sunrise</td><td>" + window.formattedSunrise + "</td></tr>" +
+    "<tr><td>Sunset</td><td>" + window.formattedSunset + "</td></tr>" +
+    "<tr><td>Visibility</td><td>" + window.visibility/1000 + "km" + "</td></tr>" +
+    "<tr><td>Dew Point</td><td>" + window.dewPoint + "</td></tr>" + "</table>";
+
+    $('#nationalWeatherModal').modal('show');
+
+});
+
+weather.button.style.width = '35px';
+weather.button.style.height = '35px';
+
+//Covid 19 modal
+covid = L.easyButton("<img src='images/covid.png' style='width:16px'>", function(){    //virus png from pngtree.com
+
+
+    //set the title
+    document.getElementById("covidTitle").innerHTML = "Covid 19 Data for " + window.country;
+
+    //set the content
+    document.getElementById("covidBody").innerHTML = "<br><table class='table table-hover table-striped table-md table-responsive'>" +
+    "<tr><td>Cases</td><td>" + window.confirmed +"</td></tr>" +
+    "<tr><td>Deaths</td><td>" + window.deaths + "</td></tr>" +
+    "<tr><td>Recovered</td><td>" + window.recovered + "</td></tr>" +
+    "<tr><td>Cases Today</td><td>" + window.confirmedToday + "</td></tr>" +
+    "<tr><td>Deaths Today</td><td>" + window.deathsToday + "</td></tr>" +
+    "<tr><td>Case Rate</td><td>" + window.casesPerMillion + "/m" + "</td></tr>" +
+    "<tr><td>Death Rate</td><td>" + window.deathRate + "%" + "</td></tr>" +
+    "<tr><td>Recovery Rate</td><td>" + window.recoveryRate + "%" + "</td></tr>" +
+    "<tr><td>Updated</td><td>" + window.updatedAt + "</td></tr>" + "</table>";
+
+    $('#covidModal').modal('show');
+
+});
+
+covid.button.style.width = '35px';
+covid.button.style.height ='35px';
+

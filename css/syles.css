@@ -59,7 +59,7 @@ div#coreInfoBody.modal-body {
 select::-ms-expand {
 	  display: none; /* Remove default arrow in Internet Explorer 10 and 11 */
 }
-  
+
 /* Target Internet Explorer 9 to undo the custom arrow */
 @media screen and (min-width:0\0) {
 	select {
@@ -68,17 +68,8 @@ select::-ms-expand {
 	}
 }
 
-@media (max-width: 768px) {
-
-	/* style the leaflet zoom controls */
-	a.leaflet-control-zoom-in {
-		top: 55px
-	}
-
-	a.leaflet-control-zoom-out {
-		top: 55px;
-	}
-
+img {
+	border-radius: 25px;
 }
 
 table {
