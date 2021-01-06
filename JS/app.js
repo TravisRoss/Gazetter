@@ -149,8 +149,14 @@ String.prototype.toHHMMSS = function () {
     return hours+':'+minutes+':'+seconds;
 }
 
-function roundNum(num){
+//rounds the number passed in to 2 decimal places
+function roundNum2(num){
     return (Math.round(num * 100) / 100).toFixed(2);
+}
+
+//rounds the number passed in to 2 decimal places
+function roundNum1(num){
+    return (Math.round(num * 100) / 100).toFixed(1);
 }
 
 //Populate the select with country names and country codes.
@@ -655,7 +661,9 @@ function selectCountry(){
 }//end select country function
 
 //core info modal
-coreInfo = L.easyButton( '<img src="images/info.png" style="width:16px">', function(){
+coreInfo = L.easyButton('<img src="images/info.png" style="width:16px">', function(){
+
+    //document.getElementById("selCountry").style.visibility = "hidden";
 
     //set the title
     document.getElementById("coreInfoTitle").innerHTML = "General info for " + window.country;
@@ -670,10 +678,10 @@ coreInfo = L.easyButton( '<img src="images/info.png" style="width:16px">', funct
     "<tr><td>Timezone</td><td>" + window.timezoneShortName + "</td></tr>" +
     "<tr><td>Currency</td><td>" + window.currencyName + " (" + window.currencySymbol + ")" + "</td></tr>" +
     "<tr><td>Currency Subunit</td><td>" + window.currencySubunit + "</td></tr>" +
-    "<tr><td>Current Exhange Rate</td><td>" + window.exchangeRate + "</td></tr>" + "</table>";
+    "<tr><td>Current Exhange Rate</td><td>" + roundNum2(window.exchangeRate) + "</td></tr>" + "</table>";
 
     //show the modal when clicked
-    $('#coreInfoModal').modal('show');
+    $('#coreInfoModal').modal('toggle');
 
 });
 
@@ -721,8 +729,8 @@ covid = L.easyButton("<img src='images/covid.png' style='width:16px'>", function
     "<tr><td>Cases Today</td><td>" + window.confirmedToday + "</td></tr>" +
     "<tr><td>Deaths Today</td><td>" + window.deathsToday + "</td></tr>" +
     "<tr><td>Case Rate</td><td>" + window.casesPerMillion + "/m" + "</td></tr>" +
-    "<tr><td>Death Rate</td><td>" + window.deathRate + "%" + "</td></tr>" +
-    "<tr><td>Recovery Rate</td><td>" + window.recoveryRate + "%" + "</td></tr>" +
+    "<tr><td>Death Rate</td><td>" + roundNum1(window.deathRate) + "%" + "</td></tr>" +
+    "<tr><td>Recovery Rate</td><td>" + roundNum1(window.recoveryRate) + "%" + "</td></tr>" +
     "<tr><td>Updated</td><td>" + window.updatedAt + "</td></tr>" + "</table>";
 
     $('#covidModal').modal('show');

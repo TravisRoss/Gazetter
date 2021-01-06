@@ -1,3 +1,10 @@
+/* import font */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans&display=swap');
+
+* {
+	font-family: 'DM Sans', sans-serif;
+}
+
 /* loading div */
 #loading {
 	width: 100%;
@@ -68,14 +75,10 @@ select::-ms-expand {
 	}
 }
 
-img {
-	width: auto;
-	height: auto;
-}
-
 table {
 	border-collapse: collapse;
 	max-width: auto;
+	width: 100% !important;
 	background-color: #666666;
 }
 
