@@ -12,7 +12,7 @@ var popup = L.popup();
 var coreInfo = null;
 var covid = null;
 var weather = null;
-var forecast = null;
+var weatherData = null;
 
 //ClusterGroups
 var wikiClusterGroup = L.markerClusterGroup();
@@ -213,10 +213,8 @@ $(document).ready(function() {
 
                         success: function(response) {
                             if(response.status.name == "ok"){
-                                console.log("country code");
+                                console.log("user country code");
                                 console.log(response);
-                                var temp = response.data;
-                                $("#selCountry").val(temp);
                             }
                         },
 
@@ -397,11 +395,11 @@ function selectCountry(){
 
                                             //put the data on the map as markers with popups
                                             for (var i = 0; i < response.data.length; ++i) {
-                                                var popup = "<table class='table'>" +
-                                                "<tr><td>Summary</td><td>" + response.data[i].summary + "</td></tr>" +
-                                                "<tr><td>URL</td><td>" + response.data[i].wikipediaUrl + "</td></tr>" +
+                                                var popup = "<table class='table table-hover table-striped table-md table-responsive'>" +
                                                 "<tr><td>Title</td><td>" + response.data[i].title + "</td></tr>" +
-                                                "<tr><td>Type</td><td>" + response.data[i].feature + "</td></tr>" + "</table>";
+                                                "<tr><td>Type</td><td>" + response.data[i].feature + "</td></tr>" +
+                                                "<tr><td>Summary</td><td>" + response.data[i].summary + "</td></tr>" +
+                                                "<tr><td>URL</td><td>" + "<a href='" + response.data[i].wikipediaUrl + "' >Read more</a>" + "</td></tr>" + "</table>";
 
                                                 var m = L.marker( [response.array[i].lat, response.array[i].lng], {icon: wikiIcon, title:"Wikipedia Links"} )
                                                     .bindPopup(popup, {maxWidth: "auto"});
@@ -440,7 +438,7 @@ function selectCountry(){
 
                                             //put the data on the map as markers with popups
                                             for (var i = 0; i < response.data.length; ++i) {
-                                                var popup = "<table class='table'>" +
+                                                var popup = "<table class='table table-hover table-striped table-sm table-responsive'>" +
                                                 "<tr><td>Magnitude</td><td>" + response.data[i].magnitude + "</td></tr>" +
                                                 "<tr><td>Depth</td><td>" + response.data[i].depth + "</td></tr>" +
                                                 "<tr><td>Date and time</td><td>" + toJSDate(response.data[i].datetime) + "</td></tr>" + "</table>";
@@ -512,13 +510,13 @@ function selectCountry(){
 
                                             //put the data on the map as markers with popups
                                             for (var i = 0; i < response.data.length; ++i) {
-                                                var popup = "<table class='table'>" +
-                                                "<tr><td>Temperature</td><td>" + response.data[i].temperature + "°C" + "</td></tr>" +
-                                                "<tr><td>Date And Time</td><td>" + toJSDate(response.data[i].datetime) + "</td></tr>" +
-                                                "<tr><td>Humidity</td><td>" + response.data[i].humidity + "%" + "</td></tr>" +
+                                                var popup = "<table class='table table-hover table-striped table-sm table-responsive'>" +
                                                 "<tr><td>Station Name</td><td>" + response.data[i].stationName + "</td></tr>" +
+                                                "<tr><td>Temperature</td><td>" + response.data[i].temperature + "°C" + "</td></tr>" +
+                                                "<tr><td>Humidity</td><td>" + response.data[i].humidity + "%" + "</td></tr>" +
+                                                "<tr><td>Wind Speed</td><td>" + response.data[i].windSpeed + "mph" + "</td></tr>" +
                                                 "<tr><td>Clouds</td><td>" + response.data[i].clouds + "</td></tr>" +
-                                                "<tr><td>Wind Speed</td><td>" + response.data[i].windSpeed + "mph" + "</td></tr>" + "</table>";
+                                                "<tr><td>Date And Time</td><td>" + toJSDate(response.data[i].datetime) + "</td></tr>" + "</table>";
 
                                                 var localWeatherMarkers = L.marker( [response.array[i].lat, response.array[i].lng], {icon: localWeatherIcon, title: "Local Weather"} )
                                                     .bindPopup(popup);
@@ -566,33 +564,52 @@ function selectCountry(){
                                     console.log("weather");
                                     console.log(response);
 
-                                    //declare weather variables to put on the marker with the rest of the core info about each country
-                                    window.clouds = response.data.current.clouds;
-                                    window.dewPoint = response.data.current.dew_point;
-                                    window.dt = response.data.current.dt;
-                                    window.feelsLike = response.data.current.feels_like;
-                                    window.humidity = response.data.current.humidity;
-                                    window.pressure = response.data.current.pressure;
-                                    window.sunrise = response.data.current.sunrise;
-                                    window.sunset = response.data.current.sunset;
-                                    window.temp = response.data.current.temp;
-                                    window.uvi = response.data.current.uvi;
-                                    window.visibility = response.data.current.visibility;
-                                    window.description = response.data.current.weather[0].description;
-                                    window.dewPoint = response.data.current.weather[0].main;
+                                    //current day weather
+                                    var clouds = response.data.current.clouds;
+                                    var feelsLike = response.data.current.feels_like;
+                                    var humidity = response.data.current.humidity;
+                                    var pressure = response.data.current.pressure;
+                                    var sunrise = response.data.current.sunrise;
+                                    var sunset = response.data.current.sunset;
+                                    var temp = response.data.current.temp;
+                                    var description = response.data.current.weather[0].description;
 
-                                    if (map.hasLayer(weatherMarker)) {
-                                        map.removeLayer(weatherMarker);
+                                    //populate the weather modal with the curent weather plus 8 days in advance
+                                    for(var i = 0; i < response.data.daily.length; i++){
+
+                                    weatherData = "<table class='table table-hover table-striped table-md table-responsive'>" +
+                                    "<thead><tr><th></th><th>Today</th><th>Tomorrow</th><th>Saturday</th><th>Sunday</th><th>Monday" +
+                                    "</th><th>Tuesday &nbsp;&nbsp;</th><th>Wednesday</th><th>Thursday</th><th>Friday</th>" +
+                                    "</tr></thead><tbody><tr><td>Temperature</td><td>"  + temp + "</td><td>" + response.data.daily[0].temp.day + "</td>" +
+                                    "<td>" + response.data.daily[1].temp.day + "</td><td>" + response.data.daily[2].temp.day + "</td><td>" + response.data.daily[3].temp.day + "</td><td>" + response.data.daily[4].temp.day + "</td><td>" +
+                                    response.data.daily[5].temp.day + "</td><td>" + response.data.daily[6].temp.day + "</td><td>" + response.data.daily[7].temp.day + "</td></tr>" +
+                                    "<tr><td>Feels Like</td><td>" + feelsLike + "</td><td>" + response.data.daily[0].feels_like.day + "</td><td>" + response.data.daily[1].feels_like.day + "</td>" +
+                                    "<td>" + response.data.daily[2].feels_like.day + "</td><td>" + response.data.daily[3].feels_like.day + "</td><td>" + response.data.daily[4].feels_like.day + "</td><td>" + response.data.daily[5].feels_like.day + "</td>" +
+                                    "<td>" + response.data.daily[6].feels_like.day + "</td><td>" + response.data.daily[7].feels_like.day + "</td></tr><tr><td>Description</td><td>" + description + "</td>" +
+                                    "<td>" + response.data.daily[0].weather[0].description + "</td><td>" + response.data.daily[1].weather[0].description + "</td><td>" + response.data.daily[2].weather[0].description + "</td><td>" + response.data.daily[3].weather[0].description + "</td>" +
+                                    "<td>" + response.data.daily[4].weather[0].description + "</td><td>" + response.data.daily[5].weather[0].description + "</td><td>" + response.data.daily[6].weather[0].description + "</td><td>" + response.data.daily[7].weather[0].description + "</td></tr>" +
+                                    "<tr><td>Humidity</td><td>" + humidity + "</td><td>" + response.data.daily[0].humidity + "</td><td>" + response.data.daily[1].humidity + "</td><td>" + response.data.daily[2].humidity + "</td><td>" + response.data.daily[3].humidity + "</td>" +
+                                    "<td>" + response.data.daily[4].humidity + "</td><td>" + response.data.daily[5].humidity + "</td><td>" + response.data.daily[6].humidity + "</td><td>" + response.data.daily[7].humidity + "</td></tr><tr><td>Clouds</td>" +
+                                    "<td>" + clouds + "</td><td>" + response.data.daily[0].clouds + "</td><td>" + response.data.daily[1].clouds + "</td><td>" + response.data.daily[2].clouds + "</td><td>" + response.data.daily[3].clouds + "</td><td>" + response.data.daily[4].clouds + "</td>" +
+                                    "<td>" + response.data.daily[5].clouds + "</td><td>" + response.data.daily[6].clouds + "</td><td>" + response.data.daily[7].clouds + "</td></tr><tr><td>Pressure</td><td>" + pressure + "</td><td>" + response.data.daily[0].pressure + "</td>" +
+                                    "<td>" + response.data.daily[1].pressure + "</td><td>" + response.data.daily[2].pressure + "</td><td>" + response.data.daily[3].pressure + "</td><td>" + response.data.daily[4].pressure + "</td><td>" + response.data.daily[5].pressure + "</td><td>" + response.data.daily[6].pressure + "</td>" +
+                                    "<td>" + response.data.daily[7].pressure + "</td></tr><tr><td>Sunrise</td><td>" + sunrise + "</td><td>" + response.data.daily[0].sunrise + "</td><td>" + response.data.daily[1].sunrise + "</td><td>" + response.data.daily[2].sunrise + "</td><td>" + response.data.daily[3].sunrise + "</td>" +
+                                    "<td>" + response.data.daily[4].sunrise + "</td><td>" + response.data.daily[5].sunrise + "</td><td>" + response.data.daily[6].sunrise + "</td><td>" + response.data.daily[7].sunrise + "</td></tr><tr><td>Sunset</td><td>" + sunset + "</td>" +
+                                    "<td>" + response.data.daily[0].sunset + "</td><td>" + response.data.daily[1].sunset + "</td><td>" + response.data.daily[2].sunset + "</td><td>" + response.data.daily[3].sunset + "</td><td>" + response.data.daily[4].sunset + "</td><td>" + response.data.daily[5].sunset + "</td>" +
+                                    "<td>" + response.data.daily[6].sunset + "</td><td>" + response.data.daily[7].sunset + "</td></tr></tbody></table>";
+
                                     }
 
+
+
                                     //format time in seconds to time in HHMMSS
-                                    var sunrise = new Date(0);
+                                    /*var sunrise = new Date(0);
                                     sunrise.setSeconds(window.sunrise); // specify value for SECONDS here
                                     window.formattedSunrise = sunrise.toISOString().substr(11, 8);
 
                                     var sunset = new Date(0);
                                     sunset.setSeconds(window.sunset); // specify value for SECONDS here
-                                    window.formattedSunset = sunset.toISOString().substr(11, 8);
+                                    window.formattedSunset = sunset.toISOString().substr(11, 8);*/
 
                                     //get covid data from https://apify.com/covid-19
                                     $.ajax({
@@ -673,7 +690,7 @@ coreInfo = L.easyButton('<img src="images/info.png" style="width:16px">', functi
     //document.getElementById("selCountry").style.visibility = "hidden";
 
     //set the title
-    document.getElementById("coreInfoTitle").innerHTML = window.country;
+    document.getElementById("coreInfoTitle").innerHTML = "Info: " + window.country;
 
     //set the content
     document.getElementById("coreInfoBody").innerHTML =
@@ -700,7 +717,7 @@ coreInfo.button.style.height = '35px';
 covid = L.easyButton("<img src='images/covid.png' style='width:16px'>", function(){    //virus png from pngtree.com
 
     //set the title
-    document.getElementById("covidTitle").innerHTML = "Covid 19 Data for " + window.country;
+    document.getElementById("covidTitle").innerHTML = "Covid 19: " + window.country;
 
     //set the content
     document.getElementById("covidBody").innerHTML = "<table class='table table-hover table-striped table-md table-responsive'>" +
@@ -725,10 +742,17 @@ covid.button.style.height ='35px';
 weather = L.easyButton("<img src='images/weather.png' style='width:16px'>", function(){
 
     //set the title
-    document.getElementById("nationalWeatherTitle").innerHTML = "Current weather in " + window.country;
+    document.getElementById("nationalWeatherTitle").innerHTML = "Weather: " + window.country;
 
     //set the content
-    document.getElementById("nationalWeatherBody").innerHTML = "<table class='table table-hover table-striped table-md table-responsive'>" +
+    document.getElementById("nationalWeatherBody").innerHTML = weatherData;
+
+
+
+
+
+    /*
+    "<table class='table table-hover table-striped table-md table-responsive'>" +
     "<tr><td>Temperature</td><td>" + convertKelvinToCelsius(window.temp) + "°C"+ "</td></tr>" +
     "<tr><td>Feels Like</td><td>" + convertKelvinToCelsius(window.feelsLike) + "°C" + "</td></tr>" +
     "<tr><td>Description</td><td>" + window.description + "</td></tr>" +
@@ -738,7 +762,7 @@ weather = L.easyButton("<img src='images/weather.png' style='width:16px'>", func
     "<tr><td>Sunrise</td><td>" + window.formattedSunrise + "</td></tr>" +
     "<tr><td>Sunset</td><td>" + window.formattedSunset + "</td></tr>" +
     "<tr><td>Visibility</td><td>" + window.visibility/1000 + "km" + "</td></tr>" +
-    "<tr><td>Dew Point</td><td>" + window.dewPoint + "</td></tr>" + "</table>";
+    "<tr><td>Dew Point</td><td>" + window.dewPoint + "</td></tr>" + "</table>";*/
 
     $('#nationalWeatherModal').modal('show');
 

@@ -59,9 +59,10 @@
 /* apply to all modals */
 div.modal-content {
 	height: 50vh;
-	width: 40vh;
+	width: auto;
 	overflow-y: scroll;
-	width: fit-content;
+	overflow-x: scroll;
+	border-radius: 15px;
 }
 
 div.modal-content table {
@@ -69,6 +70,37 @@ div.modal-content table {
 	width: fit-content;
 }
 
+/* modal headers */
+#coreInfoHeader {
+	background-color: rgb(116, 239, 255);
+}
+
+#weatherHeader {
+	background-color: rgb(251, 255, 0);
+}
+
+#covidHeader {
+	background-color: rgb(29, 255, 29);
+}
+
+
+
+/* modal bodies */
+div#coreInfoBody.modal-body {
+	padding: 0px;
+}
+
+/* national weather body */
+div#nationalWeatherBody.modal-body {
+	padding: 0px;
+}
+
+/* covid body */
+div#covidBody.modal-body {
+	padding: 0px;
+}
+
+/* table */
 table {
 	border-collapse: collapse;
 	width: 100%;
