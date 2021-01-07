@@ -56,11 +56,26 @@
 	padding: 0px 0px 10px 0px;
 }
 
-/* core info modal body */
-div#coreInfoBody.modal-body {
-	height: 70vh;
+/* apply to all modals */
+div.modal-content {
+	height: 50vh;
+	width: 40vh;
 	overflow-y: scroll;
-	max-width: auto;
+	width: fit-content;
+}
+
+div.modal-content table {
+	background-color: lightgrey;
+	width: fit-content;
+}
+
+table {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+td {
+    /* some style here */
 }
 
 select::-ms-expand {
@@ -75,25 +90,3 @@ select::-ms-expand {
 	}
 }
 
-table {
-	border-collapse: collapse;
-	max-width: auto;
-	width: 100% !important;
-	background-color: #666666;
-}
-
-td {
-    border:1px solid black;
-}
-
-table > th {
-	text-align: center;
-}
-
-#selCountry.navbar-text {
-	color: #666666;
-}
-
-ul.navbar-text {
-	color: #666666;
-}

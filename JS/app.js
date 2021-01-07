@@ -10,8 +10,9 @@ var popup = L.popup();
 
 //declare modals
 var coreInfo = null;
-var weather = null;
 var covid = null;
+var weather = null;
+var forecast = null;
 
 //ClusterGroups
 var wikiClusterGroup = L.markerClusterGroup();
@@ -57,9 +58,9 @@ var map = L.map('mapid').locate({
 });
 
 //create base layers and add the default one to the map:
-var defaultMap = L.tileLayer.provider('OpenStreetMap.DE', {id: 'mapid', maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
+var worldStreetMap = L.tileLayer.provider('OpenStreetMap.DE', {id: 'mapid', maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'});
 var tonerMap = L.tileLayer.provider('Stamen.Toner', {id: 'mapid', maxZoom: 18, attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'});
-var worldStreetMap = L.tileLayer.provider('Esri.WorldStreetMap', {id: 'mapid', maxZoom: 18, attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'});
+var defaultMap = L.tileLayer.provider('Esri.WorldStreetMap', {id: 'mapid', maxZoom: 18, attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'}).addTo(map);
 var USGS_USImageryTopo = L.tileLayer.provider('USGS.USImageryTopo', {id: 'mapid', maxZoom: 18, attribution: 'Tiles courtesy of the <a href="https://usgs.gov/">U.S. Geological Survey</a>'});
 
 var baseMaps = {
@@ -154,9 +155,14 @@ function roundNum2(num){
     return (Math.round(num * 100) / 100).toFixed(2);
 }
 
-//rounds the number passed in to 2 decimal places
+//rounds the number passed in to 1 decimal places
 function roundNum1(num){
     return (Math.round(num * 100) / 100).toFixed(1);
+}
+
+//convert K to C and give 1 dp
+function convertKelvinToCelsius(num){
+    return roundNum1(num - 273.15);
 }
 
 //Populate the select with country names and country codes.
@@ -343,6 +349,9 @@ function selectCountry(){
                                 window.timezoneShortName = response.data.annotations.timezone.short_name;
                                 window.continent = response.data.components.continent;
                                 window.politicalUnion = response.data.components.political_union;
+                                window.driveOn = response.data.annotations.roadinfo.drive_on;
+                                window.speedIn = response.data.annotations.roadinfo.speed_in;
+                                window.timezoneName = response.data.annotations.timezone.name;
                             } catch (err){
                                 console.log(err);
                             }
@@ -468,13 +477,9 @@ function selectCountry(){
                                             console.log(response);
 
                                             //if exchange rate data is avilable
-                                            if(response.data != null){
+                                            if(response.data){
                                                 window.exchangeRate = "USD: " + response.data.USD + "<br>EUR: " + response.data.EUR + "<br>GBP: " + response.data.GBP
-                                                + "<br>AUD: " + response.data.AUD + "<br>JPY: " + response.data.EUR;
-                                                response.data.EUR;
-                                                window.gbp = response.data.GBP;
-                                                window.aud = response.data.AUD;
-                                                window.jpy = response.data.JPY;
+                                                + "<br>AUD: " + response.data.AUD + "<br>JPY: " + response.data.JPY;
                                             } else {
                                                 window.exchangeRate = "unavailable";
                                             }
@@ -617,8 +622,10 @@ function selectCountry(){
                                             }
 
                                             coreInfo.addTo(map);
-                                            weather.addTo(map);
                                             covid.addTo(map);
+                                            weather.addTo(map);
+                                            //forecast.addTo(map);
+
 
                                         },//end success
 
@@ -666,19 +673,20 @@ coreInfo = L.easyButton('<img src="images/info.png" style="width:16px">', functi
     //document.getElementById("selCountry").style.visibility = "hidden";
 
     //set the title
-    document.getElementById("coreInfoTitle").innerHTML = "General info for " + window.country;
+    document.getElementById("coreInfoTitle").innerHTML = window.country;
 
     //set the content
     document.getElementById("coreInfoBody").innerHTML =
-    "<img src='" + window.flagUrl + "' class='img-fluid'/>" +
-    "<br><table class='table table-hover table-striped table-md table-responsive'>" +
+    "<table class='table table-hover table-striped table-md table-responsive'>" +
     "<tr><td>Capital</td><td>" + window.capital + "</td></tr>" +
     "<tr><td>Population</td><td>" + window.population + "</td></tr>" +
     "<tr><td>Continent</td><td>" + window.continent + "</td></tr>" +
-    "<tr><td>Timezone</td><td>" + window.timezoneShortName + "</td></tr>" +
+    "<tr><td>Timezone</td><td>" + window.timezoneName + ", " + window.timezoneShortName + "</td></tr>" +
     "<tr><td>Currency</td><td>" + window.currencyName + " (" + window.currencySymbol + ")" + "</td></tr>" +
     "<tr><td>Currency Subunit</td><td>" + window.currencySubunit + "</td></tr>" +
-    "<tr><td>Current Exhange Rate</td><td>" + roundNum2(window.exchangeRate) + "</td></tr>" + "</table>";
+    "<tr><td>Current Exhange Rate</td><td>" + roundNum2(window.exchangeRate) + "</td></tr>" +
+    "<tr><td>Drive on</td><td>" + window.driveOn + "</td></tr>" +
+    "<tr><td>Speed in</td><td>" + window.speedIn + "</td></tr>" + "</table>";
 
     //show the modal when clicked
     $('#coreInfoModal').modal('toggle');
@@ -688,6 +696,31 @@ coreInfo = L.easyButton('<img src="images/info.png" style="width:16px">', functi
 coreInfo.button.style.width = '35px';
 coreInfo.button.style.height = '35px';
 
+//Covid 19 modal
+covid = L.easyButton("<img src='images/covid.png' style='width:16px'>", function(){    //virus png from pngtree.com
+
+    //set the title
+    document.getElementById("covidTitle").innerHTML = "Covid 19 Data for " + window.country;
+
+    //set the content
+    document.getElementById("covidBody").innerHTML = "<table class='table table-hover table-striped table-md table-responsive'>" +
+    "<tr><td>Cases</td><td>" + formatNumber(window.confirmed )+"</td></tr>" +
+    "<tr><td>Deaths</td><td>" + formatNumber(window.deaths) + "</td></tr>" +
+    "<tr><td>Recovered</td><td>" + formatNumber(window.recovered) + "</td></tr>" +
+    "<tr><td>Cases Today</td><td>" + formatNumber(window.confirmedToday) + "</td></tr>" +
+    "<tr><td>Deaths Today</td><td>" + formatNumber(window.deathsToday) + "</td></tr>" +
+    "<tr><td>Case Rate</td><td>" + window.casesPerMillion + "/mil" + "</td></tr>" +
+    "<tr><td>Death Rate</td><td>" + roundNum1(window.deathRate) + "%" + "</td></tr>" +
+    "<tr><td>Recovery Rate</td><td>" + roundNum1(window.recoveryRate) + "%" + "</td></tr>" +
+    "<tr><td>Updated</td><td>" + window.updatedAt.toHHMMSS() + "</td></tr>" + "</table>";
+
+    $('#covidModal').modal('show');
+
+});
+
+covid.button.style.width = '35px';
+covid.button.style.height ='35px';
+
 //weather modal
 weather = L.easyButton("<img src='images/weather.png' style='width:16px'>", function(){
 
@@ -695,11 +728,11 @@ weather = L.easyButton("<img src='images/weather.png' style='width:16px'>", func
     document.getElementById("nationalWeatherTitle").innerHTML = "Current weather in " + window.country;
 
     //set the content
-    document.getElementById("nationalWeatherBody").innerHTML = "<br><table class='table table-hover table-striped table-md table-responsive'>" +
-    "<tr><td>Temperature</td><td>" + window.temp + "K" +"</td></tr>" +
+    document.getElementById("nationalWeatherBody").innerHTML = "<table class='table table-hover table-striped table-md table-responsive'>" +
+    "<tr><td>Temperature</td><td>" + convertKelvinToCelsius(window.temp) + "°C"+ "</td></tr>" +
+    "<tr><td>Feels Like</td><td>" + convertKelvinToCelsius(window.feelsLike) + "°C" + "</td></tr>" +
     "<tr><td>Description</td><td>" + window.description + "</td></tr>" +
     "<tr><td>Humidity</td><td>" + window.humidity + "%" + "</td></tr>" +
-    "<tr><td>Feels Like</td><td>" + window.feelsLike + "°C" + "</td></tr>" +
     "<tr><td>Clouds</td><td>" + window.clouds + "</td></tr>" +
     "<tr><td>Pressure</td><td>" + window.pressure + "mb" + "</td></tr>" +
     "<tr><td>Sunrise</td><td>" + window.formattedSunrise + "</td></tr>" +
@@ -713,30 +746,4 @@ weather = L.easyButton("<img src='images/weather.png' style='width:16px'>", func
 
 weather.button.style.width = '35px';
 weather.button.style.height = '35px';
-
-//Covid 19 modal
-covid = L.easyButton("<img src='images/covid.png' style='width:16px'>", function(){    //virus png from pngtree.com
-
-
-    //set the title
-    document.getElementById("covidTitle").innerHTML = "Covid 19 Data for " + window.country;
-
-    //set the content
-    document.getElementById("covidBody").innerHTML = "<br><table class='table table-hover table-striped table-md table-responsive'>" +
-    "<tr><td>Cases</td><td>" + window.confirmed +"</td></tr>" +
-    "<tr><td>Deaths</td><td>" + window.deaths + "</td></tr>" +
-    "<tr><td>Recovered</td><td>" + window.recovered + "</td></tr>" +
-    "<tr><td>Cases Today</td><td>" + window.confirmedToday + "</td></tr>" +
-    "<tr><td>Deaths Today</td><td>" + window.deathsToday + "</td></tr>" +
-    "<tr><td>Case Rate</td><td>" + window.casesPerMillion + "/m" + "</td></tr>" +
-    "<tr><td>Death Rate</td><td>" + roundNum1(window.deathRate) + "%" + "</td></tr>" +
-    "<tr><td>Recovery Rate</td><td>" + roundNum1(window.recoveryRate) + "%" + "</td></tr>" +
-    "<tr><td>Updated</td><td>" + window.updatedAt + "</td></tr>" + "</table>";
-
-    $('#covidModal').modal('show');
-
-});
-
-covid.button.style.width = '35px';
-covid.button.style.height ='35px';
 
