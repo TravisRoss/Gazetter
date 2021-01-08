@@ -35,14 +35,12 @@
 	position: relative;
 }
 
-/* select */
 .form-control {
 	max-width: 11vw;
 	text-align: center;
 	width: max-content;
 }
 
-/* the map itself */
 #mapid {
 	height: 100vh;
 	position: absolute;
@@ -56,60 +54,58 @@
 	padding: 0px 0px 10px 0px;
 }
 
-/* apply to all modals */
+/*************** apply to all modals ***************/
 div.modal-content {
-	height: 50vh;
+	height: fit-content;
 	width: auto;
 	overflow-y: scroll;
 	overflow-x: scroll;
 	border-radius: 15px;
 }
 
+/*
 div.modal-content table {
 	background-color: lightgrey;
 	width: fit-content;
-}
+}*/
 
-/* modal headers */
+/*************** modal headers ***************/
 #coreInfoHeader {
 	background-color: rgb(116, 239, 255);
 }
 
 #weatherHeader {
-	background-color: rgb(251, 255, 0);
+	display: none;
 }
 
 #covidHeader {
 	background-color: rgb(29, 255, 29);
 }
 
-
-
-/* modal bodies */
+/*************** modal bodies ***************/
 div#coreInfoBody.modal-body {
 	padding: 0px;
 }
 
-/* national weather body */
 div#nationalWeatherBody.modal-body {
 	padding: 0px;
 }
 
-/* covid body */
 div#covidBody.modal-body {
 	padding: 0px;
 }
 
-/* table */
+/*************** tables and containing cells ***************/
 table {
 	border-collapse: collapse;
 	width: 100%;
 }
 
-td {
-    /* some style here */
+tr:nth-child(even) {
+    background-color: #ebebeb;	/* apply to every other table row */
 }
 
+/*************** Support for IE browser ***************/
 select::-ms-expand {
 	  display: none; /* Remove default arrow in Internet Explorer 10 and 11 */
 }

@@ -132,22 +132,20 @@ function toJSDate (dateTime) {
     return new Date(date[0], date[1]-1, date[2], time[0], time[1], time[2], 0);
 }
 
+//format datetime
+function formatDatetime(date){
+    var thedate = new Date(Date.parse(date));
+    return thedate;
+}
+
 //format big numbers, seperating thousands with commas
 function formatNumber(num) {
     return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 }
 
 //convert time in seconds to HHMMSS
-String.prototype.toHHMMSS = function () {
-    var sec_num = parseInt(this, 10); // don't forget the second param
-    var hours   = Math.floor(sec_num / 3600);
-    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-    var seconds = sec_num - (hours * 3600) - (minutes * 60);
-
-    if (hours   < 10) {hours   = "0"+hours;}
-    if (minutes < 10) {minutes = "0"+minutes;}
-    if (seconds < 10) {seconds = "0"+seconds;}
-    return hours+':'+minutes+':'+seconds;
+function secondsToHHMMSS(seconds) {
+    return (new Date(seconds * 1000)).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0];
 }
 
 //rounds the number passed in to 2 decimal places
@@ -163,6 +161,21 @@ function roundNum1(num){
 //convert K to C and give 1 dp
 function convertKelvinToCelsius(num){
     return roundNum1(num - 273.15);
+}
+
+//add a certain number of days to todays data. to be used for the weather forecast
+function addDaysToCurrentDate (num){
+    var someDate = new Date();
+    var numberOfDaysToAdd = num;
+    someDate.setDate(someDate.getDate() + numberOfDaysToAdd);
+
+    //format to dd//mm/yy
+    var dd = someDate.getDate();
+    var mm = someDate.getMonth() + 1;
+    var y = someDate.getFullYear();
+
+    var someFormattedDate = dd + '/'+ mm + '/'+ y;
+    return someFormattedDate;
 }
 
 //Populate the select with country names and country codes.
@@ -574,12 +587,14 @@ function selectCountry(){
                                     var temp = response.data.current.temp;
                                     var description = response.data.current.weather[0].description;
 
+
+
                                     //populate the weather modal with the curent weather plus 8 days in advance
                                     for(var i = 0; i < response.data.daily.length; i++){
 
-                                    weatherData = "<table class='table table-hover table-striped table-md table-responsive'>" +
-                                    "<thead><tr><th></th><th>Today</th><th>Tomorrow</th><th>Saturday</th><th>Sunday</th><th>Monday" +
-                                    "</th><th>Tuesday &nbsp;&nbsp;</th><th>Wednesday</th><th>Thursday</th><th>Friday</th>" +
+                                    weatherData = "<table class='table table-hover table-striped table-md table-responsive' id='forecast'>" +
+                                    "<thead><tr><th>Weather</th><th>Today</th><th>Tomorrow</th><th>" + addDaysToCurrentDate(2) + "</th><th>" + addDaysToCurrentDate(3) + "</th><th>" +
+                                    addDaysToCurrentDate(4) + "</th><th>" + addDaysToCurrentDate(5) + "</th><th>" + addDaysToCurrentDate(5) + "</th><th>" + addDaysToCurrentDate(6) + "</th><th>" + addDaysToCurrentDate(7) + "</th>" +
                                     "</tr></thead><tbody><tr><td>Temperature</td><td>"  + temp + "</td><td>" + response.data.daily[0].temp.day + "</td>" +
                                     "<td>" + response.data.daily[1].temp.day + "</td><td>" + response.data.daily[2].temp.day + "</td><td>" + response.data.daily[3].temp.day + "</td><td>" + response.data.daily[4].temp.day + "</td><td>" +
                                     response.data.daily[5].temp.day + "</td><td>" + response.data.daily[6].temp.day + "</td><td>" + response.data.daily[7].temp.day + "</td></tr>" +
@@ -593,10 +608,10 @@ function selectCountry(){
                                     "<td>" + clouds + "</td><td>" + response.data.daily[0].clouds + "</td><td>" + response.data.daily[1].clouds + "</td><td>" + response.data.daily[2].clouds + "</td><td>" + response.data.daily[3].clouds + "</td><td>" + response.data.daily[4].clouds + "</td>" +
                                     "<td>" + response.data.daily[5].clouds + "</td><td>" + response.data.daily[6].clouds + "</td><td>" + response.data.daily[7].clouds + "</td></tr><tr><td>Pressure</td><td>" + pressure + "</td><td>" + response.data.daily[0].pressure + "</td>" +
                                     "<td>" + response.data.daily[1].pressure + "</td><td>" + response.data.daily[2].pressure + "</td><td>" + response.data.daily[3].pressure + "</td><td>" + response.data.daily[4].pressure + "</td><td>" + response.data.daily[5].pressure + "</td><td>" + response.data.daily[6].pressure + "</td>" +
-                                    "<td>" + response.data.daily[7].pressure + "</td></tr><tr><td>Sunrise</td><td>" + sunrise + "</td><td>" + response.data.daily[0].sunrise + "</td><td>" + response.data.daily[1].sunrise + "</td><td>" + response.data.daily[2].sunrise + "</td><td>" + response.data.daily[3].sunrise + "</td>" +
-                                    "<td>" + response.data.daily[4].sunrise + "</td><td>" + response.data.daily[5].sunrise + "</td><td>" + response.data.daily[6].sunrise + "</td><td>" + response.data.daily[7].sunrise + "</td></tr><tr><td>Sunset</td><td>" + sunset + "</td>" +
-                                    "<td>" + response.data.daily[0].sunset + "</td><td>" + response.data.daily[1].sunset + "</td><td>" + response.data.daily[2].sunset + "</td><td>" + response.data.daily[3].sunset + "</td><td>" + response.data.daily[4].sunset + "</td><td>" + response.data.daily[5].sunset + "</td>" +
-                                    "<td>" + response.data.daily[6].sunset + "</td><td>" + response.data.daily[7].sunset + "</td></tr></tbody></table>";
+                                    "<td>" + response.data.daily[7].pressure + "</td></tr><tr><td>Sunrise</td><td>" + secondsToHHMMSS(sunrise) + "</td><td>" + secondsToHHMMSS(response.data.daily[0].sunrise) + "</td><td>" + secondsToHHMMSS(response.data.daily[1].sunrise) + "</td><td>" + secondsToHHMMSS(response.data.daily[2].sunrise) + "</td><td>" + secondsToHHMMSS(response.data.daily[3].sunrise) + "</td>" +
+                                    "<td>" + secondsToHHMMSS(response.data.daily[4].sunrise) + "</td><td>" + secondsToHHMMSS(response.data.daily[5].sunrise) + "</td><td>" + secondsToHHMMSS(response.data.daily[6].sunrise) + "</td><td>" + secondsToHHMMSS(response.data.daily[7].sunrise) + "</td></tr><tr><td>Sunset</td><td>" + secondsToHHMMSS(sunset) + "</td>" +
+                                    "<td>" + secondsToHHMMSS(response.data.daily[0].sunset) + "</td><td>" + secondsToHHMMSS(response.data.daily[1].sunset) + "</td><td>" + secondsToHHMMSS(response.data.daily[2].sunset) + "</td><td>" + secondsToHHMMSS(response.data.daily[3].sunset) + "</td><td>" + secondsToHHMMSS(response.data.daily[4].sunset) + "</td><td>" + secondsToHHMMSS(response.data.daily[5].sunset) + "</td>" +
+                                    "<td>" + secondsToHHMMSS(response.data.daily[6].sunset) + "</td><td>" + secondsToHHMMSS(response.data.daily[7].sunset) + "</td></tr></tbody></table>";
 
                                     }
 
@@ -710,6 +725,7 @@ coreInfo = L.easyButton('<img src="images/info.png" style="width:16px">', functi
 
 });
 
+//style the buttons
 coreInfo.button.style.width = '35px';
 coreInfo.button.style.height = '35px';
 
@@ -729,7 +745,7 @@ covid = L.easyButton("<img src='images/covid.png' style='width:16px'>", function
     "<tr><td>Case Rate</td><td>" + window.casesPerMillion + "/mil" + "</td></tr>" +
     "<tr><td>Death Rate</td><td>" + roundNum1(window.deathRate) + "%" + "</td></tr>" +
     "<tr><td>Recovery Rate</td><td>" + roundNum1(window.recoveryRate) + "%" + "</td></tr>" +
-    "<tr><td>Updated</td><td>" + window.updatedAt.toHHMMSS() + "</td></tr>" + "</table>";
+    "<tr><td>Updated</td><td>" + formatDatetime(window.updatedAt) + "</td></tr>" + "</table>";
 
     $('#covidModal').modal('show');
 
@@ -746,23 +762,6 @@ weather = L.easyButton("<img src='images/weather.png' style='width:16px'>", func
 
     //set the content
     document.getElementById("nationalWeatherBody").innerHTML = weatherData;
-
-
-
-
-
-    /*
-    "<table class='table table-hover table-striped table-md table-responsive'>" +
-    "<tr><td>Temperature</td><td>" + convertKelvinToCelsius(window.temp) + "°C"+ "</td></tr>" +
-    "<tr><td>Feels Like</td><td>" + convertKelvinToCelsius(window.feelsLike) + "°C" + "</td></tr>" +
-    "<tr><td>Description</td><td>" + window.description + "</td></tr>" +
-    "<tr><td>Humidity</td><td>" + window.humidity + "%" + "</td></tr>" +
-    "<tr><td>Clouds</td><td>" + window.clouds + "</td></tr>" +
-    "<tr><td>Pressure</td><td>" + window.pressure + "mb" + "</td></tr>" +
-    "<tr><td>Sunrise</td><td>" + window.formattedSunrise + "</td></tr>" +
-    "<tr><td>Sunset</td><td>" + window.formattedSunset + "</td></tr>" +
-    "<tr><td>Visibility</td><td>" + window.visibility/1000 + "km" + "</td></tr>" +
-    "<tr><td>Dew Point</td><td>" + window.dewPoint + "</td></tr>" + "</table>";*/
 
     $('#nationalWeatherModal').modal('show');
 
