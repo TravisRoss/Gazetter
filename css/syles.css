@@ -49,6 +49,18 @@
 	bottom: 0px;
 }
 
+.right-align {
+	text-align: right;
+}
+
+.left-align {
+	text-align: left;
+}
+
+.fit-content {
+	width: fit-content;
+}
+
 .img-fluid {
 	width: 100%;
 	padding: 0px 0px 10px 0px;

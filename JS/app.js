@@ -593,7 +593,7 @@ function selectCountry(){
                                     for(var i = 0; i < response.data.daily.length; i++){
 
                                     weatherData = "<table class='table table-hover table-striped table-md table-responsive' id='forecast'>" +
-                                    "<thead><tr><th>Weather</th><th>Today</th><th>Tomorrow</th><th>" + addDaysToCurrentDate(2) + "</th><th>" + addDaysToCurrentDate(3) + "</th><th>" +
+                                    "<thead><tr><th>" + window.country + "</th><th>Today</th><th>Tomorrow</th><th>" + addDaysToCurrentDate(2) + "</th><th>" + addDaysToCurrentDate(3) + "</th><th>" +
                                     addDaysToCurrentDate(4) + "</th><th>" + addDaysToCurrentDate(5) + "</th><th>" + addDaysToCurrentDate(5) + "</th><th>" + addDaysToCurrentDate(6) + "</th><th>" + addDaysToCurrentDate(7) + "</th>" +
                                     "</tr></thead><tbody><tr><td>Temperature</td><td>"  + temp + "</td><td>" + response.data.daily[0].temp.day + "</td>" +
                                     "<td>" + response.data.daily[1].temp.day + "</td><td>" + response.data.daily[2].temp.day + "</td><td>" + response.data.daily[3].temp.day + "</td><td>" + response.data.daily[4].temp.day + "</td><td>" +
@@ -705,20 +705,20 @@ coreInfo = L.easyButton('<img src="images/info.png" style="width:16px">', functi
     //document.getElementById("selCountry").style.visibility = "hidden";
 
     //set the title
-    document.getElementById("coreInfoTitle").innerHTML = "Info: " + window.country;
+    document.getElementById("coreInfoTitle").innerHTML = "<img src='images/info.png' alt='weather icon' width='35' height='35'>&nbsp;Background: " + window.country;
 
     //set the content
     document.getElementById("coreInfoBody").innerHTML =
     "<table class='table table-hover table-striped table-md table-responsive'>" +
-    "<tr><td>Capital</td><td>" + window.capital + "</td></tr>" +
-    "<tr><td>Population</td><td>" + window.population + "</td></tr>" +
-    "<tr><td>Continent</td><td>" + window.continent + "</td></tr>" +
-    "<tr><td>Timezone</td><td>" + window.timezoneName + ", " + window.timezoneShortName + "</td></tr>" +
-    "<tr><td>Currency</td><td>" + window.currencyName + " (" + window.currencySymbol + ")" + "</td></tr>" +
-    "<tr><td>Currency Subunit</td><td>" + window.currencySubunit + "</td></tr>" +
-    "<tr><td>Current Exhange Rate</td><td>" + roundNum2(window.exchangeRate) + "</td></tr>" +
-    "<tr><td>Drive on</td><td>" + window.driveOn + "</td></tr>" +
-    "<tr><td>Speed in</td><td>" + window.speedIn + "</td></tr>" + "</table>";
+    "<tr><td><img src='images/capitol.png' width='35' height='35'>&nbsp;Capital</td><td class='right-align'>" + window.capital + "</td></tr>" +
+    "<tr><td><img src='images/population.png' width='35' height='35'>&nbsp;Population</td><td class='right-align'>" + window.population + "</td></tr>" +
+    "<tr><td><img src='images/continent.png' width='35' height='35'>&nbsp;Continent</td><td class='right-align'>" + window.continent + "</td></tr>" +
+    "<tr><td><img src='images/timezone.png' width='35' height='35'>&nbsp;Timezone</td><td class='right-align'>" + window.timezoneName + ", " + window.timezoneShortName + "</td></tr>" +
+    "<tr><td><img src='images/currency.png' width='35' height='35'>&nbsp;Currency</td><td class='right-align'>" + window.currencyName + " (" + window.currencySymbol + ")" + "</td></tr>" +
+    "<tr><td><img src='images/currencySubunit.png' width='35' height='35'>&nbsp;Subunit</td><td class='right-align'>" + window.currencySubunit + "</td></tr>" +
+    "<tr><td><img src='images/exchangeRate.png' width='35' height='35'>&nbsp;Current Exhange Rate</td><td class='right-align'>" + roundNum2(window.exchangeRate) + "</td></tr>" +
+    "<tr><td><img src='images/driveOn.png' width='35' height='35'>&nbsp;Drive on</td><td class='right-align'>" + window.driveOn + "</td></tr>" +
+    "<tr><td><img src='images/speedIn.png' width='35' height='35'>&nbsp;Speed in</td><td class='right-align'>" + window.speedIn + "</td></tr>" + "</table>";
 
     //show the modal when clicked
     $('#coreInfoModal').modal('toggle');
@@ -733,19 +733,19 @@ coreInfo.button.style.height = '35px';
 covid = L.easyButton("<img src='images/covid.png' style='width:16px'>", function(){    //virus png from pngtree.com
 
     //set the title
-    document.getElementById("covidTitle").innerHTML = "Covid 19: " + window.country;
+    document.getElementById("covidTitle").innerHTML = "<img src='images/covid.png' alt='virus icon' width='35' height='35'>&nbsp;Covid 19: " + window.country;
 
     //set the content
     document.getElementById("covidBody").innerHTML = "<table class='table table-hover table-striped table-md table-responsive'>" +
-    "<tr><td>Cases</td><td>" + formatNumber(window.confirmed )+"</td></tr>" +
-    "<tr><td>Deaths</td><td>" + formatNumber(window.deaths) + "</td></tr>" +
-    "<tr><td>Recovered</td><td>" + formatNumber(window.recovered) + "</td></tr>" +
-    "<tr><td>Cases Today</td><td>" + formatNumber(window.confirmedToday) + "</td></tr>" +
-    "<tr><td>Deaths Today</td><td>" + formatNumber(window.deathsToday) + "</td></tr>" +
-    "<tr><td>Case Rate</td><td>" + window.casesPerMillion + "/mil" + "</td></tr>" +
-    "<tr><td>Death Rate</td><td>" + roundNum1(window.deathRate) + "%" + "</td></tr>" +
-    "<tr><td>Recovery Rate</td><td>" + roundNum1(window.recoveryRate) + "%" + "</td></tr>" +
-    "<tr><td>Updated</td><td>" + formatDatetime(window.updatedAt) + "</td></tr>" + "</table>";
+    "<tr><td><img src='images/cases.png' width='35' height='35'>&nbsp;Cases</td><td class='right-align'>" + formatNumber(window.confirmed )+"</td></tr>" +
+    "<tr><td><img src='images/deaths.png' width='35' height='35'>&nbsp;Deaths</td><td class='right-align'>" + formatNumber(window.deaths) + "</td></tr>" +
+    "<tr><td><img src='images/recovered.png' width='35' height='35'>&nbsp;Recovered</td><td class='right-align'>" + formatNumber(window.recovered) + "</td></tr>" +
+    "<tr><td><img src='images/casesToday.png' width='35' height='35'>&nbsp;Cases Today</td><td class='right-align'>" + formatNumber(window.confirmedToday) + "</td></tr>" +
+    "<tr><td><img src='images/deaths.png' width='35' height='35'>&nbsp;Deaths Today</td><td class='right-align'>" + formatNumber(window.deathsToday) + "</td></tr>" +
+    "<tr><td><img src='images/caseRate.png' width='35' height='35'>&nbsp;Case&nbspRate</td><td class='right-align'>" + window.casesPerMillion + "/mil" + "</td></tr>" +
+    "<tr><td><img src='images/deathRate.png' width='35' height='35'>&nbsp;Death Rate</td><td class='right-align'>" + roundNum1(window.deathRate) + "%" + "</td></tr>" +
+    "<tr><td><img src='images/recoveryRate.png' width='35' height='35'>&nbsp;Recovery Rate</td><td class='right-align'>" + roundNum1(window.recoveryRate) + "%" + "</td></tr>" +
+    "<tr><td><img src='images/updatedAt.png' width='35' height='35'>&nbsp;Updated</td><td class='right-align'>" + formatDatetime(window.updatedAt) + "</td></tr>" + "</table>";
 
     $('#covidModal').modal('show');
 
