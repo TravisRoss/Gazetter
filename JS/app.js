@@ -18,16 +18,19 @@ var weatherData = null;
 var wikiClusterGroup = L.markerClusterGroup();
 var earthquakeClusterGroup = L.markerClusterGroup();
 var localWeatherClusterGroup = L.markerClusterGroup();
+var nearbyPoisClusterGroup = L.markerClusterGroup();
 
 //featureGroups
 var earthquakeFeatureGroup = L.featureGroup();
 var wikiLinksFeatureGroup = L.featureGroup();
 var localWeatherFeatureGroup = L.featureGroup();
+var nearbyPoisFeatureGroup = L.featureGroup();
 
 //combines all the markers into one layer so you can add or remove them from the map at once.
 var earthquakes = L.layerGroup([earthquakeFeatureGroup]);
 var wikiLinks = L.layerGroup([wikiLinksFeatureGroup]);
 var localWeather = L.layerGroup([localWeatherFeatureGroup]);
+var nearbyPois = L.layerGroup([nearbyPoisFeatureGroup]);
 
 //toner labels
 var Stamen_TonerLabels = L.tileLayer.provider('Stamen.TonerLabels', {
@@ -54,7 +57,7 @@ var WaymarkedTrails_cycling = L.tileLayer.provider('WaymarkedTrails.cycling', {
 var map = L.map('mapid').locate({
     setView: true,
     maxZoom: 6,
-    layers: [defaultMap, earthquakes, wikiLinks, localWeather]
+    layers: [defaultMap, earthquakes, wikiLinks, localWeather, nearbyPois]
 });
 
 //create base layers and add the default one to the map:
@@ -74,7 +77,8 @@ var overlayMaps = {
     "Earthquakes": earthquakes,
     "Wikipedia Links": wikiLinks,
     "Local Weather": localWeather,
-    "Toner labels": Stamen_TonerLabels,
+    "Cafes": nearbyPois,
+    "Toner Labels": Stamen_TonerLabels,
     "Cycling": WaymarkedTrails_cycling,
     "Hiking": WaymarkedTrails_hiking
 };
@@ -99,7 +103,7 @@ var wikiIcon = L.icon({
 });
 
 var poiIcon = L.icon({
-    iconUrl: 'images/pois.png',
+    iconUrl: 'images/poi.png',
     iconRetinaUrl: 'images/pois.png',
     iconSize: [29, 24],
     iconAnchor: [9, 21],
@@ -397,7 +401,6 @@ function selectCountry(){
                                         south: response.data.south,
                                         east: response.data.east,
                                         west: response.data.west,
-                                        isoCode: window.isoCode
                                     },
 
                                     success: function(response) {
@@ -426,6 +429,50 @@ function selectCountry(){
 
                                     error: function(errorThrown){
                                         console.log("error with wiki links: " + errorThrown);
+                                    }
+
+                                });
+
+                                $.ajax({
+
+                                    url: 'PHP/getNearbyPointsOfInterest.php',
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    data: {
+                                        lat: window.lat,
+                                        lng: window.lng,
+                                        countrySet: $('#selCountry').val()
+                                    },
+
+                                    success: function(response) {
+
+                                        if(response.status.name == "ok"){
+                                            console.log("poi");
+                                            console.log(response);
+
+                                            //put the data on the map as markers with popups
+                                            for (var i = 0; i < response.data.length; ++i) {
+                                                var popup = "<table class='table table-hover table-striped table-sm table-responsive'>" +
+                                                "<tr><td>Name</td><td>" + response.data[i].poi.name + "</td></tr>" +
+                                                "<tr><td>Category</td><td>" + response.data[i].poi.categories[0] + "</td></tr>" +
+                                                "<tr><td>Freeform Address</td><td>" + response.data[i].address.freeformAddress + "</td></tr>" +
+                                                "<tr><td>Foursquare score</td><td>" + roundNum1(response.data[i].score) + "/10</td></tr>" +
+                                                "<tr><td>Street</td><td>" + response.data[i].address.streetName + "</td></tr>" +
+                                                "<tr><td>City</td><td>" + response.data[i].address.localName + "</td></tr>" + "</table>";
+
+                                                var nearbyPois = L.marker( [response.array[i].lat, response.array[i].lng], {icon: poiIcon, title: "Cafe"} )
+                                                    .bindPopup(popup);
+
+                                                nearbyPoisClusterGroup.addLayer(nearbyPois);
+                                            }
+                                            nearbyPoisFeatureGroup.addLayer(nearbyPoisClusterGroup);
+                                        }
+
+                                    },
+
+                                    error: function(xhr, status, error){
+                                        console.log(xhr + "\n" + status + "\n" + error);
+                                        console.warn(xhr.responseText)
                                     }
 
                                 });
@@ -558,8 +605,6 @@ function selectCountry(){
 
                         }); //end geo data ajax call
 
-
-
                         //get weather using Open Weather API
                         $.ajax({
 
@@ -587,8 +632,6 @@ function selectCountry(){
                                     var temp = response.data.current.temp;
                                     var description = response.data.current.weather[0].description;
 
-
-
                                     //populate the weather modal with the curent weather plus 8 days in advance
                                     for(var i = 0; i < response.data.daily.length; i++){
 
@@ -615,18 +658,7 @@ function selectCountry(){
 
                                     }
 
-
-
-                                    //format time in seconds to time in HHMMSS
-                                    /*var sunrise = new Date(0);
-                                    sunrise.setSeconds(window.sunrise); // specify value for SECONDS here
-                                    window.formattedSunrise = sunrise.toISOString().substr(11, 8);
-
-                                    var sunset = new Date(0);
-                                    sunset.setSeconds(window.sunset); // specify value for SECONDS here
-                                    window.formattedSunset = sunset.toISOString().substr(11, 8);*/
-
-                                    //get covid data from https://apify.com/covid-19
+                                    //covid data from https://apify.com/covid-19
                                     $.ajax({
 
                                         url: 'PHP/getCovidData.php',
@@ -657,7 +689,6 @@ function selectCountry(){
                                             covid.addTo(map);
                                             weather.addTo(map);
                                             //forecast.addTo(map);
-
 
                                         },//end success
 
