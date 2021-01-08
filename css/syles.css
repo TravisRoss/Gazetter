@@ -83,15 +83,26 @@ div.modal-content table {
 
 /*************** modal headers ***************/
 #coreInfoHeader {
-	background-color: rgb(116, 239, 255);
+	background-color: rgb(17, 135, 182);
+	color: white;
 }
 
 #weatherHeader {
-	display: none;
+	background-color: rgb(255, 224, 51);
 }
 
+#nationalWeatherTitle {
+	align-content: center;
+}
+
+/*
+h5#nationalWeatherTitle.modal-title {
+	text-align: center;
+}*/
+
 #covidHeader {
-	background-color: rgb(29, 255, 29);
+	background-color: rgb(226, 0, 0);
+	color: white;
 }
 
 /*************** modal bodies ***************/
