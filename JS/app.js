@@ -19,18 +19,21 @@ var wikiClusterGroup = L.markerClusterGroup();
 var earthquakeClusterGroup = L.markerClusterGroup();
 var localWeatherClusterGroup = L.markerClusterGroup();
 var nearbyPoisClusterGroup = L.markerClusterGroup();
+var evStationsClusterGroup = L.markerClusterGroup();
 
 //featureGroups
 var earthquakeFeatureGroup = L.featureGroup();
 var wikiLinksFeatureGroup = L.featureGroup();
 var localWeatherFeatureGroup = L.featureGroup();
 var nearbyPoisFeatureGroup = L.featureGroup();
+var evStationsFeatureGroup = L.featureGroup();
 
-//combines all the markers into one layer so you can add or remove them from the map at once.
+//combines all the feature groups into one layer so you can add or remove them from the map at once.
 var earthquakes = L.layerGroup([earthquakeFeatureGroup]);
 var wikiLinks = L.layerGroup([wikiLinksFeatureGroup]);
 var localWeather = L.layerGroup([localWeatherFeatureGroup]);
 var nearbyPois = L.layerGroup([nearbyPoisFeatureGroup]);
+var evChargingStations = L.layerGroup([evStationsFeatureGroup]);
 
 //toner labels
 var Stamen_TonerLabels = L.tileLayer.provider('Stamen.TonerLabels', {
@@ -78,6 +81,7 @@ var overlayMaps = {
     "Wikipedia Links": wikiLinks,
     "Local Weather": localWeather,
     "Cafes": nearbyPois,
+    "EV Charging Stations": evChargingStations,
     "Toner Labels": Stamen_TonerLabels,
     "Cycling": WaymarkedTrails_cycling,
     "Hiking": WaymarkedTrails_hiking
@@ -121,6 +125,14 @@ var weatherIcon = L.icon({
 var localWeatherIcon = L.icon({
     iconUrl: 'images/localweather.png',
     iconRetinaUrl: 'images/localweather.png',
+    iconSize: [29, 24],
+    iconAnchor: [9, 21],
+    popupAnchor: [0, -14]
+});
+
+var evStationsIcon = L.icon({
+    iconUrl: 'images/evStations.png',
+    iconRetinaUrl: 'images/evStations.png',
     iconSize: [29, 24],
     iconAnchor: [9, 21],
     popupAnchor: [0, -14]
@@ -433,6 +445,7 @@ function selectCountry(){
 
                                 });
 
+                                //cafes
                                 $.ajax({
 
                                     url: 'PHP/getNearbyPointsOfInterest.php',
@@ -466,6 +479,55 @@ function selectCountry(){
                                                 nearbyPoisClusterGroup.addLayer(nearbyPois);
                                             }
                                             nearbyPoisFeatureGroup.addLayer(nearbyPoisClusterGroup);
+                                        }
+
+                                    },
+
+                                    error: function(xhr, status, error){
+                                        console.log(xhr + "\n" + status + "\n" + error);
+                                        console.warn(xhr.responseText)
+                                    }
+
+                                });
+
+                                //Electric Vehicle (EV) charging stations
+                                $.ajax({
+
+                                    url: 'PHP/getEVChargingStations.php',
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    data: {
+                                        lat: window.lat,
+                                        lng: window.lng,
+                                        countrySet: $('#selCountry').val()
+                                    },
+
+                                    success: function(response) {
+
+                                        if(response.status.name == "ok"){
+                                            console.log("charging stations");
+                                            console.log(response);
+
+                                            //put the data on the map as markers with popups
+                                            for (var i = 0; i < response.data.length; ++i) {
+                                                var popup = "<table class='table table-hover table-striped table-sm table-responsive'>" +
+                                                "<tr><td>Name</td><td>" + response.data[i].poi.name + "</td></tr>" +
+                                                "<tr><td>Phone</td><td>" + response.data[i].poi.phone + "</td></tr>" +
+                                                "<tr><td>Category</td><td>" + response.data[i].poi.categories[0] + "</td></tr>" +
+                                                "<tr><td>Freeform Address</td><td>" + response.data[i].address.freeformAddress + "</td></tr>" +
+                                                "<tr><td>Foursquare score</td><td>" + roundNum1(response.data[i].score) + "/10</td></tr>" +
+                                                "<tr><td>City</td><td>" + response.data[i].address.localName + "</td></tr>" +
+                                                "<tr><td>Power Rating</td><td>" + response.data[i].chargingPark.connectors[0].ratedPowerKW + "KW</td></tr>" +
+                                                "<tr><td>Voltage</td><td>" + response.data[i].chargingPark.connectors[0].voltageV + "V</td></tr>" +
+                                                "<tr><td>Current</td><td>" + response.data[i].chargingPark.connectors[0].currentA + "A</td></tr>" +
+                                                "<tr><td>Current Type</td><td>" + response.data[i].chargingPark.connectors[0].currentType + "</td></tr>" + "</table>";
+
+                                                var evStations = L.marker( [response.array[i].lat, response.array[i].lng], {icon: evStationsIcon, title: "EV Charging Station"} )
+                                                    .bindPopup(popup);
+
+                                                evStationsClusterGroup.addLayer(evStations);
+                                            }
+                                            evStationsFeatureGroup.addLayer(evStationsClusterGroup);
                                         }
 
                                     },
