@@ -83,6 +83,10 @@ div.leaflet-popup-content-wrapper {
 	text-align: left;
 }
 
+.centre-align {
+	text-align: center;
+}
+
 .fit-content {
 	width: fit-content;
 }
@@ -99,6 +103,7 @@ div.modal-content {
 	overflow-y: scroll;
 	overflow-x: scroll;
 	border-radius: 15px;
+	color: black;
 }
 
 /*************** modal headers ***************/
@@ -120,6 +125,17 @@ div.modal-content {
 	color: white;
 }
 
+#newsHeader {
+	background-color: rgb(119, 48, 69);
+	color: white;
+}
+
+hr.hr1 {
+	height: 5px;
+	border: 2px solid black;
+	border-radius: 10px;
+	background-color: rgb(119, 48, 69);
+}
 /*************** modal bodies ***************/
 div#coreInfoBody.modal-body {
 	padding: 0px;

@@ -561,13 +561,11 @@ function selectCountry(){
 
                                             //populate one string with all of the top headlines
                                             for (var i = 0; i < response.data.length; ++i) {
-                                                newsData += "<table class='table table-hover table-striped table-sm table-responsive'>" +
-                                                "<tr><td class='left-align'>Title</td><td class='right-align'>" + response.data[i].title + "</td></tr>" +
-                                                "<tr><td class='left-align'>Published</td><td class='right-align'>" + response.data[i].publishedAt + "</td></tr>" +
-                                                "<tr><td class='left-align'>Description</td><td class='right-align'>" + response.data[i].description + "</td></tr>" +
-                                                "<tr><td class='left-align'>Source</td><td class='right-align'>" + response.data[i].source.name + "</td></tr>" +
-                                                "<tr><td class='left-align'>URL</td><td class='right-align'><a href='" + response.data[i].url + "'></a></td></tr>" +
-                                                "<tr><td class='left-align'>Image</td><td class='right-align'><img  src='" + response.data[i].urlToImage + "' width='200' height='100'></td></tr>" + "</table>";
+                                                newsData = newsData + "<hr class='hr1'><table class='table table-hover table-striped table-sm table-responsive'>" +
+                                                "<tr><td class='centre-align' colspan='2'><img  src='" + response.data[i].urlToImage + "' width='200' height='100'></td></tr>" +
+                                                "<tr><td class='centre-align' colspan='2'><a href='" + response.data[i].url + "'>" + response.data[i].title + "</a>" + "</td></tr>" +
+                                                "<tr><td class='centre-align' colspan='2'>" + response.data[i].description + "</td></tr>" +
+                                                "<tr><td class='centre-align' colspan='2'>" + formatDatetime(response.data[i].publishedAt) + "</td></tr>" + "</table>";
                                             }
 
                                         }
@@ -641,8 +639,8 @@ function selectCountry(){
 
                                             //if exchange rate data is avilable
                                             if(response.data){
-                                                window.exchangeRate = "USD: " + response.data.USD + "<br>EUR: " + response.data.EUR + "<br>GBP: " + response.data.GBP
-                                                + "<br>AUD: " + response.data.AUD + "<br>JPY: " + response.data.JPY;
+                                                window.exchangeRate = "USD: " + roundNum2(response.data.USD) + "<br>EUR: " + roundNum2(response.data.EUR) + "<br>GBP: " + roundNum2(response.data.GBP)
+                                                + "<br>AUD: " + roundNum2(response.data.AUD) + "<br>JPY: " + roundNum2(response.data.JPY);
                                             } else {
                                                 window.exchangeRate = "unavailable";
                                             }
@@ -851,7 +849,7 @@ coreInfo = L.easyButton('<img src="images/info.png" style="width:16px">', functi
     "<tr><td><img src='images/timezone.png' width='35' height='35'>&nbsp;Timezone</td><td class='right-align'>" + window.timezoneName + ", " + window.timezoneShortName + "</td></tr>" +
     "<tr><td><img src='images/currency.png' width='35' height='35'>&nbsp;Currency</td><td class='right-align'>" + window.currencyName + " (" + window.currencySymbol + ")" + "</td></tr>" +
     "<tr><td><img src='images/currencySubunit.png' width='35' height='35'>&nbsp;Subunit</td><td class='right-align'>" + window.currencySubunit + "</td></tr>" +
-    "<tr><td><img src='images/exchangeRate.png' width='35' height='35'>&nbsp;Current Exhange Rate</td><td class='right-align'>" + roundNum2(window.exchangeRate) + "</td></tr>" +
+    "<tr><td><img src='images/exchangeRate.png' width='35' height='35'>&nbsp;Current Exhange Rates</td><td class='right-align'>" + window.exchangeRate + "</td></tr>" +
     "<tr><td><img src='images/driveOn.png' width='35' height='35'>&nbsp;Drive on</td><td class='right-align'>" + window.driveOn + "</td></tr>" +
     "<tr><td><img src='images/speedIn.png' width='35' height='35'>&nbsp;Speed in</td><td class='right-align'>" + window.speedIn + "</td></tr>" + "</table>";
 
