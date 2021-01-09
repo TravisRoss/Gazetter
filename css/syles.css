@@ -53,6 +53,32 @@
 	text-align: right;
 }
 
+/*specific to wiki link markers*/
+#wiki {
+	width: 40vw;
+}
+
+/*************** apply to all marker popups ***************/
+.leaflet-popup-content-wrapper {
+	width: fit-content;
+	padding: 0px;
+}
+
+.leaflet-popup-content-wrapper tr:nth-child(even) {
+	background-color: white;
+	color: black;
+}
+
+.leaflet-popup-content-wrapper tr:nth-child(odd) {
+	background-color: lightgray;
+	color: black;
+}
+
+div.leaflet-popup-content-wrapper {
+	background-color: #f3f3f3ec;
+}
+
+
 .left-align {
 	text-align: left;
 }
@@ -75,12 +101,6 @@ div.modal-content {
 	border-radius: 15px;
 }
 
-/*
-div.modal-content table {
-	background-color: lightgrey;
-	width: fit-content;
-}*/
-
 /*************** modal headers ***************/
 #coreInfoHeader {
 	background-color: rgb(17, 135, 182);
@@ -94,11 +114,6 @@ div.modal-content table {
 #nationalWeatherTitle {
 	align-content: center;
 }
-
-/*
-h5#nationalWeatherTitle.modal-title {
-	text-align: center;
-}*/
 
 #covidHeader {
 	background-color: rgb(226, 0, 0);
@@ -140,4 +155,3 @@ select::-ms-expand {
 		padding: 5px\9;
 	}
 }
-

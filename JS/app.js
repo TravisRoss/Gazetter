@@ -13,6 +13,8 @@ var coreInfo = null;
 var covid = null;
 var weather = null;
 var weatherData = null;
+var news = null;
+var newsData = null;
 
 //ClusterGroups
 var wikiClusterGroup = L.markerClusterGroup();
@@ -244,6 +246,8 @@ $(document).ready(function() {
                             if(response.status.name == "ok"){
                                 console.log("user country code");
                                 console.log(response);
+                                $('#selCountry').val("" + response.data + "");
+                                console.log("" + response.data + "");
                             }
                         },
 
@@ -423,11 +427,11 @@ function selectCountry(){
 
                                             //put the data on the map as markers with popups
                                             for (var i = 0; i < response.data.length; ++i) {
-                                                var popup = "<table class='table table-hover table-striped table-md table-responsive'>" +
-                                                "<tr><td>Title</td><td>" + response.data[i].title + "</td></tr>" +
-                                                "<tr><td>Type</td><td>" + response.data[i].feature + "</td></tr>" +
-                                                "<tr><td>Summary</td><td>" + response.data[i].summary + "</td></tr>" +
-                                                "<tr><td>URL</td><td>" + "<a href='" + response.data[i].wikipediaUrl + "' >Read more</a>" + "</td></tr>" + "</table>";
+                                                var popup = "<table class='table table-hover table-striped table-md table-responsive' id='wiki'>" +
+                                                "<tr><td class='left-align'>Title</td><td class='right-align'>" + response.data[i].title + "</td></tr>" +
+                                                "<tr><td class='left-align'>Type</td><td class='right-align'>" + response.data[i].feature + "</td></tr>" +
+                                                "<tr><td class='left-align'>Summary</td><td class='right-align'>" + response.data[i].summary + "</td></tr>" +
+                                                "<tr><td class='left-align'>URL</td><td class='right-align'>" + "<a href='" + response.data[i].wikipediaUrl + "' >Read more</a>" + "</td></tr>" + "</table>";
 
                                                 var m = L.marker( [response.array[i].lat, response.array[i].lng], {icon: wikiIcon, title:"Wikipedia Links"} )
                                                     .bindPopup(popup, {maxWidth: "auto"});
@@ -466,12 +470,12 @@ function selectCountry(){
                                             //put the data on the map as markers with popups
                                             for (var i = 0; i < response.data.length; ++i) {
                                                 var popup = "<table class='table table-hover table-striped table-sm table-responsive'>" +
-                                                "<tr><td>Name</td><td>" + response.data[i].poi.name + "</td></tr>" +
-                                                "<tr><td>Category</td><td>" + response.data[i].poi.categories[0] + "</td></tr>" +
-                                                "<tr><td>Freeform Address</td><td>" + response.data[i].address.freeformAddress + "</td></tr>" +
-                                                "<tr><td>Foursquare score</td><td>" + roundNum1(response.data[i].score) + "/10</td></tr>" +
-                                                "<tr><td>Street</td><td>" + response.data[i].address.streetName + "</td></tr>" +
-                                                "<tr><td>City</td><td>" + response.data[i].address.localName + "</td></tr>" + "</table>";
+                                                "<tr><td class='left-align'>Name</td><td class='right-align'>" + response.data[i].poi.name + "</td></tr>" +
+                                                "<tr><td class='left-align'>Category</td><td class='right-align'>" + response.data[i].poi.categories[0] + "</td></tr>" +
+                                                "<tr><td class='left-align'>Freeform Address</td><td class='right-align'>" + response.data[i].address.freeformAddress + "</td></tr>" +
+                                                "<tr><td class='left-align'>Foursquare score</td><td class='right-align'>" + roundNum1(response.data[i].score) + "/10</td></tr>" +
+                                                "<tr><td class='left-align'>Street</td><td class='right-align'>" + response.data[i].address.streetName + "</td></tr>" +
+                                                "<tr><td class='left-align'>City</td><td class='right-align'>" + response.data[i].address.localName + "</td></tr>" + "</table>";
 
                                                 var nearbyPois = L.marker( [response.array[i].lat, response.array[i].lng], {icon: poiIcon, title: "Cafe"} )
                                                     .bindPopup(popup);
@@ -511,16 +515,16 @@ function selectCountry(){
                                             //put the data on the map as markers with popups
                                             for (var i = 0; i < response.data.length; ++i) {
                                                 var popup = "<table class='table table-hover table-striped table-sm table-responsive'>" +
-                                                "<tr><td>Name</td><td>" + response.data[i].poi.name + "</td></tr>" +
-                                                "<tr><td>Phone</td><td>" + response.data[i].poi.phone + "</td></tr>" +
-                                                "<tr><td>Category</td><td>" + response.data[i].poi.categories[0] + "</td></tr>" +
-                                                "<tr><td>Freeform Address</td><td>" + response.data[i].address.freeformAddress + "</td></tr>" +
-                                                "<tr><td>Foursquare score</td><td>" + roundNum1(response.data[i].score) + "/10</td></tr>" +
-                                                "<tr><td>City</td><td>" + response.data[i].address.localName + "</td></tr>" +
-                                                "<tr><td>Power Rating</td><td>" + response.data[i].chargingPark.connectors[0].ratedPowerKW + "KW</td></tr>" +
-                                                "<tr><td>Voltage</td><td>" + response.data[i].chargingPark.connectors[0].voltageV + "V</td></tr>" +
-                                                "<tr><td>Current</td><td>" + response.data[i].chargingPark.connectors[0].currentA + "A</td></tr>" +
-                                                "<tr><td>Current Type</td><td>" + response.data[i].chargingPark.connectors[0].currentType + "</td></tr>" + "</table>";
+                                                "<tr><td class='left-align'>Name</td><td class='right-align'>" + response.data[i].poi.name + "</td></tr>" +
+                                                "<tr><td class='left-align'>Phone</td><td class='right-align'>" + response.data[i].poi.phone + "</td></tr>" +
+                                                "<tr><td class='left-align'>Category</td><td class='right-align'>" + response.data[i].poi.categories[0] + "</td></tr>" +
+                                                "<tr><td class='left-align'>Freeform Address</td><td class='right-align'>" + response.data[i].address.freeformAddress + "</td></tr>" +
+                                                "<tr><td class='left-align'>Foursquare score</td><td class='right-align'>" + roundNum1(response.data[i].score) + "/10</td></tr>" +
+                                                "<tr><td class='left-align'>City</td><td class='right-align'>" + response.data[i].address.localName + "</td></tr>" +
+                                                "<tr><td class='left-align'>Power Rating</td><td class='right-align'>" + response.data[i].chargingPark.connectors[0].ratedPowerKW + "KW</td></tr>" +
+                                                "<tr><td class='left-align'>Voltage</td><td class='right-align'>" + response.data[i].chargingPark.connectors[0].voltageV + "V</td></tr>" +
+                                                "<tr><td class='left-align'>Current</td><td class='right-align'>" + response.data[i].chargingPark.connectors[0].currentA + "A</td></tr>" +
+                                                "<tr><td class='left-align'>Current Type</td><td class='right-align'>" + response.data[i].chargingPark.connectors[0].currentType + "</td></tr>" + "</table>";
 
                                                 var evStations = L.marker( [response.array[i].lat, response.array[i].lng], {icon: evStationsIcon, title: "EV Charging Station"} )
                                                     .bindPopup(popup);
@@ -538,6 +542,45 @@ function selectCountry(){
                                     }
 
                                 });
+
+                                //news
+                                $.ajax({
+
+                                    url: 'PHP/getNews.php',
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    data: {
+                                        countryCode: $('#selCountry').val()
+                                    },
+
+                                    success: function(response) {
+
+                                        if(response.status.name == "ok"){
+                                            console.log("news");
+                                            console.log(response);
+
+                                            //populate one string with all of the top headlines
+                                            for (var i = 0; i < response.data.length; ++i) {
+                                                newsData += "<table class='table table-hover table-striped table-sm table-responsive'>" +
+                                                "<tr><td class='left-align'>Title</td><td class='right-align'>" + response.data[i].title + "</td></tr>" +
+                                                "<tr><td class='left-align'>Published</td><td class='right-align'>" + response.data[i].publishedAt + "</td></tr>" +
+                                                "<tr><td class='left-align'>Description</td><td class='right-align'>" + response.data[i].description + "</td></tr>" +
+                                                "<tr><td class='left-align'>Source</td><td class='right-align'>" + response.data[i].source.name + "</td></tr>" +
+                                                "<tr><td class='left-align'>URL</td><td class='right-align'><a href='" + response.data[i].url + "'></a></td></tr>" +
+                                                "<tr><td class='left-align'>Image</td><td class='right-align'><img  src='" + response.data[i].urlToImage + "' width='200' height='100'></td></tr>" + "</table>";
+                                            }
+
+                                        }
+
+                                    },
+
+                                    error: function(xhr, status, error){
+                                        console.log(xhr + "\n" + status + "\n" + error);
+                                        console.warn(xhr.responseText)
+                                    }
+
+                                });
+
 
                                 //get earthquake activity using GeoNames API
                                 $.ajax({
@@ -561,9 +604,9 @@ function selectCountry(){
                                             //put the data on the map as markers with popups
                                             for (var i = 0; i < response.data.length; ++i) {
                                                 var popup = "<table class='table table-hover table-striped table-sm table-responsive'>" +
-                                                "<tr><td>Magnitude</td><td>" + response.data[i].magnitude + "</td></tr>" +
-                                                "<tr><td>Depth</td><td>" + response.data[i].depth + "</td></tr>" +
-                                                "<tr><td>Date and time</td><td>" + toJSDate(response.data[i].datetime) + "</td></tr>" + "</table>";
+                                                "<tr><td class='left-align'>Magnitude</td><td class='right-align'>" + response.data[i].magnitude + "</td></tr>" +
+                                                "<tr><td class='left-align'>Depth</td><td class='right-align'>" + response.data[i].depth + "</td></tr>" +
+                                                "<tr><td class='left-align'>Date and time</td><td class='right-align'>" + toJSDate(response.data[i].datetime) + "</td></tr>" + "</table>";
 
                                                 var earthquakeActivity = L.marker( [response.array[i].lat, response.array[i].lng], {icon: earthquakeIcon, title: "Earthquake Activity"} )
                                                     .bindPopup(popup);
@@ -633,12 +676,12 @@ function selectCountry(){
                                             //put the data on the map as markers with popups
                                             for (var i = 0; i < response.data.length; ++i) {
                                                 var popup = "<table class='table table-hover table-striped table-sm table-responsive'>" +
-                                                "<tr><td>Station Name</td><td>" + response.data[i].stationName + "</td></tr>" +
-                                                "<tr><td>Temperature</td><td>" + response.data[i].temperature + "°C" + "</td></tr>" +
-                                                "<tr><td>Humidity</td><td>" + response.data[i].humidity + "%" + "</td></tr>" +
-                                                "<tr><td>Wind Speed</td><td>" + response.data[i].windSpeed + "mph" + "</td></tr>" +
-                                                "<tr><td>Clouds</td><td>" + response.data[i].clouds + "</td></tr>" +
-                                                "<tr><td>Date And Time</td><td>" + toJSDate(response.data[i].datetime) + "</td></tr>" + "</table>";
+                                                "<tr><td class='left-align'>Station Name</td><td class='right-align'>" + response.data[i].stationName + "</td></tr>" +
+                                                "<tr><td class='left-align'>Temperature</td><td class='right-align'>" + response.data[i].temperature + "°C" + "</td></tr>" +
+                                                "<tr><td class='left-align'>Humidity</td><td class='right-align'>" + response.data[i].humidity + "%" + "</td></tr>" +
+                                                "<tr><td class='left-align'>Wind Speed</td><td class='right-align'>" + response.data[i].windSpeed + "mph" + "</td></tr>" +
+                                                "<tr><td class='left-align'>Clouds</td><td class='right-align'>" + response.data[i].clouds + "</td></tr>" +
+                                                "<tr><td class='left-align'>Date And Time</td><td class='right-align'>" + toJSDate(response.data[i].datetime) + "</td></tr>" + "</table>";
 
                                                 var localWeatherMarkers = L.marker( [response.array[i].lat, response.array[i].lng], {icon: localWeatherIcon, title: "Local Weather"} )
                                                     .bindPopup(popup);
@@ -699,7 +742,7 @@ function selectCountry(){
 
                                     weatherData = "<table class='table table-hover table-striped table-md table-responsive' id='forecast'>" +
                                     "<thead><tr><th>" + "</th><th>Today</th><th>Tomorrow</th><th>" + addDaysToCurrentDate(2) + "</th><th>" + addDaysToCurrentDate(3) + "</th><th>" +
-                                    addDaysToCurrentDate(4) + "</th><th>" + addDaysToCurrentDate(5) + "</th><th>" + addDaysToCurrentDate(5) + "</th><th>" + addDaysToCurrentDate(6) + "</th><th>" + addDaysToCurrentDate(7) + "</th>" +
+                                    addDaysToCurrentDate(4) + "</th><th>" + addDaysToCurrentDate(5) + "</th><th>" + addDaysToCurrentDate(6) + "</th><th>" + addDaysToCurrentDate(7) + "</th><th>" + addDaysToCurrentDate(8) + "</th>" +
                                     "</tr></thead><tbody><tr><td><img src='images/temperature.png' width='35' height='35'>Temperature</td><td>"  + convertKelvinToCelsius(temp) + "°C</td><td>" + convertKelvinToCelsius(response.data.daily[0].temp.day) + "°C</td>" +
                                     "<td>" + convertKelvinToCelsius(response.data.daily[1].temp.day) + "°C</td><td>" + convertKelvinToCelsius(response.data.daily[2].temp.day) + "°C</td><td>" + convertKelvinToCelsius(response.data.daily[3].temp.day) + "°C</td><td>" + convertKelvinToCelsius(response.data.daily[4].temp.day) + "°C</td><td>" +
                                     convertKelvinToCelsius(response.data.daily[5].temp.day) + "°C</td><td>" + convertKelvinToCelsius(response.data.daily[6].temp.day) + "°C</td><td>" + convertKelvinToCelsius(response.data.daily[7].temp.day) + "°C</td></tr>" +
@@ -750,7 +793,7 @@ function selectCountry(){
                                             coreInfo.addTo(map);
                                             covid.addTo(map);
                                             weather.addTo(map);
-                                            //forecast.addTo(map);
+                                            news.addTo(map);
 
                                         },//end success
 
@@ -801,8 +844,7 @@ coreInfo = L.easyButton('<img src="images/info.png" style="width:16px">', functi
     document.getElementById("coreInfoTitle").innerHTML = "<img src='images/info.png' alt='weather icon' width='35' height='35'>&nbsp;Background: " + window.country;
 
     //set the content
-    document.getElementById("coreInfoBody").innerHTML =
-    "<table class='table table-hover table-striped table-md table-responsive'>" +
+    document.getElementById("coreInfoBody").innerHTML = "<table class='table table-hover table-striped table-md table-responsive'>" +
     "<tr><td><img src='images/capitol.png' width='35' height='35'>&nbsp;Capital</td><td class='right-align'>" + window.capital + "</td></tr>" +
     "<tr><td><img src='images/population.png' width='35' height='35'>&nbsp;Population</td><td class='right-align'>" + window.population + "</td></tr>" +
     "<tr><td><img src='images/continent.png' width='35' height='35'>&nbsp;Continent</td><td class='right-align'>" + window.continent + "</td></tr>" +
@@ -862,4 +904,20 @@ weather = L.easyButton("<img src='images/weather.png' style='width:16px'>", func
 
 weather.button.style.width = '35px';
 weather.button.style.height = '35px';
+
+//news modal
+news = L.easyButton("<img src='images/news.png' style='width:16px'>", function(){
+
+    //set the title
+    document.getElementById("newsTitle").innerHTML = "<img src='images/news.png' alt='news icon' width='35' height='35'>&nbsp;Top Headlines: " + window.country;
+
+    //set the content
+    document.getElementById("newsBody").innerHTML = newsData;
+
+    $('#newsModal').modal('show');
+
+});
+
+news.button.style.width = '35px';
+news.button.style.height = '35px';
 
