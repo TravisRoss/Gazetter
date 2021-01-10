@@ -24,6 +24,7 @@ var earthquakeClusterGroup = L.markerClusterGroup();
 var localWeatherClusterGroup = L.markerClusterGroup();
 var nearbyPoisClusterGroup = L.markerClusterGroup();
 var evStationsClusterGroup = L.markerClusterGroup();
+var nearbyPizzaClusterGroup = L.markerClusterGroup();
 
 //featureGroups
 var earthquakeFeatureGroup = L.featureGroup();
@@ -31,6 +32,7 @@ var wikiLinksFeatureGroup = L.featureGroup();
 var localWeatherFeatureGroup = L.featureGroup();
 var nearbyPoisFeatureGroup = L.featureGroup();
 var evStationsFeatureGroup = L.featureGroup();
+var nearbyPizzaFeatureGroup = L.featureGroup();
 
 //combines all the feature groups into one layer so you can add or remove them from the map at once.
 var earthquakes = L.layerGroup([earthquakeFeatureGroup]);
@@ -38,6 +40,7 @@ var wikiLinks = L.layerGroup([wikiLinksFeatureGroup]);
 var localWeather = L.layerGroup([localWeatherFeatureGroup]);
 var nearbyPois = L.layerGroup([nearbyPoisFeatureGroup]);
 var evChargingStations = L.layerGroup([evStationsFeatureGroup]);
+var nearbyPizza = L.layerGroup([nearbyPizzaFeatureGroup]);
 
 //toner labels
 var Stamen_TonerLabels = L.tileLayer.provider('Stamen.TonerLabels', {
@@ -73,6 +76,7 @@ var tonerMap = L.tileLayer.provider('Stamen.Toner', {id: 'mapid', maxZoom: 18, a
 var defaultMap = L.tileLayer.provider('Esri.WorldStreetMap', {id: 'mapid', maxZoom: 18, attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'}).addTo(map);
 var USGS_USImageryTopo = L.tileLayer.provider('USGS.USImageryTopo', {id: 'mapid', maxZoom: 18, attribution: 'Tiles courtesy of the <a href="https://usgs.gov/">U.S. Geological Survey</a>'});
 
+//add the base maps
 var baseMaps = {
     "Default Map": defaultMap,
     "Toner Map": tonerMap,
@@ -80,11 +84,13 @@ var baseMaps = {
     "US Imagery": USGS_USImageryTopo
 };
 
+//add the layer groups
 var overlayMaps = {
     "Earthquakes": earthquakes,
     "Wikipedia Links": wikiLinks,
     "Local Weather": localWeather,
     "Cafes": nearbyPois,
+    "Pizza": nearbyPizza,
     "EV Charging Stations": evChargingStations,
     "Toner Labels": Stamen_TonerLabels,
     "Cycling Trails": WaymarkedTrails_cycling,
@@ -137,6 +143,14 @@ var localWeatherIcon = L.icon({
 var evStationsIcon = L.icon({
     iconUrl: 'images/evStations.png',
     iconRetinaUrl: 'images/evStations.png',
+    iconSize: [29, 24],
+    iconAnchor: [9, 21],
+    popupAnchor: [0, -14]
+});
+
+var pizzaIcon = L.icon({
+    iconUrl: 'images/pizzaIcon.png',
+    iconRetinaUrl: 'images/pizzaIcon.png',
     iconSize: [29, 24],
     iconAnchor: [9, 21],
     popupAnchor: [0, -14]
@@ -454,7 +468,7 @@ function selectCountry(){
                                 //cafes
                                 $.ajax({
 
-                                    url: 'PHP/getNearbyPointsOfInterest.php',
+                                    url: 'PHP/getCafes.php',
                                     type: 'GET',
                                     dataType: 'json',
                                     data: {
@@ -466,7 +480,7 @@ function selectCountry(){
                                     success: function(response) {
 
                                         if(response.status.name == "ok"){
-                                            console.log("poi");
+                                            console.log("cafes");
                                             console.log(response);
 
                                             //put the data on the map as markers with popups
@@ -485,6 +499,51 @@ function selectCountry(){
                                                 nearbyPoisClusterGroup.addLayer(nearbyPois);
                                             }
                                             nearbyPoisFeatureGroup.addLayer(nearbyPoisClusterGroup);
+                                        }
+
+                                    },
+
+                                    error: function(xhr, status, error){
+                                        console.log(xhr + "\n" + status + "\n" + error);
+                                        console.warn(xhr.responseText)
+                                    }
+
+                                });
+
+                                //pizza
+                                $.ajax({
+
+                                    url: 'PHP/getPizza.php',
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    data: {
+                                        lat: window.lat,
+                                        lng: window.lng,
+                                        countrySet: $('#selCountry').val()
+                                    },
+
+                                    success: function(response) {
+
+                                        if(response.status.name == "ok"){
+                                            console.log("pizza");
+                                            console.log(response);
+
+                                            //put the data on the map as markers with popups
+                                            for (var i = 0; i < response.data.length; ++i) {
+                                                var popup = "<table class='table table-hover table-striped table-sm table-responsive'>" +
+                                                "<tr><td class='left-align'>Name</td><td class='right-align'>" + response.data[i].poi.name + "</td></tr>" +
+                                                "<tr><td class='left-align'>Category</td><td class='right-align'>" + response.data[i].poi.categories[0] + "</td></tr>" +
+                                                "<tr><td class='left-align'>Freeform Address</td><td class='right-align'>" + response.data[i].address.freeformAddress + "</td></tr>" +
+                                                "<tr><td class='left-align'>Foursquare score</td><td class='right-align'>" + roundNum1(response.data[i].score) + "/10</td></tr>" +
+                                                "<tr><td class='left-align'>Street</td><td class='right-align'>" + response.data[i].address.streetName + "</td></tr>" +
+                                                "<tr><td class='left-align'>City</td><td class='right-align'>" + response.data[i].address.localName + "</td></tr>" + "</table>";
+
+                                                var nearbyPizza = L.marker( [response.array[i].lat, response.array[i].lng], {icon: pizzaIcon, title: "Pizza"} )
+                                                    .bindPopup(popup);
+
+                                                nearbyPizzaClusterGroup.addLayer(nearbyPizza);
+                                            }
+                                            nearbyPizzaFeatureGroup.addLayer(nearbyPizzaClusterGroup);
                                         }
 
                                     },

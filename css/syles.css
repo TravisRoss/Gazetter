@@ -143,6 +143,10 @@ hr.hr1 {
 	border-radius: 10px;
 	background-color: rgb(119, 48, 69);
 }
+
+/*************** modal titles ***************/
+
+
 /*************** modal bodies ***************/
 div#coreInfoBody.modal-body {
 	padding: 0px;
