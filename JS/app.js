@@ -25,6 +25,7 @@ var localWeatherClusterGroup = L.markerClusterGroup();
 var nearbyPoisClusterGroup = L.markerClusterGroup();
 var evStationsClusterGroup = L.markerClusterGroup();
 var nearbyPizzaClusterGroup = L.markerClusterGroup();
+var shopsClusterGroup = L.markerClusterGroup();
 
 //featureGroups
 var earthquakeFeatureGroup = L.featureGroup();
@@ -33,6 +34,7 @@ var localWeatherFeatureGroup = L.featureGroup();
 var nearbyPoisFeatureGroup = L.featureGroup();
 var evStationsFeatureGroup = L.featureGroup();
 var nearbyPizzaFeatureGroup = L.featureGroup();
+var shopsFeatureGroup = L.featureGroup();
 
 //combines all the feature groups into one layer so you can add or remove them from the map at once.
 var earthquakes = L.layerGroup([earthquakeFeatureGroup]);
@@ -41,6 +43,7 @@ var localWeather = L.layerGroup([localWeatherFeatureGroup]);
 var nearbyPois = L.layerGroup([nearbyPoisFeatureGroup]);
 var evChargingStations = L.layerGroup([evStationsFeatureGroup]);
 var nearbyPizza = L.layerGroup([nearbyPizzaFeatureGroup]);
+var nearbyShops = L.layerGroup([shopsFeatureGroup]);
 
 //toner labels
 var Stamen_TonerLabels = L.tileLayer.provider('Stamen.TonerLabels', {
@@ -91,6 +94,7 @@ var overlayMaps = {
     "Local Weather": localWeather,
     "Cafes": nearbyPois,
     "Pizza": nearbyPizza,
+    "Shops": nearbyShops,
     "EV Charging Stations": evChargingStations,
     "Toner Labels": Stamen_TonerLabels,
     "Cycling Trails": WaymarkedTrails_cycling,
@@ -151,6 +155,14 @@ var evStationsIcon = L.icon({
 var pizzaIcon = L.icon({
     iconUrl: 'images/pizzaIcon.png',
     iconRetinaUrl: 'images/pizzaIcon.png',
+    iconSize: [29, 24],
+    iconAnchor: [9, 21],
+    popupAnchor: [0, -14]
+});
+
+var shopIcon = L.icon({
+    iconUrl: 'images/shopIcon.png',
+    iconRetinaUrl: 'images/shopIcon.png',
     iconSize: [29, 24],
     iconAnchor: [9, 21],
     popupAnchor: [0, -14]
@@ -544,6 +556,51 @@ function selectCountry(){
                                                 nearbyPizzaClusterGroup.addLayer(nearbyPizza);
                                             }
                                             nearbyPizzaFeatureGroup.addLayer(nearbyPizzaClusterGroup);
+                                        }
+
+                                    },
+
+                                    error: function(xhr, status, error){
+                                        console.log(xhr + "\n" + status + "\n" + error);
+                                        console.warn(xhr.responseText)
+                                    }
+
+                                });
+
+                                //shops
+                                $.ajax({
+
+                                    url: 'PHP/getShops.php',
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    data: {
+                                        lat: window.lat,
+                                        lng: window.lng,
+                                        countrySet: $('#selCountry').val()
+                                    },
+
+                                    success: function(response) {
+
+                                        if(response.status.name == "ok"){
+                                            console.log("shops");
+                                            console.log(response);
+
+                                            //put the data on the map as markers with popups
+                                            for (var i = 0; i < response.data.length; ++i) {
+                                                var popup = "<table class='table table-hover table-striped table-sm table-responsive'>" +
+                                                "<tr><td class='left-align'>Name</td><td class='right-align'>" + response.data[i].poi.name + "</td></tr>" +
+                                                "<tr><td class='left-align'>Category</td><td class='right-align'>" + response.data[i].poi.categories[0] + "</td></tr>" +
+                                                "<tr><td class='left-align'>Freeform Address</td><td class='right-align'>" + response.data[i].address.freeformAddress + "</td></tr>" +
+                                                "<tr><td class='left-align'>Foursquare score</td><td class='right-align'>" + roundNum1(response.data[i].score) + "/10</td></tr>" +
+                                                "<tr><td class='left-align'>Street</td><td class='right-align'>" + response.data[i].address.streetName + "</td></tr>" +
+                                                "<tr><td class='left-align'>City</td><td class='right-align'>" + response.data[i].address.localName + "</td></tr>" + "</table>";
+
+                                                var shops = L.marker( [response.array[i].lat, response.array[i].lng], {icon: shopIcon, title: "Shop"} )
+                                                    .bindPopup(popup);
+
+                                                shopsClusterGroup.addLayer(shops);
+                                            }
+                                            shopsFeatureGroup.addLayer(shopsClusterGroup);
                                         }
 
                                     },
