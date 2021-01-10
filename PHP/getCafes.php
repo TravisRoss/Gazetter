@@ -7,11 +7,15 @@
 
     $api = 'GUNgzfJPa2UkxGojgYA4w9GtwyeWateP';
 
-    //create emoty array
+    //create empty array
     $latsAndLngs = [];
+    $north = $_REQUEST['north'];
+    $south = $_REQUEST['south'];
+    $east = $_REQUEST['east'];
+    $west = $_REQUEST['west'];
 
-    $url='https://api.tomtom.com/search/2/poiSearch/coffee.json?limit=100&countrySet='
-    . $_REQUEST['countrySet'] . '&lat=' . $_REQUEST['lat'] . '&lon=' . $_REQUEST['lng'] . '&radius=100000000000&language=en-GB' . '&key=' . $api;
+    $url='https://api.tomtom.com/search/2/poiSearch/coffee.json?limit=100&countrySet=' . $_REQUEST['countrySet'] .
+    '&radius=100000&topLeft=' . $north . '%2C%20' . $west . '&btmRight=' . $south . '%2C%20' . $east . '&key=GUNgzfJPa2UkxGojgYA4w9GtwyeWateP';
 
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);

@@ -432,6 +432,10 @@ function selectCountry(){
                                     console.log(response);
                                     window.capital = response.data.capital;
                                     window.population = formatNumber(response.data.population);
+                                    window.north = response.data.north;
+                                    window.south = response.data.south;
+                                    window.east = response.data.east;
+                                    window.west = response.data.west;
                                 }
 
                                 //get wikipedia links using GeoNames API
@@ -484,8 +488,10 @@ function selectCountry(){
                                     type: 'GET',
                                     dataType: 'json',
                                     data: {
-                                        lat: window.lat,
-                                        lng: window.lng,
+                                        north: window.north,
+                                        south: window.south,
+                                        east: window.east,
+                                        west: window.west,
                                         countrySet: $('#selCountry').val()
                                     },
 
@@ -529,8 +535,10 @@ function selectCountry(){
                                     type: 'GET',
                                     dataType: 'json',
                                     data: {
-                                        lat: window.lat,
-                                        lng: window.lng,
+                                        north: window.north,
+                                        south: window.south,
+                                        east: window.east,
+                                        west: window.west,
                                         countrySet: $('#selCountry').val()
                                     },
 
@@ -574,8 +582,10 @@ function selectCountry(){
                                     type: 'GET',
                                     dataType: 'json',
                                     data: {
-                                        lat: window.lat,
-                                        lng: window.lng,
+                                        north: window.north,
+                                        south: window.south,
+                                        east: window.east,
+                                        west: window.west,
                                         countrySet: $('#selCountry').val()
                                     },
 
@@ -619,8 +629,10 @@ function selectCountry(){
                                     type: 'GET',
                                     dataType: 'json',
                                     data: {
-                                        lat: window.lat,
-                                        lng: window.lng,
+                                        north: window.north,
+                                        south: window.south,
+                                        east: window.east,
+                                        west: window.west,
                                         countrySet: $('#selCountry').val()
                                     },
 
