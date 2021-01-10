@@ -11,7 +11,7 @@
     $latsAndLngs = [];
 
     $url='https://api.tomtom.com/search/2/poiSearch/ev.json?limit=100&countrySet='
-    . $_REQUEST['countrySet'] . '&lat=' . $_REQUEST['lat'] . '&lon=' . $_REQUEST['lng'] . '&radius=100000000000&language=en-GB' . '&key=' . $api;
+    . $_REQUEST['countrySet'] . '&lat=' . $_REQUEST['lat'] . '&lon=' . $_REQUEST['lng'] . '&radius=100000000000000&language=en-GB' . '&key=' . $api;
 
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);

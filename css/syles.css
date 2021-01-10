@@ -53,6 +53,10 @@
 	text-align: right;
 }
 
+.hide-me {
+	display: none;
+}
+
 /*specific to wiki link markers*/
 #wiki {
 	width: 40vw;
@@ -104,6 +108,9 @@ div.modal-content {
 	overflow-x: scroll;
 	border-radius: 15px;
 	color: black;
+	position: fixed;
+	top: 60px;
+	left: 40px;
 }
 
 /*************** modal headers ***************/

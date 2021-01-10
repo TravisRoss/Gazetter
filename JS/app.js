@@ -8,13 +8,15 @@ var border = null;
 var weatherMarker = null;
 var popup = L.popup();
 
-//declare modals
-var coreInfo = null;
-var covid = null;
-var weather = null;
-var weatherData = null;
-var news = null;
-var newsData = null;
+//declare modals and their data
+var coreInfo = null;    //modal
+var covid = null;       //modal
+var weather = null;     //modal
+var weatherData = null;   //data
+var news = null;        //modal
+var newsData = null;    //data
+var travelInfo = null;  //modal
+var travelInfoData = null;  //data
 
 //ClusterGroups
 var wikiClusterGroup = L.markerClusterGroup();
@@ -85,8 +87,8 @@ var overlayMaps = {
     "Cafes": nearbyPois,
     "EV Charging Stations": evChargingStations,
     "Toner Labels": Stamen_TonerLabels,
-    "Cycling": WaymarkedTrails_cycling,
-    "Hiking": WaymarkedTrails_hiking
+    "Cycling Trails": WaymarkedTrails_cycling,
+    "Hiking Trails": WaymarkedTrails_hiking
 };
 
 L.control.layers(baseMaps, overlayMaps).addTo(map);
@@ -513,18 +515,14 @@ function selectCountry(){
                                             console.log(response);
 
                                             //put the data on the map as markers with popups
-                                            for (var i = 0; i < response.data.length; ++i) {
+                                            for (var i = 0; i < response.data.length; i++) {
                                                 var popup = "<table class='table table-hover table-striped table-sm table-responsive'>" +
                                                 "<tr><td class='left-align'>Name</td><td class='right-align'>" + response.data[i].poi.name + "</td></tr>" +
                                                 "<tr><td class='left-align'>Phone</td><td class='right-align'>" + response.data[i].poi.phone + "</td></tr>" +
                                                 "<tr><td class='left-align'>Category</td><td class='right-align'>" + response.data[i].poi.categories[0] + "</td></tr>" +
                                                 "<tr><td class='left-align'>Freeform Address</td><td class='right-align'>" + response.data[i].address.freeformAddress + "</td></tr>" +
                                                 "<tr><td class='left-align'>Foursquare score</td><td class='right-align'>" + roundNum1(response.data[i].score) + "/10</td></tr>" +
-                                                "<tr><td class='left-align'>City</td><td class='right-align'>" + response.data[i].address.localName + "</td></tr>" +
-                                                "<tr><td class='left-align'>Power Rating</td><td class='right-align'>" + response.data[i].chargingPark.connectors[0].ratedPowerKW + "KW</td></tr>" +
-                                                "<tr><td class='left-align'>Voltage</td><td class='right-align'>" + response.data[i].chargingPark.connectors[0].voltageV + "V</td></tr>" +
-                                                "<tr><td class='left-align'>Current</td><td class='right-align'>" + response.data[i].chargingPark.connectors[0].currentA + "A</td></tr>" +
-                                                "<tr><td class='left-align'>Current Type</td><td class='right-align'>" + response.data[i].chargingPark.connectors[0].currentType + "</td></tr>" + "</table>";
+                                                "<tr><td class='left-align'>City</td><td class='right-align'>" + response.data[i].address.localName + "</td></tr>" + + "</table>";
 
                                                 var evStations = L.marker( [response.array[i].lat, response.array[i].lng], {icon: evStationsIcon, title: "EV Charging Station"} )
                                                     .bindPopup(popup);
@@ -559,13 +557,16 @@ function selectCountry(){
                                             console.log("news");
                                             console.log(response);
 
+                                            //clear any previous news
+                                            newsData = "";
+
                                             //populate one string with all of the top headlines
                                             for (var i = 0; i < response.data.length; ++i) {
-                                                newsData = newsData + "<hr class='hr1'><table class='table table-hover table-striped table-sm table-responsive'>" +
+                                                newsData += "<table class='table table-hover table-striped table-sm table-responsive'>" +
                                                 "<tr><td class='centre-align' colspan='2'><img  src='" + response.data[i].urlToImage + "' width='200' height='100'></td></tr>" +
-                                                "<tr><td class='centre-align' colspan='2'><a href='" + response.data[i].url + "'>" + response.data[i].title + "</a>" + "</td></tr>" +
+                                                "<tr><td class='centre-align' colspan='2'><a href='" + response.data[i].url + "' target='_blank'>" + response.data[i].title + "</a>" + "</td></tr>" +
                                                 "<tr><td class='centre-align' colspan='2'>" + response.data[i].description + "</td></tr>" +
-                                                "<tr><td class='centre-align' colspan='2'>" + formatDatetime(response.data[i].publishedAt) + "</td></tr>" + "</table>";
+                                                "<tr><td class='centre-align' colspan='2'>" + formatDatetime(response.data[i].publishedAt) + "</td></tr>" + "</table><hr class='hr1'>";
                                             }
 
                                         }
@@ -579,6 +580,39 @@ function selectCountry(){
 
                                 });
 
+                                //travel advisory - is it safe to travel?
+                                $.ajax({
+
+                                    url: 'PHP/getTravelAdvisory.php',
+                                    type: 'GET',
+                                    dataType: 'json',
+                                    data: {
+                                        isoCode: $('#selCountry').val()
+                                    },
+
+                                    success: function(response) {
+
+                                        if(response.status.name == "ok"){
+                                            console.log("travel");
+                                            console.log(response);
+
+                                            //populate one string with all of the travel info
+                                            travelInfoData = "<table class='table table-hover table-striped table-sm table-responsive'>" +
+                                            "<tr><td class='centre-align' colspan='2'>" + response.data.advisory.message + "</h1></td></tr>" +
+                                            "<tr><td class='left-align'>Safety Score</td><td class='right-align'>" + response.data.advisory.score + "/5</td></tr>" +
+                                            "<tr><td class='left-align'>Source</td><td class='right-align'><a href='" + response.data.advisory.source + "'>" + response.data.advisory.source + "</a></td></tr>" +
+                                            "<tr><td class='left-align'>Updated</td><td class='right-align'>" + response.data.advisory.updated + "</td></tr>" + "</table>";
+
+                                        }
+
+                                    },
+
+                                    error: function(xhr, status, error){
+                                        console.log(xhr + "\n" + status + "\n" + error);
+                                        console.warn(xhr.responseText)
+                                    }
+
+                                });
 
                                 //get earthquake activity using GeoNames API
                                 $.ajax({
@@ -792,6 +826,7 @@ function selectCountry(){
                                             covid.addTo(map);
                                             weather.addTo(map);
                                             news.addTo(map);
+                                            travelInfo.addTo(map);
 
                                         },//end success
 
@@ -855,6 +890,7 @@ coreInfo = L.easyButton('<img src="images/info.png" style="width:16px">', functi
 
     //show the modal when clicked
     $('#coreInfoModal').modal('toggle');
+    //$( "#selCountry" ).hide();
 
 });
 
@@ -918,4 +954,22 @@ news = L.easyButton("<img src='images/news.png' style='width:16px'>", function()
 
 news.button.style.width = '35px';
 news.button.style.height = '35px';
+
+//travel modal
+travelInfo = L.easyButton("<img src='images/travel.png' style='width:16px'>", function(){
+
+    //set the title
+    document.getElementById("travelTitle").innerHTML = "<img src='images/travel.png' alt='travel icon' width='35' height='35'>&nbsp;Travel Advice: " + window.country;
+
+    //set the content
+    document.getElementById("travelBody").innerHTML = travelInfoData;
+
+    if(travelInfoData){
+        $('#travelModal').modal('show');
+    }
+
+});
+
+travelInfo.button.style.width = '35px';
+travelInfo.button.style.height = '35px';
 
