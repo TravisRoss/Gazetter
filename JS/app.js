@@ -332,6 +332,10 @@ function selectCountry(){
                 wikiClusterGroup.clearLayers();
                 earthquakeClusterGroup.clearLayers();
                 localWeatherClusterGroup.clearLayers();
+                evStationsClusterGroup.clearLayers();
+                shopsClusterGroup.clearLayers();
+                nearbyPizzaClusterGroup.clearLayers();
+                nearbyPoisClusterGroup.clearLayers();
 
                 border = L.geoJson(response.data,{
                     color: '#666666',

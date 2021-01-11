@@ -112,15 +112,13 @@ div.leaflet-popup-content-wrapper {
 div.modal-content {
 	height: fit-content;
 	width: auto;
-	border-radius: 15px;
+	border-radius: 20px;
 	color: black;
-	position: fixed;
 }
 
 div.modal-body {
 	max-height: 80vh;
 	overflow-y: auto;
-	overflow-x: scroll;
 }
 
 /*************** modal headers ***************/
