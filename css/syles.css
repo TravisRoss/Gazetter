@@ -28,17 +28,21 @@
 
 /* the div containing the select */
 .form-group {
-	width: 12vw;
+	width: 200px;
+	min-width: 50px;
+	max-width: 200px;
 	top: 1vw;
 	margin: 0 auto;
-	z-index: 99999;
+	z-index: 900;
 	position: relative;
+	text-align: center;
 }
 
-.form-control {
-	max-width: 11vw;
-	text-align: center;
-	width: max-content;
+/* the select itself */
+#selCountry {
+	z-index: 900;
+	display: inline-block;
+	margin: 0 auto;
 }
 
 #mapid {
@@ -104,13 +108,15 @@ div.leaflet-popup-content-wrapper {
 div.modal-content {
 	height: fit-content;
 	width: auto;
-	overflow-y: scroll;
-	overflow-x: scroll;
 	border-radius: 15px;
 	color: black;
 	position: fixed;
-	top: 60px;
-	left: 40px;
+}
+
+div.modal-body {
+	max-height: 80vh;
+	overflow-y: auto;
+	overflow-x: scroll;
 }
 
 /*************** modal headers ***************/
@@ -182,3 +188,15 @@ select::-ms-expand {
 		padding: 5px\9;
 	}
 }
+
+/* If the browser window is 768px or smaller, the select will be repositioned in line with the controls */
+@media only screen and (max-width: 768px) {
+	.form-group {
+		top: 15px;
+	}
+
+
+}
+
+
+

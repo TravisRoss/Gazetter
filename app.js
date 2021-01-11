@@ -236,14 +236,13 @@ $(document).ready(function() {
         success: function(response){
 
             if (response.status.name == "ok"){
-
+                //loop through the response object and populate the select tag
                 //check if the country code contains a number
                 function hasNumber(myString) {
                     return /\d/.test(myString);
                 }
 
                 var options = '';
-                //loop through the response object and populate the select tag
                 for(var i = 0; i < 175; i++){
                     if(hasNumber(response['data'][i]['code'])){
                         options += '<option value="' + "SO" + '">' + response['data'][i]['name'] + '</option>';
@@ -273,10 +272,10 @@ $(document).ready(function() {
 
                         success: function(response) {
                             if(response.status.name == "ok"){
-                                console.log("country code");
-                                console.log(response)
-                                console.log(response['data']);
-                                //$('#selCountry').val(response.data).change();
+                                console.log("user country code");
+                                console.log(response);
+                                $('#selCountry').val("" + response.data + "");
+                                console.log("" + response.data + "");
                             }
                         },
 
@@ -307,7 +306,7 @@ function selectCountry(){
 
     $.ajax({
 
-        url: 'PHP/getCountryBorder.php',
+        url: 'PHP/getCountryBorders.php',
         type: 'GET',
         dataType: 'json',
         data: {
@@ -330,6 +329,10 @@ function selectCountry(){
                 wikiClusterGroup.clearLayers();
                 earthquakeClusterGroup.clearLayers();
                 localWeatherClusterGroup.clearLayers();
+                evStationsClusterGroup.clearLayers();
+                nearbyPizzaClusterGroup.clearLayers();
+                nearbyPoisClusterGroup.clearLayers();
+                shopsClusterGroup.clearLayers();
 
                 border = L.geoJson(response.data,{
                     color: '#666666',
@@ -1101,3 +1104,4 @@ travelInfo = L.easyButton("<img src='images/travel.png' style='width:16px'>", fu
 
 travelInfo.button.style.width = '35px';
 travelInfo.button.style.height = '35px';
+
