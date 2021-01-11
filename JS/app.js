@@ -326,6 +326,8 @@ function selectCountry(){
                     map.removeLayer(border);
                 }
 
+                document.getElementById("noNewsDiv").style.visibility = "hidden";
+
                 //clear any previous markers and layers
                 wikiClusterGroup.clearLayers();
                 earthquakeClusterGroup.clearLayers();
@@ -1077,7 +1079,13 @@ news = L.easyButton("<img src='images/news.png' style='width:16px'>", function()
     //set the content
     document.getElementById("newsBody").innerHTML = newsData;
 
-    $('#newsModal').modal('show');
+    //if the news response is valid ie if there is news tobe displayed, display it.
+    if(newsData){
+        $('#newsModal').modal('show');
+    } else {
+        //otherwise show a message to say "news unavailable".
+        document.getElementById("noNewsDiv").style.visibility = "visible";
+    }
 
 });
 

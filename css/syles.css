@@ -5,6 +5,10 @@
 	font-family: 'DM Sans', sans-serif;
 }
 
+div.leaflet-control-attribution.leaflet-control {
+	display: none;
+}
+
 /* loading div */
 #loading {
 	width: 100%;
@@ -49,7 +53,7 @@
 	height: 100vh;
 	position: absolute;
 	width: 100%;
-	overflow: hidden;
+
 	bottom: 0px;
 }
 
@@ -194,8 +198,30 @@ select::-ms-expand {
 	.form-group {
 		top: 15px;
 	}
+}
+
+/* the message when there is no news to display */
+#noNewsDiv {
+	background-color: #666666;
+	color: white;
+	visibility: hidden;
+	position: absolute;
+	z-index: 400;
+	bottom: 0px;
+	width: 100vw;
+	text-align: center;
+}
+
+p {
+	vertical-align: middle;
+}
 
 
+/* If the browser window is 768px or smaller, the select will be repositioned in line with the controls */
+@media only screen and (max-width: 768px) {
+	.form-group {
+		top: 15px;
+	}
 }
 
 
