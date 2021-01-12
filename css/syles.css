@@ -116,7 +116,7 @@ div.leaflet-popup-content-wrapper {
 
 /* the core info table specificlly */
 #coreInfoTable {
-
+	max-width: 100vw;
 }
 
 /*************** apply to all modals ***************/
@@ -167,9 +167,6 @@ hr.hr1 {
 	border-radius: 10px;
 	background-color: rgb(119, 48, 69);
 }
-
-/*************** modal titles ***************/
-
 
 /*************** modal bodies ***************/
 div#coreInfoBody.modal-body {

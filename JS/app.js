@@ -1064,14 +1064,14 @@ covid = L.easyButton("<img src='images/covid.png' style='width:16px'>", function
 
     //set the content
     document.getElementById("covidBody").innerHTML = "<table class='table table-hover table-striped table-md table-responsive'>" +
-    "<tr><td><img src='images/cases.png' width='35' height='35'>&nbsp;Cases</td><td class='right-align'>" + formatNumber(window.confirmed )+"</td></tr>" +
-    "<tr><td><img src='images/deaths.png' width='35' height='35'>&nbsp;Deaths</td><td class='right-align'>" + formatNumber(window.deaths) + "</td></tr>" +
-    "<tr><td><img src='images/recovered.png' width='35' height='35'>&nbsp;Recovered</td><td class='right-align'>" + formatNumber(window.recovered) + "</td></tr>" +
-    "<tr><td><img src='images/casesToday.png' width='35' height='35'>&nbsp;Cases Today</td><td class='right-align'>" + formatNumber(window.confirmedToday) + "</td></tr>" +
-    "<tr><td><img src='images/deaths.png' width='35' height='35'>&nbsp;Deaths Today</td><td class='right-align'>" + formatNumber(window.deathsToday) + "</td></tr>" +
-    "<tr><td><img src='images/caseRate.png' width='35' height='35'>&nbsp;Case&nbspRate</td><td class='right-align'>" + window.casesPerMillion + "/mil" + "</td></tr>" +
-    "<tr><td><img src='images/deathRate.png' width='35' height='35'>&nbsp;Death Rate</td><td class='right-align'>" + roundNum1(window.deathRate) + "%" + "</td></tr>" +
-    "<tr><td><img src='images/recoveryRate.png' width='35' height='35'>&nbsp;Recovery Rate</td><td class='right-align'>" + roundNum1(window.recoveryRate) + "%" + "</td></tr>" +
+    "<tr><td><img src='images/cases.png' width='35' height='35'>Cases</td><td class='right-align'>" + formatNumber(window.confirmed )+"</td></tr>" +
+    "<tr><td><img src='images/deaths.png' width='35' height='35'>Deaths</td><td class='right-align'>" + formatNumber(window.deaths) + "</td></tr>" +
+    "<tr><td><img src='images/recovered.png' width='35' height='35'>Recovered</td><td class='right-align'>" + formatNumber(window.recovered) + "</td></tr>" +
+    "<tr><td><img src='images/casesToday.png' width='35' height='35'>Cases Today</td><td class='right-align'>" + formatNumber(window.confirmedToday) + "</td></tr>" +
+    "<tr><td><img src='images/deaths.png' width='35' height='35'>Deaths Today</td><td class='right-align'>" + formatNumber(window.deathsToday) + "</td></tr>" +
+    "<tr><td><img src='images/caseRate.png' width='35' height='35'>Case&nbspRate</td><td class='right-align'>" + window.casesPerMillion + "/mil" + "</td></tr>" +
+    "<tr><td><img src='images/deathRate.png' width='35' height='35'>Death Rate</td><td class='right-align'>" + roundNum1(window.deathRate) + "%" + "</td></tr>" +
+    "<tr><td><img src='images/recoveryRate.png' width='35' height='35'>Recovery Rate</td><td class='right-align'>" + roundNum1(window.recoveryRate) + "%" + "</td></tr>" +
     "<tr><td><img src='images/updatedAt.png' width='35' height='35'>&nbsp;Updated</td><td class='right-align'>" + formatDatetime(window.updatedAt) + "</td></tr>" + "</table>";
 
     $('#covidModal').modal('show');
