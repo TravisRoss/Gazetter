@@ -5,6 +5,7 @@
 	font-family: 'DM Sans', sans-serif;
 }
 
+/* remove the leaflet attribution from the application */
 div.leaflet-control-attribution.leaflet-control {
 	display: none;
 }
@@ -13,21 +14,26 @@ div.leaflet-control-attribution.leaflet-control {
 #loading {
 	width: 100%;
 	height: 100%;
-	top: 0;
-	left: 0;
-	position: fixed;
+	position: absolute;
 	opacity: 0.7;
 	background-color: #fff;
 	z-index: 9999;
 	text-align: center;
+	margin: 0;
+	vertical-align:middle;
 }
 
-/* loading gif */
+/* image inside the loading div */
 #loading-image {
+	display: block;
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	z-index: 100;
+	transform: translate(-50%, -50%);
+	-webkit-transform: translate(-50%, -50%); /* Safari and Chrome */
+	-moz-transform: translate(-50%, -50%); /* Firefox */
+	-ms-transform: translate(-50%, -50%); /* IE 9 */
+	-o-transform: translate(-50%, -50%); /* Opera */
 }
 
 /* the div containing the select */
