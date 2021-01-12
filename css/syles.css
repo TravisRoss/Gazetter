@@ -114,10 +114,14 @@ div.leaflet-popup-content-wrapper {
 	padding: 0px 0px 10px 0px;
 }
 
+/* the core info table specificlly */
+#coreInfoTable {
+
+}
+
 /*************** apply to all modals ***************/
 div.modal-content {
 	height: fit-content;
-	width: auto;
 	border-radius: 20px;
 	color: black;
 }
@@ -125,6 +129,7 @@ div.modal-content {
 div.modal-body {
 	max-height: 80vh;
 	overflow-y: auto;
+	width:auto;
 }
 
 /*************** modal headers ***************/
@@ -151,6 +156,11 @@ div.modal-body {
 	color: white;
 }
 
+#travelHeader {
+	background-color: lightskyblue;
+	color: white;
+}
+
 hr.hr1 {
 	height: 5px;
 	border: 2px solid black;
@@ -168,6 +178,7 @@ div#coreInfoBody.modal-body {
 
 div#nationalWeatherBody.modal-body {
 	padding: 0px;
+
 }
 
 div#covidBody.modal-body {

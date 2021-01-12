@@ -168,6 +168,30 @@ var shopIcon = L.icon({
     popupAnchor: [0, -14]
 });
 
+var updateIcon = L.icon({
+    iconUrl: 'images/update.png',
+    iconRetinaUrl: 'images/update.png',
+    iconSize: [29, 24],
+    iconAnchor: [9, 21],
+    popupAnchor: [0, -14]
+});
+
+var scoreIcon = L.icon({
+    iconUrl: 'images/score.png',
+    iconRetinaUrl: 'images/score.png',
+    iconSize: [29, 24],
+    iconAnchor: [9, 21],
+    popupAnchor: [0, -14]
+});
+
+var sourceIcon = L.icon({
+    iconUrl: 'images/source.png',
+    iconRetinaUrl: 'images/source.png',
+    iconSize: [29, 24],
+    iconAnchor: [9, 21],
+    popupAnchor: [0, -14]
+});
+
 //format date and time
 function toJSDate (dateTime) {
     var dateTime = dateTime.split(" ");//dateTime[0] = date, dateTime[1] = time
@@ -734,10 +758,9 @@ function selectCountry(){
                                             //populate one string with all of the travel info
                                             travelInfoData = "<table class='table table-hover table-striped table-sm table-responsive'>" +
                                             "<tr><td class='centre-align' colspan='2'>" + response.data.advisory.message + "</h1></td></tr>" +
-                                            "<tr><td class='left-align'>Safety Score</td><td class='right-align'>" + response.data.advisory.score + "/5</td></tr>" +
-                                            "<tr><td class='left-align'>Source</td><td class='right-align'><a href='" + response.data.advisory.source + "'>" + response.data.advisory.source + "</a></td></tr>" +
-                                            "<tr><td class='left-align'>Updated</td><td class='right-align'>" + response.data.advisory.updated + "</td></tr>" + "</table>";
-
+                                            "<tr><td class='left-align'><img src='images/score.png' width='35' height='35'>&nbsp;Safety Score</td><td class='right-align'>" + response.data.advisory.score + "/5</td></tr>" +
+                                            "<tr><td class='left-align'><img src='images/source.png' width='35' height='35'>&nbsp;Source</td><td class='right-align'><a href='" + response.data.advisory.source + "'>" + response.data.advisory.source + "</a></td></tr>" +
+                                            "<tr><td class='left-align'><img src='images/update.png' width='35' height='35'>&nbsp;Updated</td><td class='right-align'>" + response.data.advisory.updated + "</td></tr>" + "</table>";
                                         }
 
                                     },
@@ -1012,7 +1035,7 @@ coreInfo = L.easyButton('<img src="images/info.png" style="width:16px">', functi
     document.getElementById("coreInfoTitle").innerHTML = "<img src='images/info.png' alt='weather icon' width='35' height='35'>&nbsp;Background: " + window.country;
 
     //set the content
-    document.getElementById("coreInfoBody").innerHTML = "<table class='table table-hover table-striped table-md table-responsive'>" +
+    document.getElementById("coreInfoBody").innerHTML = "<table class='table table-hover table-striped table-md table-responsive' id='coreInfoTable'>" +
     "<tr><td><img src='images/capitol.png' width='35' height='35'>&nbsp;Capital</td><td class='right-align'>" + window.capital + "</td></tr>" +
     "<tr><td><img src='images/population.png' width='35' height='35'>&nbsp;Population</td><td class='right-align'>" + window.population + "</td></tr>" +
     "<tr><td><img src='images/continent.png' width='35' height='35'>&nbsp;Continent</td><td class='right-align'>" + window.continent + "</td></tr>" +
