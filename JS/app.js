@@ -713,12 +713,18 @@ function selectCountry(){
                                             //clear any previous news
                                             newsData = "";
 
-                                            var image = null;
 
                                             //populate one string with all of the top headlines
                                             for (var i = 0; i < response.data.length; ++i) {
+                                                var image = null;
+                                                if(response.data[i].urlToImage != null){
+                                                    image = "<img src='" + response.data[i].urlToImage + "' width='200' height='100'>";
+                                                } else {
+                                                    image = "Image unavailable";
+                                                }
+
                                                 newsData += "<table class='table table-hover table-striped table-sm table-responsive'>" +
-                                                "<tr><td class='centre-align' colspan='2'><img  src='" + response.data[i].urlToImage + "' width='200' height='100'></td></tr>" +
+                                                "<tr><td class='centre-align' colspan='2'>" + image + "</td></tr>" +
                                                 "<tr><td class='centre-align' colspan='2'><a href='" + response.data[i].url + "' target='_blank'>" + response.data[i].title + "</a>" + "</td></tr>" +
                                                 "<tr><td class='centre-align' colspan='2'>" + response.data[i].description + "</td></tr>" +
                                                 "<tr><td class='centre-align' colspan='2'>" + formatDatetime(response.data[i].publishedAt) + "</td></tr>" + "</table><hr class='hr1'>";
