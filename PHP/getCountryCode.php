@@ -5,7 +5,7 @@
 
 	$executionStartTime = microtime(true) / 1000;
 
-	$url='http://api.geonames.org/countryCode?lat=' . $_REQUEST['lat'] . '&lng=' . $_REQUEST['lng'] . '&username=travyalonso';
+	$url='http://api.geonames.org/countryCodeJSON?lat=' . $_REQUEST['lat'] . '&lng=' . $_REQUEST['lng'] . '&username=travyalonso';
 
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -23,7 +23,7 @@
 	$output['status']['description'] = "mission saved";
 	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
 
-	$output['code'] = $result;
+	$output['code'] = $decode['countryCode'];
 
 	header('Content-Type: application/json; charset=UTF-8');
 

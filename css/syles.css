@@ -159,6 +159,10 @@ table {
 	border-collapse: collapse;
 }
 
+.nowrap {
+	white-space: nowrap;
+}
+
 .table-responsive {
 	display: inline;
 	display: table;

@@ -96,7 +96,7 @@ var overlayMaps = {
     "Pizza": nearbyPizza,
     "Shops": nearbyShops,
     "EV Charging Stations": evChargingStations,
-    "Toner Labels": Stamen_TonerLabels,
+    "Extra Labels": Stamen_TonerLabels,
     "Cycling Trails": WaymarkedTrails_cycling,
     "Hiking Trails": WaymarkedTrails_hiking
 };
@@ -204,6 +204,7 @@ function toJSDate (dateTime) {
 
 //format datetime
 function formatDatetime(date){
+    //Date.parse() returns a Number, then use new Date() to parse it:
     var thedate = new Date(Date.parse(date));
     return thedate;
 }
@@ -298,8 +299,8 @@ $(document).ready(function() {
                         success: function(response) {
                             if(response.status.name == "ok"){
                                 console.log("country code");
-                                console.log(response);
-                                //$('#selCountry').val(response.code).change();
+                                console.log(response.code);
+                                $('#selCountry').val(response.code).change();
                             }
                         },
 
@@ -713,9 +714,9 @@ function selectCountry(){
                                             //clear any previous news
                                             newsData = "";
 
-
                                             //populate one string with all of the top headlines
                                             for (var i = 0; i < response.data.length; ++i) {
+                                                //validate the images. If they are null, show "image unavailable" instead.
                                                 var image = null;
                                                 if(response.data[i].urlToImage != null){
                                                     image = "<img src='" + response.data[i].urlToImage + "' width='200' height='100'>";
@@ -1064,15 +1065,15 @@ covid = L.easyButton("<img src='images/covid.png' style='width:16px'>", function
 
     //set the content
     document.getElementById("covidBody").innerHTML = "<table class='table table-hover table-striped table-md table-responsive'>" +
-    "<tr><td><img src='images/cases.png' width='35' height='35'>Cases</td><td class='right-align'>" + formatNumber(window.confirmed )+"</td></tr>" +
-    "<tr><td><img src='images/deaths.png' width='35' height='35'>Deaths</td><td class='right-align'>" + formatNumber(window.deaths) + "</td></tr>" +
-    "<tr><td><img src='images/recovered.png' width='35' height='35'>Recovered</td><td class='right-align'>" + formatNumber(window.recovered) + "</td></tr>" +
-    "<tr><td><img src='images/casesToday.png' width='35' height='35'>Cases Today</td><td class='right-align'>" + formatNumber(window.confirmedToday) + "</td></tr>" +
-    "<tr><td><img src='images/deaths.png' width='35' height='35'>Deaths Today</td><td class='right-align'>" + formatNumber(window.deathsToday) + "</td></tr>" +
-    "<tr><td><img src='images/caseRate.png' width='35' height='35'>Case&nbspRate</td><td class='right-align'>" + window.casesPerMillion + "/mil" + "</td></tr>" +
-    "<tr><td><img src='images/deathRate.png' width='35' height='35'>Death Rate</td><td class='right-align'>" + roundNum1(window.deathRate) + "%" + "</td></tr>" +
-    "<tr><td><img src='images/recoveryRate.png' width='35' height='35'>Recovery Rate</td><td class='right-align'>" + roundNum1(window.recoveryRate) + "%" + "</td></tr>" +
-    "<tr><td><img src='images/updatedAt.png' width='35' height='35'>&nbsp;Updated</td><td class='right-align'>" + formatDatetime(window.updatedAt) + "</td></tr>" + "</table>";
+    "<tr><td class='nowrap'><img src='images/cases.png' width='35' height='35'></td><td>Cases</td><td class='right-align'>" + formatNumber(window.confirmed )+"</td></tr>" +
+    "<tr><td class='nowrap'><img src='images/deaths.png' width='35' height='35'></td><td>Deaths</td><td class='right-align'>" + formatNumber(window.deaths) + "</td></tr>" +
+    "<tr><td class='nowrap'><img src='images/recovered.png' width='35' height='35'></td><td>Recovered</td><td class='right-align'>" + formatNumber(window.recovered) + "</td></tr>" +
+    "<tr><td class='nowrap'><img src='images/casesToday.png' width='35' height='35'></td><td>Cases Today</td><td class='right-align'>" + formatNumber(window.confirmedToday) + "</td></tr>" +
+    "<tr><td class='nowrap'><img src='images/deaths.png' width='35' height='35'></td><td>Deaths Today</td><td class='right-align'>" + formatNumber(window.deathsToday) + "</td></tr>" +
+    "<tr><td class='nowrap'><img src='images/caseRate.png' width='35' height='35'></td><td>Case Rate</td><td class='right-align'>" + window.casesPerMillion + "/mil" + "</td></tr>" +
+    "<tr><td class='nowrap'><img src='images/deathRate.png' width='35' height='35'></td><td>Death Rate</td><td class='right-align'>" + roundNum1(window.deathRate) + "%" + "</td></tr>" +
+    "<tr><td class='nowrap'><img src='images/recoveryRate.png' width='35' height='35'></td><td>Recovery Rate</td><td class='right-align'>" + roundNum1(window.recoveryRate) + "%" + "</td></tr>" +
+    "<tr><td class='nowrap'><img src='images/updatedAt.png' width='35' height='35'></td><td>Updated</td><td class='right-align'>" + formatDatetime(window.updatedAt) + "</td></tr>" + "</table>";
 
     $('#covidModal').modal('show');
 
