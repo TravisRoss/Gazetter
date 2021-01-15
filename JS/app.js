@@ -298,9 +298,8 @@ $(document).ready(function() {
                         success: function(response) {
                             if(response.status.name == "ok"){
                                 console.log("country code");
-                                console.log(response)
-                                console.log(response['data']);
-                                //$('#selCountry').val(response.data).change();
+                                console.log(response);
+                                //$('#selCountry').val(response.code).change();
                             }
                         },
 
@@ -341,7 +340,7 @@ function selectCountry(){
         success: function(response) {
 
             if (response.status.name == "ok") {
-                console.log("country borders");
+                console.log("country border");
                 console.log(response);
 
                 window.name = response.data.properties.name;
@@ -362,8 +361,8 @@ function selectCountry(){
                 nearbyPoisClusterGroup.clearLayers();
 
                 border = L.geoJson(response.data,{
-                    color: '#666666',
-                    weight: 3,
+                    color: '#FF0000',
+                    weight: 4,
                     opacity: 1
                 }).addTo(map);
 
@@ -539,7 +538,6 @@ function selectCountry(){
                                                 "<tr><td class='left-align'>Category</td><td class='right-align'>" + response.data[i].poi.categories[0] + "</td></tr>" +
                                                 "<tr><td class='left-align'>Freeform Address</td><td class='right-align'>" + response.data[i].address.freeformAddress + "</td></tr>" +
                                                 "<tr><td class='left-align'>Foursquare score</td><td class='right-align'>" + roundNum1(response.data[i].score) + "/10</td></tr>" +
-                                                "<tr><td class='left-align'>Street</td><td class='right-align'>" + response.data[i].address.streetName + "</td></tr>" +
                                                 "<tr><td class='left-align'>City</td><td class='right-align'>" + response.data[i].address.localName + "</td></tr>" + "</table>";
 
                                                 var nearbyPois = L.marker( [response.array[i].lat, response.array[i].lng], {icon: poiIcon, title: "Cafe"} )
@@ -586,7 +584,6 @@ function selectCountry(){
                                                 "<tr><td class='left-align'>Category</td><td class='right-align'>" + response.data[i].poi.categories[0] + "</td></tr>" +
                                                 "<tr><td class='left-align'>Freeform Address</td><td class='right-align'>" + response.data[i].address.freeformAddress + "</td></tr>" +
                                                 "<tr><td class='left-align'>Foursquare score</td><td class='right-align'>" + roundNum1(response.data[i].score) + "/10</td></tr>" +
-                                                "<tr><td class='left-align'>Street</td><td class='right-align'>" + response.data[i].address.streetName + "</td></tr>" +
                                                 "<tr><td class='left-align'>City</td><td class='right-align'>" + response.data[i].address.localName + "</td></tr>" + "</table>";
 
                                                 var nearbyPizza = L.marker( [response.array[i].lat, response.array[i].lng], {icon: pizzaIcon, title: "Pizza"} )
@@ -633,7 +630,6 @@ function selectCountry(){
                                                 "<tr><td class='left-align'>Category</td><td class='right-align'>" + response.data[i].poi.categories[0] + "</td></tr>" +
                                                 "<tr><td class='left-align'>Freeform Address</td><td class='right-align'>" + response.data[i].address.freeformAddress + "</td></tr>" +
                                                 "<tr><td class='left-align'>Foursquare score</td><td class='right-align'>" + roundNum1(response.data[i].score) + "/10</td></tr>" +
-                                                "<tr><td class='left-align'>Street</td><td class='right-align'>" + response.data[i].address.streetName + "</td></tr>" +
                                                 "<tr><td class='left-align'>City</td><td class='right-align'>" + response.data[i].address.localName + "</td></tr>" + "</table>";
 
                                                 var shops = L.marker( [response.array[i].lat, response.array[i].lng], {icon: shopIcon, title: "Shop"} )
@@ -719,6 +715,8 @@ function selectCountry(){
                                             //clear any previous news
                                             newsData = "";
 
+                                            var image = null;
+
                                             //populate one string with all of the top headlines
                                             for (var i = 0; i < response.data.length; ++i) {
                                                 newsData += "<table class='table table-hover table-striped table-sm table-responsive'>" +
@@ -758,7 +756,7 @@ function selectCountry(){
                                             //populate one string with all of the travel info
                                             travelInfoData = "<table class='table table-hover table-striped table-sm table-responsive'>" +
                                             "<tr><td class='centre-align' colspan='2'>" + response.data.advisory.message + "</h1></td></tr>" +
-                                            "<tr><td class='left-align'><img src='images/score.png' width='35' height='35'>&nbsp;Safety Score</td><td class='right-align'>" + response.data.advisory.score + "/5</td></tr>" +
+                                            "<tr><td class='left-align'><img src='images/score.png' width='35' height='35'>&nbsp;Risk Level</td><td class='right-align'>" + response.data.advisory.score + "/5</td></tr>" +
                                             "<tr><td class='left-align'><img src='images/source.png' width='35' height='35'>&nbsp;Source</td><td class='right-align'><a href='" + response.data.advisory.source + "'>" + response.data.advisory.source + "</a></td></tr>" +
                                             "<tr><td class='left-align'><img src='images/update.png' width='35' height='35'>&nbsp;Updated</td><td class='right-align'>" + response.data.advisory.updated + "</td></tr>" + "</table>";
                                         }
@@ -796,7 +794,7 @@ function selectCountry(){
                                                 var popup = "<table class='table table-hover table-striped table-sm table-responsive'>" +
                                                 "<tr><td class='left-align'>Magnitude</td><td class='right-align'>" + response.data[i].magnitude + "</td></tr>" +
                                                 "<tr><td class='left-align'>Depth</td><td class='right-align'>" + response.data[i].depth + "</td></tr>" +
-                                                "<tr><td class='left-align'>Date and time</td><td class='right-align'>" + toJSDate(response.data[i].datetime) + "</td></tr>" + "</table>";
+                                                "<tr><td class='left-align'>Updated</td><td class='right-align'>" + toJSDate(response.data[i].datetime) + "</td></tr>" + "</table>";
 
                                                 var earthquakeActivity = L.marker( [response.array[i].lat, response.array[i].lng], {icon: earthquakeIcon, title: "Earthquake Activity"} )
                                                     .bindPopup(popup);
@@ -829,18 +827,17 @@ function selectCountry(){
                                             console.log("exchange rate");
                                             console.log(response);
 
-                                            //if exchange rate data is avilable
-                                            if(response.data){
-                                                window.exchangeRate = "USD: " + roundNum2(response.data.USD) + "<br>EUR: " + roundNum2(response.data.EUR) + "<br>GBP: " + roundNum2(response.data.GBP)
-                                                + "<br>AUD: " + roundNum2(response.data.AUD) + "<br>JPY: " + roundNum2(response.data.JPY);
-                                            } else {
-                                                window.exchangeRate = "unavailable";
-                                            }
-
+                                            window.exchangeRate = "USD: " + roundNum2(response.data.USD) + "<br>EUR: " + roundNum2(response.data.EUR) + "<br>GBP: " + roundNum2(response.data.GBP)
+                                            + "<br>AUD: " + roundNum2(response.data.AUD) + "<br>JPY: " + roundNum2(response.data.JPY);
                                         }
 
                                     },
 
+                                    error: function(error){
+                                        console.log("exchange error");
+                                        console.log(error);
+                                        window.exchangeRate = "Unavailable";
+                                    }
 
                                 });
 
@@ -1035,7 +1032,7 @@ coreInfo = L.easyButton('<img src="images/info.png" style="width:16px">', functi
     document.getElementById("coreInfoTitle").innerHTML = "<img src='images/info.png' alt='weather icon' width='35' height='35'>&nbsp;Background: " + window.country;
 
     //set the content
-    document.getElementById("coreInfoBody").innerHTML = "<table class='table table-hover table-striped table-md table-responsive' id='coreInfoTable'>" +
+    document.getElementById("coreInfoBody").innerHTML = "<table class='table table-hover table-striped table-md'" +
     "<tr><td><img src='images/capitol.png' width='35' height='35'>&nbsp;Capital</td><td class='right-align'>" + window.capital + "</td></tr>" +
     "<tr><td><img src='images/population.png' width='35' height='35'>&nbsp;Population</td><td class='right-align'>" + window.population + "</td></tr>" +
     "<tr><td><img src='images/continent.png' width='35' height='35'>&nbsp;Continent</td><td class='right-align'>" + window.continent + "</td></tr>" +
@@ -1047,8 +1044,7 @@ coreInfo = L.easyButton('<img src="images/info.png" style="width:16px">', functi
     "<tr><td><img src='images/speedIn.png' width='35' height='35'>&nbsp;Speed in</td><td class='right-align'>" + window.speedIn + "</td></tr>" + "</table>";
 
     //show the modal when clicked
-    $('#coreInfoModal').modal('toggle');
-    //$( "#selCountry" ).hide();
+    $('#coreInfoModal').modal('show');
 
 });
 

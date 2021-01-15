@@ -103,15 +103,6 @@ div.leaflet-popup-content-wrapper {
 	text-align: center;
 }
 
-.fit-content {
-	width: fit-content;
-}
-
-.img-fluid {
-	width: 100%;
-	padding: 0px 0px 10px 0px;
-}
-
 /*************** apply to all modals ***************/
 div.modal-content {
 	height: fit-content;
@@ -166,24 +157,15 @@ hr.hr1 {
 /*************** tables and containing cells ***************/
 table {
 	border-collapse: collapse;
-	width: 100%;
+}
+
+.table-responsive {
+	display: inline;
+	display: table;
 }
 
 tr:nth-child(even) {
     background-color: #ebebeb;
-}
-
-/*************** Support for IE browser ***************/
-select::-ms-expand {
-	  display: none; /* Remove default arrow in Internet Explorer 10 and 11 */
-}
-
-/* Target Internet Explorer 9 to undo the custom arrow */
-@media screen and (min-width:0\0) {
-	select {
-		background: none\9;
-		padding: 5px\9;
-	}
 }
 
 /* If the browser window is 768px or smaller, the select will be repositioned in line with the controls */
@@ -193,7 +175,7 @@ select::-ms-expand {
 	}
 }
 
-/* the message when there is no news to display */
+/* div to show a message when there is no news to display */
 #noNewsDiv {
 	background-color: #666666;
 	color: white;
@@ -209,7 +191,6 @@ p {
 	vertical-align: middle;
 }
 
-
 /* If the browser window is 768px or smaller, the select will be repositioned in line with the controls */
 @media only screen and (max-width: 768px) {
 	.form-group {
@@ -217,5 +198,15 @@ p {
 	}
 }
 
+/*************** Support for IE browser ***************/
+select::-ms-expand {
+	display: none; /* Remove default arrow in Internet Explorer 10 and 11 */
+}
 
-
+/* Target Internet Explorer 9 to undo the custom arrow */
+@media screen and (min-width:0\0) {
+  select {
+	  background: none\9;
+	  padding: 5px\9;
+  }
+}
