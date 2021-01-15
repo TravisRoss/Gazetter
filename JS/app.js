@@ -493,7 +493,7 @@ function selectCountry(){
                                                 "<tr><td class='left-align'>Title</td><td class='right-align'>" + response.data[i].title + "</td></tr>" +
                                                 "<tr><td class='left-align'>Type</td><td class='right-align'>" + response.data[i].feature + "</td></tr>" +
                                                 "<tr><td class='left-align'>Summary</td><td class='right-align'>" + response.data[i].summary + "</td></tr>" +
-                                                "<tr><td class='left-align'>URL</td><td class='right-align'>" + "<a href='" + response.data[i].wikipediaUrl + "' >Read more</a>" + "</td></tr>" + "</table>";
+                                                "<tr><td class='left-align'>Link</td><td class='right-align'><a href='http://" + response.data[i].wikipediaUrl + "' target='_blank' >" + response.data[i].wikipediaUrl + "</a></td></tr></table>";
 
                                                 var m = L.marker( [response.array[i].lat, response.array[i].lng], {icon: wikiIcon, title:"Wikipedia Links"} )
                                                     .bindPopup(popup, {maxWidth: "auto"});
@@ -673,11 +673,9 @@ function selectCountry(){
                                             for (var i = 0; i < response.data.length; i++) {
                                                 var popup = "<table class='table table-hover table-striped table-sm table-responsive'>" +
                                                 "<tr><td class='left-align'>Name</td><td class='right-align'>" + response.data[i].poi.name + "</td></tr>" +
-                                                "<tr><td class='left-align'>Phone</td><td class='right-align'>" + response.data[i].poi.phone + "</td></tr>" +
-                                                "<tr><td class='left-align'>Category</td><td class='right-align'>" + response.data[i].poi.categories[0] + "</td></tr>" +
                                                 "<tr><td class='left-align'>Freeform Address</td><td class='right-align'>" + response.data[i].address.freeformAddress + "</td></tr>" +
                                                 "<tr><td class='left-align'>Foursquare score</td><td class='right-align'>" + roundNum1(response.data[i].score) + "/10</td></tr>" +
-                                                "<tr><td class='left-align'>City</td><td class='right-align'>" + response.data[i].address.localName + "</td></tr>" + + "</table>";
+                                                "<tr><td class='left-align'>City</td><td class='right-align'>" + response.data[i].address.localName + "</td></tr>" + "</table>";
 
                                                 var evStations = L.marker( [response.array[i].lat, response.array[i].lng], {icon: evStationsIcon, title: "EV Charging Station"} )
                                                     .bindPopup(popup);
@@ -757,7 +755,7 @@ function selectCountry(){
                                             travelInfoData = "<table class='table table-hover table-striped table-sm table-responsive'>" +
                                             "<tr><td class='centre-align' colspan='2'>" + response.data.advisory.message + "</h1></td></tr>" +
                                             "<tr><td class='left-align'><img src='images/score.png' width='35' height='35'>&nbsp;Risk Level</td><td class='right-align'>" + response.data.advisory.score + "/5</td></tr>" +
-                                            "<tr><td class='left-align'><img src='images/source.png' width='35' height='35'>&nbsp;Source</td><td class='right-align'><a href='" + response.data.advisory.source + "'>" + response.data.advisory.source + "</a></td></tr>" +
+                                            "<tr><td class='left-align'><img src='images/source.png' width='35' height='35'>&nbsp;Source</td><td class='right-align'><a href='" + response.data.advisory.source + "' target='_blank'>" + response.data.advisory.source + "</a></td></tr>" +
                                             "<tr><td class='left-align'><img src='images/update.png' width='35' height='35'>&nbsp;Updated</td><td class='right-align'>" + response.data.advisory.updated + "</td></tr>" + "</table>";
                                         }
 
