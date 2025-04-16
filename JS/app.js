@@ -1,11 +1,7 @@
-import { overlayMaps, baseMaps, map } from '../src/maps'
-
 //load a gif while page loads
 $(window).load(function () {
   $('#loading').hide()
 })
-
-L.control.layers(baseMaps, overlayMaps).addTo(map)
 
 //global variables
 var border = null
@@ -72,6 +68,210 @@ var WaymarkedTrails_cycling = L.tileLayer.provider('WaymarkedTrails.cycling', {
   attribution:
     'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Map style: &copy; <a href="https://waymarkedtrails.org">waymarkedtrails.org</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
 })
+
+//initialise the map and get user location
+var map = L.map('mapid').locate({
+  setView: true,
+  maxZoom: 6,
+  layers: [defaultMap, earthquakes, wikiLinks, localWeather, nearbyPois],
+})
+
+//create base layers and add the default one to the map:
+var worldStreetMap = L.tileLayer.provider('OpenStreetMap.DE', {
+  id: 'mapid',
+  maxZoom: 18,
+  attribution:
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+})
+var tonerMap = L.tileLayer.provider('Stamen.Toner', {
+  id: 'mapid',
+  maxZoom: 18,
+  attribution:
+    'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+})
+var defaultMap = L.tileLayer
+  .provider('Esri.WorldStreetMap', {
+    id: 'mapid',
+    maxZoom: 18,
+    attribution:
+      'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012',
+  })
+  .addTo(map)
+var USGS_USImageryTopo = L.tileLayer.provider('USGS.USImageryTopo', {
+  id: 'mapid',
+  maxZoom: 18,
+  attribution:
+    'Tiles courtesy of the <a href="https://usgs.gov/">U.S. Geological Survey</a>',
+})
+
+//add the base maps
+var baseMaps = {
+  'Default Map': defaultMap,
+  'Toner Map': tonerMap,
+  'World Street Map': worldStreetMap,
+  'US Imagery': USGS_USImageryTopo,
+}
+
+var overlayMaps = {
+  Earthquakes: earthquakes,
+  'Wikipedia Links': wikiLinks,
+  'Local Weather': localWeather,
+  Cafes: nearbyPois,
+  Pizza: nearbyPizzaClusterGroup,
+  Shops: nearbyShopsClusterGroup,
+  'EV Charging Stations': evChargingStations,
+  'Extra Labels': Stamen_TonerLabels,
+  'Cycling Trails': WaymarkedTrails_cycling,
+  'Hiking Trails': WaymarkedTrails_hiking,
+}
+
+L.control.layers(baseMaps, overlayMaps).addTo(map)
+
+//icons
+var earthquakeIcon = L.icon({
+  iconUrl: 'images/earthquake.png',
+  iconRetinaUrl: 'images/earthquake.png',
+  iconSize: [29, 24],
+  iconAnchor: [9, 21],
+  popupAnchor: [0, -14],
+})
+
+var wikiIcon = L.icon({
+  iconUrl: 'images/wikiIcon.png',
+  iconRetinaUrl: 'images/wikiIcon.png',
+  iconSize: [29, 24],
+  iconAnchor: [9, 21],
+  popupAnchor: [0, -14],
+})
+
+var poiIcon = L.icon({
+  iconUrl: 'images/cafe.png',
+  iconRetinaUrl: 'images/cafe.png',
+  iconSize: [29, 24],
+  iconAnchor: [9, 21],
+  popupAnchor: [0, -14],
+})
+
+var weatherIcon = L.icon({
+  iconUrl: 'images/weather.png',
+  iconRetinaUrl: 'images/weather.png',
+  iconSize: [29, 24],
+  iconAnchor: [9, 21],
+  popupAnchor: [0, -14],
+})
+
+var localWeatherIcon = L.icon({
+  iconUrl: 'images/localweather.png',
+  iconRetinaUrl: 'images/localweather.png',
+  iconSize: [29, 24],
+  iconAnchor: [9, 21],
+  popupAnchor: [0, -14],
+})
+
+var evStationsIcon = L.icon({
+  iconUrl: 'images/evStations.png',
+  iconRetinaUrl: 'images/evStations.png',
+  iconSize: [29, 24],
+  iconAnchor: [9, 21],
+  popupAnchor: [0, -14],
+})
+
+var pizzaIcon = L.icon({
+  iconUrl: 'images/pizzaIcon.png',
+  iconRetinaUrl: 'images/pizzaIcon.png',
+  iconSize: [29, 24],
+  iconAnchor: [9, 21],
+  popupAnchor: [0, -14],
+})
+
+var shopIcon = L.icon({
+  iconUrl: 'images/shopIcon.png',
+  iconRetinaUrl: 'images/shopIcon.png',
+  iconSize: [29, 24],
+  iconAnchor: [9, 21],
+  popupAnchor: [0, -14],
+})
+
+var updateIcon = L.icon({
+  iconUrl: 'images/update.png',
+  iconRetinaUrl: 'images/update.png',
+  iconSize: [29, 24],
+  iconAnchor: [9, 21],
+  popupAnchor: [0, -14],
+})
+
+var scoreIcon = L.icon({
+  iconUrl: 'images/score.png',
+  iconRetinaUrl: 'images/score.png',
+  iconSize: [29, 24],
+  iconAnchor: [9, 21],
+  popupAnchor: [0, -14],
+})
+
+var sourceIcon = L.icon({
+  iconUrl: 'images/source.png',
+  iconRetinaUrl: 'images/source.png',
+  iconSize: [29, 24],
+  iconAnchor: [9, 21],
+  popupAnchor: [0, -14],
+})
+
+//format date and time
+function toJSDate(dateTime) {
+  var dateTime = dateTime.split(' ') //dateTime[0] = date, dateTime[1] = time
+  var date = dateTime[0].split('-')
+  var time = dateTime[1].split(':')
+  //(year, month, day, hours, minutes, seconds, milliseconds)
+  //month is 0 indexed so date[1] - 1 corrected format
+  return new Date(date[0], date[1] - 1, date[2], time[0], time[1], time[2], 0)
+}
+
+//format datetime
+function formatDatetime(date) {
+  //Date.parse() returns a Number, then use new Date() to parse it:
+  var thedate = new Date(Date.parse(date))
+  return thedate
+}
+
+//format big numbers, seperating thousands with commas
+function formatNumber(num) {
+  return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+}
+
+//convert time in seconds to HHMMSS
+function secondsToHHMMSS(seconds) {
+  return new Date(seconds * 1000).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0]
+}
+
+//rounds the number passed in to 2 decimal places
+function roundNum2(num) {
+  return (Math.round(num * 100) / 100).toFixed(2)
+}
+
+//rounds the number passed in to 1 decimal places
+function roundNum1(num) {
+  return (Math.round(num * 100) / 100).toFixed(1)
+}
+
+//convert K to C and give 1 dp
+function convertKelvinToCelsius(num) {
+  return roundNum1(num - 273.15)
+}
+
+//add a certain number of days to todays data. to be used for the weather forecast
+function addDaysToCurrentDate(num) {
+  var someDate = new Date()
+  var numberOfDaysToAdd = num
+  someDate.setDate(someDate.getDate() + numberOfDaysToAdd)
+
+  //format to dd//mm/yy
+  var dd = someDate.getDate()
+  var mm = someDate.getMonth() + 1
+  var y = someDate.getFullYear()
+
+  var someFormattedDate = dd + '/' + mm + '/' + y
+  return someFormattedDate
+}
 
 //Populate the select with country names and country codes.
 $(document).ready(function () {
@@ -205,7 +405,6 @@ async function selectCountry() {
     await handlePOIs()
   } catch (error) {
     console.error('Error in workflow:', error)
-    showErrorToast('Failed to load country data')
   } finally {
     // Re-enable UI after processing
     $('#selCountry').prop('disabled', false)
@@ -291,7 +490,6 @@ async function handlePOIs() {
     }
   } catch (error) {
     console.error('Error in handlePOIs:', error)
-    showErrorToast('Failed to load POI data')
   }
 }
 
@@ -498,8 +696,4 @@ function clearMapLayers() {
   ;[wikiClusterGroup, nearbyPizzaClusterGroup, nearbyPoisClusterGroup].forEach(
     (group) => group.clearLayers()
   )
-}
-
-function showErrorToast(message) {
-  alert(message) // Replace with a better UI notification system if available
 }
