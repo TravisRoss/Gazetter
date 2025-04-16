@@ -200,6 +200,10 @@ p {
 	.form-group {
 		top: 15px;
 	}
+
+	.leaflet-control-zoom-in {
+		top: 15px;
+	}
 }
 
 /*************** Support for IE browser ***************/

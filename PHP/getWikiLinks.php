@@ -3,50 +3,90 @@
 ini_set('display_errors', 'On');
 error_reporting(E_ALL);
 
-$executionStartTime = microtime(true) / 1000;
+$executionStartTime = microtime(true);
 
-$north = round($_REQUEST['north']);
-$south = round($_REQUEST['south']);
-$east = round($_REQUEST['east']);
-$west = round($_REQUEST['west']);
+// Validate and sanitize coordinates
+$north = isset($_REQUEST['north']) ? (float) $_REQUEST['north'] : 0;
+$south = isset($_REQUEST['south']) ? (float) $_REQUEST['south'] : 0;
+$east = isset($_REQUEST['east']) ? (float) $_REQUEST['east'] : 0;
+$west = isset($_REQUEST['west']) ? (float) $_REQUEST['west'] : 0;
 
-$url = 'http://api.geonames.org/wikipediaBoundingBoxJSON?north=' . $north . '&south=' . $south . '&east=' . $east . '&west=' . $west . '&username=travyalonso';
-
-//create emoty array
-$latsAndLngs = [];
+$url = 'http://api.geonames.org/wikipediaBoundingBoxJSON?' . http_build_query([
+    'north' => $north,
+    'south' => $south,
+    'east' => $east,
+    'west' => $west,
+    'username' => 'travyalonso'
+]);
 
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_URL,$url);
+curl_setopt_array($ch, [
+    CURLOPT_SSL_VERIFYPEER => false,
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_URL => $url,
+    CURLOPT_FAILONERROR => true
+]);
 
-$result=curl_exec($ch);
+$result = curl_exec($ch);
+
+if (curl_errno($ch)) {
+    $output = [
+        'status' => [
+            'code' => '400',
+            'name' => 'Bad Request',
+            'description' => curl_error($ch),
+            'returnedIn' => (microtime(true) - $executionStartTime) . " ms"
+        ]
+    ];
+} else {
+    $decode = json_decode($result, true);
+
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        $output = [
+            'status' => [
+                'code' => '400',
+                'name' => 'Invalid JSON',
+                'description' => json_last_error_msg(),
+                'returnedIn' => (microtime(true) - $executionStartTime) . " ms"
+            ]
+        ];
+    } elseif (empty($decode['geonames'])) {
+        $output = [
+            'status' => [
+                'code' => '404',
+                'name' => 'Not Found',
+                'description' => 'No Wikipedia entries found in this area',
+                'returnedIn' => (microtime(true) - $executionStartTime) . " ms"
+            ]
+        ];
+    } else {
+        // Process valid data
+        $output = [
+            'status' => [
+                'code' => '200',
+                'name' => 'ok',
+                'description' => 'mission saved',
+                'returnedIn' => (microtime(true) - $executionStartTime) . " ms"
+            ],
+            'data' => array_map(function ($entry) {
+                return [
+                    'title' => $entry['title'] ?? 'Untitled',
+                    'summary' => $entry['summary'] ?? '',
+                    'lat' => (float) ($entry['lat'] ?? 0),
+                    'lng' => (float) ($entry['lng'] ?? 0),
+                    'wikipediaUrl' => $entry['wikipediaUrl'] ?? ''
+                ];
+            }, $decode['geonames'])
+        ];
+    }
+}
 
 curl_close($ch);
 
-$decode = json_decode($result,true);
-
-//loop through the array of features and add the lat and lng data of each feature into the array
-foreach ($decode['geonames'] as $feature) {
-    //create empty object to store the lat and lng values
-    $temp = null;
-    $temp['lat'] = $feature["lat"];
-    $temp['lng'] = $feature["lng"];
-
-    //add the object into the array
-    array_push($latsAndLngs, $temp);
-}
-
-$output['status']['code'] = "200";
-$output['status']['name'] = "ok";
-$output['status']['description'] = "mission saved";
-$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-
-$output['array'] = $latsAndLngs;
-$output['data'] = $decode['geonames'];
-
+// Set JSON header and output
 header('Content-Type: application/json; charset=UTF-8');
+echo json_encode($output);
 
-echo json_encode($output); 
+
 
 ?>

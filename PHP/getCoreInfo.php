@@ -1,47 +1,77 @@
 <?php
 
-	ini_set('display_errors', 'On');
-	error_reporting(E_ALL);
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
 
-	$executionStartTime = microtime(true) / 1000;
+$executionStartTime = microtime(true);
 
-	$isoCode = $_REQUEST['isoCode'];
-	$countryName = $_REQUEST['name'];
-	$newCountryName = str_replace(' ', '%20', $countryName);
-	
-	$url = 'https://api.opencagedata.com/geocode/v1/json?q=' . $isoCode . '%2C%20' . $newCountryName . '&key=61d11ab3f64b472c96c9a8665cbcfe34&language=en&pretty=1';
-	
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($ch, CURLOPT_URL,$url);
+$isoCode = $_REQUEST['isoCode'] ?? null;
+$countryName = $_REQUEST['name'] ?? null;
 
-	$result=curl_exec($ch);
+if (!$isoCode || !$countryName) {
+	die(json_encode([
+		'status' => [
+			'code' => 400,
+			'name' => 'Bad Request',
+			'description' => 'Missing required parameters.',
+		]
+	]));
+}
 
-	curl_close($ch);
+$newCountryName = str_replace(' ', '%20', $countryName);
 
-	$decode = json_decode($result,true);
-	
-	$countryData = null;
-	
-    //loop through the array of features and return the one feature that matches the country code (iso_a3).
-    foreach ($decode['results'] as $result) {
-        
-        if($isoCode == $result["components"]['ISO_3166-1_alpha-2']){   
-            $countryData = $result;
-        }
+$url = 'https://api.opencagedata.com/geocode/v1/json?q=' . $isoCode . '%2C%20' . $newCountryName . '&key=ff85bdf4a8be4c119522594082225ebb&language=en&pretty=1';
 
-    }
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_URL, $url);
 
-	$output['status']['code'] = "200";
-	$output['status']['name'] = "ok";
-	$output['status']['description'] = "mission saved";
-	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+$result = curl_exec($ch);
 
-	$output['data'] = $countryData;
-	
-	header('Content-Type: application/json; charset=UTF-8');
+if ($result === false) {
+	die(json_encode([
+		'status' => [
+			'code' => 500,
+			'name' => 'Internal Server Error',
+			'description' => curl_error($ch),
+		]
+	]));
+}
 
-	echo json_encode($output); 
+curl_close($ch);
+
+$decode = json_decode($result, true);
+
+if (json_last_error() !== JSON_ERROR_NONE) {
+	die(json_encode([
+		'status' => [
+			'code' => 500,
+			'name' => 'Invalid JSON',
+			'description' => json_last_error_msg(),
+		]
+	]));
+}
+
+$countryData = null;
+
+foreach ($decode['results'] as $result) {
+	if ($isoCode == ($result['components']['ISO_3166-1_alpha-2'] ?? null)) {
+		$countryData = $result;
+	}
+}
+
+$output = [
+	'status' => [
+		'code' => 200,
+		'name' => 'ok',
+		'description' => 'mission saved',
+		'returnedIn' => (microtime(true) - $executionStartTime) . " ms",
+	],
+	'data' => $countryData,
+];
+
+header('Content-Type: application/json; charset=UTF-8');
+echo json_encode($output);
 
 ?>
