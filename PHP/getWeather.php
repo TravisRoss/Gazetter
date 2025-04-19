@@ -1,37 +1,47 @@
 <?php
-	//need to return the lat and lng of each feature to be put on the map at that location (lat and lon)
-	//also need to return the current weather. (current)
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
 
-	ini_set('display_errors', 'On');
-	error_reporting(E_ALL);
+// Check if the latitude and longitude are provided
+if (!isset($_REQUEST['lat']) || !isset($_REQUEST['lng'])) {
+    echo json_encode(["status" => ["code" => 400, "name" => "Bad Request", "description" => "Missing latitude or longitude"]]);
+    exit;
+}
 
-	$executionStartTime = microtime(true) / 1000;
+// Get latitude and longitude from the request
+$lat = $_REQUEST['lat'];
+$lng = $_REQUEST['lng'];
 
-	$lat = $_REQUEST['lat'];
-	$lng = $_REQUEST['lng'];
+// Your WeatherAPI key
+$apiKey = '2e82f88f32f54945bff130304251804';  // Replace with your WeatherAPI key
 
-	$url='https://api.openweathermap.org/data/2.5/onecall?lat=' . $lat . '&lon=' . $lng . '&exclude=minutely,hourly&appid=9aefa45a848d1073fd549b9fc76b8659';
-	
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($ch, CURLOPT_URL,$url);
+// Build the API URL for weather forecast (5-day forecast)
+$apiUrl = "https://api.weatherapi.com/v1/forecast.json?key={$apiKey}&q={$lat},{$lng}&days=5&aqi=no&alerts=no";
 
-	$result=curl_exec($ch);
+// Use cURL to fetch the weather data
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_URL, $apiUrl);
+$result = curl_exec($ch);
+curl_close($ch);
 
-	curl_close($ch);
-	 
-	$decode = json_decode($result,true);	
+// Decode the JSON response
+$weatherData = json_decode($result, true);
 
-	$output['status']['code'] = "200";
-	$output['status']['name'] = "ok";
-	$output['status']['description'] = "mission saved";
-	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+// Check if the data was fetched successfully
+if (isset($weatherData['error'])) {
+    echo json_encode(["status" => ["code" => 500, "name" => "Internal Server Error", "description" => $weatherData['error']['message']]]);
+    exit;
+}
 
-	$output['data'] = $decode;
-	
-	header('Content-Type: application/json; charset=UTF-8');
+// Prepare the response
+$response = [
+    'status' => ['code' => 200, 'name' => 'ok'],
+    'data' => $weatherData['forecast']['forecastday']
+];
 
-	echo json_encode($output); 
-
+// Return the weather data as JSON
+header('Content-Type: application/json; charset=UTF-8');
+echo json_encode($response);
 ?>
